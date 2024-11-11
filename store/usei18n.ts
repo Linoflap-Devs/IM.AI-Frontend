@@ -779,6 +779,14 @@ export const useI18nStore = create<I18nStore>((set) => ({
   SuccesfullyDeletedPromoi18n: {
     en: "Succesfully deleted promo",
     ja: "削除しました",
+  },
+  TINNumber: {
+    en: "TIN Number",
+    ja: "TIN番号"
+  },
+  TINNumberFormatErrorMsg: {
+    en: "Please enter a valid TIN.",
+    ja: "有効な TIN を入力してください。"
   }
 }));
 export interface I18nStore {
@@ -1031,4 +1039,6 @@ export interface I18nStore {
   Failedi18n: LocalizedString;
   PleaseUseADifferentPromoCodei18n: LocalizedString;
   SuccesfullyDeletedPromoi18n: LocalizedString;
+  TINNumber: LocalizedString;
+  TINNumberFormatErrorMsg: LocalizedString;
 }

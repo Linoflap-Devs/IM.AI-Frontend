@@ -60,6 +60,7 @@ type StoreBranches = {
     Contact: number;
     ContactPerson: string;
     ImgLink: string;
+    TIN: string;
 };
 
 type TransactionTableData = {

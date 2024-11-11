@@ -46,6 +46,7 @@ const formSchema = z.object({
     fullAddress: z.string().min(2).max(100),
     contact: z.coerce.string().min(1),
     contactPerson: z.string().min(2).max(50),
+    tinNumber: z.coerce.string().min(9).max(12),
     imgFile: fileSchema.required(),
     /* imgFile: z.instanceof(File), */
 });
@@ -85,7 +86,8 @@ function ManageStore() {
         AddBranchi18n,
         Contacti18n,
         AreYouAbsolutelySurei18n,
-        Savei18n
+        Savei18n,
+        TINNumber
     } = useI18nStore();
     const [isOpenDial, setIsOpenDial] = useState<boolean>(false);
     const [isOpenDelDial, setIsOpenDelDial] = useState<boolean>(false);
@@ -128,6 +130,7 @@ function ManageStore() {
                     address: newStore.fullAddress,
                     contact: newStore.contact,
                     contactPerson: newStore.contactPerson,
+                    tinNumber: newStore.tinNumber,
                     imgLink: "sample Link",
                 },
                 {
@@ -166,6 +169,7 @@ function ManageStore() {
                     address: newStore.fullAddress,
                     contact: newStore.contact,
                     contactPerson: newStore.contactPerson,
+                    tinNumber: newStore.tinNumber,
                     imgLink: "sample Link",
                 }
             );
@@ -209,6 +213,7 @@ function ManageStore() {
             fullAddress: "",
             contact: "",
             contactPerson: "",
+            tinNumber: "",
             imgFile: new File([], ""),
         },
     });
@@ -240,6 +245,10 @@ function ManageStore() {
                     "branchName",
                     `${filteredStoreBranches[editStoreIndex].Name}`
                 );
+                form.setValue(
+                    'tinNumber',
+                    `${filteredStoreBranches[editStoreIndex].TIN}`
+                )
             });
         }
     }, [form.setValue, isOpenDial]);
@@ -454,6 +463,30 @@ function ManageStore() {
                                             />
                                             <FormField
                                                 control={form.control}
+                                                name="tinNumber"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-col items-center">
+                                                        <div className="flex w-full items-center justify-between">
+                                                            <FormLabel className="text-lg">
+                                                                {
+                                                                   TINNumber[locale]
+                                                                }
+                                                            </FormLabel>
+                                                            <FormControl className="w-[60%]">
+                                                                <Input
+                                                                    placeholder={
+                                                                        TINNumber[locale]
+                                                                    }
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                        </div>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
                                                 name="imgFile"
                                                 render={({ field }) => (
                                                     <FormItem className="">
@@ -577,6 +610,10 @@ function ManageStore() {
                                                     <p className="text-sm font-medium text-gray-500">
                                                         {Contacti18n[locale]}:{" "}
                                                         {item.Contact}
+                                                    </p>
+                                                    <p className="text-sm font-medium text-gray-500">
+                                                        {TINNumber[locale]}:{" "}
+                                                        {item.TIN || "N/A"}
                                                     </p>
                                                 </div>
                                             </div>
