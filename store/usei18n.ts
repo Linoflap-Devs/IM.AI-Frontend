@@ -787,6 +787,30 @@ export const useI18nStore = create<I18nStore>((set) => ({
   TINNumberFormatErrorMsg: {
     en: "Please enter a valid TIN.",
     ja: "有効な TIN を入力してください。"
+  },
+  AddCategory: {
+    en: "Add Category",
+    ja: "カデゴリーを追加"
+  },
+  EditCategory: {
+    en: "Edit Category",
+    ja: "カデゴリーを編集"
+  },
+  CategoryName: {
+    en: "Category Name",
+    ja: "カデゴリー名"
+  },
+  Update: {
+    en: "Update",
+    ja: "更新"
+  },
+  DeleteCategory: {
+    en: "Delete Category",
+    ja: "カデゴリーを削除"
+  },
+  DeleteCategoryDeleteMsg: {
+    en: "Are you sure you want to delete this record?",
+    ja: "このレコードを削除しますか？"
   }
 }));
 export interface I18nStore {
@@ -1041,4 +1065,10 @@ export interface I18nStore {
   SuccesfullyDeletedPromoi18n: LocalizedString;
   TINNumber: LocalizedString;
   TINNumberFormatErrorMsg: LocalizedString;
+  AddCategory: LocalizedString;
+  EditCategory: LocalizedString;
+  CategoryName: LocalizedString;
+  Update: LocalizedString;
+  DeleteCategory: LocalizedString;
+  DeleteCategoryDeleteMsg: LocalizedString;
 }

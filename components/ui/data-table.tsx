@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Tangent } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useI18nStore } from "@/store/usei18n";
 
@@ -57,6 +57,8 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [hiddenColoumns, setHiddenColoumn] =
         useState<VisibilityState>(visibility);
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({ ...visibility });
+    const [rowSelection, setRowSelection] = useState({});
     const table = useReactTable({
         data,
         columns,
@@ -75,12 +77,14 @@ export function DataTable<TData, TValue>({
         state: {
             sorting,
             columnFilters,
+            columnVisibility,
+            rowSelection
         },
         autoResetAll: false,
     });
     const currentPage = table.getState().pagination.pageIndex + 1;
     return (
-        <div className={`flex flex-col gap-4 rounded-md pb-2`}>
+        <div className={`flex flex-col rounded-md pb-2`}>
             {(pagination || resetSortBtn || filtering) && (
                 <div
                     className={`flex items-center gap-2 ${
@@ -150,7 +154,7 @@ export function DataTable<TData, TValue>({
                     )}
                 </div>
             )}
-            <Table>
+            <Table className="mt-4">
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow className="bg-gray-200" key={headerGroup.id}>
@@ -211,6 +215,11 @@ export function DataTable<TData, TValue>({
                     )}
                 </TableBody>
             </Table>
+            <div className="flex justify-end w-full border-t pt-4 pr-2">
+                <p className="text-sm text-black ">
+                Showing {table.getRowModel().rows.length.toLocaleString()} of {data?.length.toLocaleString()} rows.  
+                </p>
+            </div>
         </div>
     );
 }

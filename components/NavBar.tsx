@@ -20,6 +20,7 @@ import {
     BadgeAlert,
     AlignJustify,
     Package,
+    LayoutGrid,
 } from "lucide-react";
 import { Toaster } from "./ui/toaster";
 import AnimateHeight from "react-animate-height";
@@ -97,6 +98,15 @@ function NavBar() {
             permission: [1, 2, 3, 4],
             state: currentPath.includes("inv&products"),
             subNav: [
+                {
+                    name: {
+                        en: "Category",
+                        ja: "カデゴリー",
+                    },
+                    icon: <LayoutGrid />,
+                    navigation: "category",
+                    permission: [1, 2, 3, 4],
+                },
                 {
                     name: {
                         en: "Inventory",
@@ -236,7 +246,7 @@ function NavBar() {
     return (
         <div className="h-100 mb-3 ml-3 mt-3 flex w-1/5 flex-col gap-8 rounded-lg border bg-white p-[24px] shadow-sm">
             <h1 className="text-lg font-semibold text-primary">
-                <Toaster />
+                
                 <Link
                     className="flex items-center gap-3 text-2xl font-semibold"
                     href={"/home/dashboard"}
@@ -330,6 +340,7 @@ function NavBar() {
                         </div>
                     )}
                 </ul>
+                <Toaster />
                 <ul className="flex flex-col gap-5">
                     <li
                         onClick={() => {
@@ -341,7 +352,9 @@ function NavBar() {
                         {Logouti18n[locale]}
                     </li>
                 </ul>
+                
             </div>
+            
         </div>
     );
 }
