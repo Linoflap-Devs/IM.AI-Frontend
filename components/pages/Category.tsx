@@ -41,6 +41,7 @@ import { number, string, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "../ui/input";
+import { useGlobalStore } from "@/store/useStore";
 
 export default function Category() {
     const session = useSession();
@@ -64,44 +65,65 @@ export default function Category() {
         Deletei18n,
         DeleteCategory,
         DeleteCategoryDeleteMsg,
-        Canceli18n
+        Canceli18n,
+        CompanyIdi8n
     } = useI18nStore();
+
+    const { globalCompanyState } = useGlobalStore();
 
     const [open, setOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedEditId, setSelectedEditId] = useState(0)
-    const [selectedRecord, setSelectedRecord] = useState<{id: number, categoryName: string}>({id: 0, categoryName: ""});
+    const [selectedRecord, setSelectedRecord] = useState<{id: number, categoryName: string, companyId: number}>({id: 0, categoryName: "", companyId: 0});
     const [deleteOpen, setDeleteOpen] = useState(false);
 
-    const getCategoriesQuery = useQuery({
-        queryKey: ["getCategories"],
-        enabled: session.status === "authenticated" && userData.role <= 2,
-        queryFn: async () => {
-            const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_API_URL}/product/getCategories`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${session.data?.token}`,
-                    },
-                }
-            );
+        const getCategoriesQuery = useQuery({
+            queryKey: ["getCategories", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId],
+            enabled: session.status === "authenticated" && userData.role <= 2,
+            queryFn: async () => {
+                const isAdmin = userData.role === 1;
+                const adminQuery = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_URL}/product/getCategoriesAll`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${session.data?.token}`,
+                        },
+                    }
+                );
+                const companyQuery = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_URL}/product/getCategories`,
+                    {
+                        params: {
+                            companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId
+                        },
+                        headers: {
+                            Authorization: `Bearer ${session.data?.token}`,
+                        },
+                    }
+                );
+                
+                console.log(isAdmin, globalCompanyState !== "all" ? globalCompanyState : userData?.companyId)
+                const response = companyQuery;
 
-            return response.data;
-        },
-        refetchOnWindowFocus: false,
-    });    
+                return response.data;
+            },
+            refetchOnWindowFocus: false,
+        });    
 
     const formSchema = z.object({
         categoryName: z.string().min(1 , { message: "Category Name is required" }),
+        companyId: z.coerce.number().min(1, { message: "Company is required" }),
     })
 
     const form = useForm<z.infer <typeof formSchema>>({
         resolver: zodResolver(formSchema),
         values: {
-            categoryName: selectedRecord.categoryName || ""
+            categoryName: selectedRecord.categoryName || "",
+            companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId
         },
         defaultValues: {
-            categoryName: ""
+            categoryName: "",
+            companyId: 0
         }
     })
 
@@ -111,6 +133,7 @@ export default function Category() {
                 `${process.env.NEXT_PUBLIC_API_URL}/product/addCategory`,
                 {
                     name: data.categoryName,
+                    companyId: data.companyId
                 },
                 // {
                 //     headers: {
@@ -214,6 +237,12 @@ export default function Category() {
             enableHiding: true
         },
         {
+            accessorKey: "CompanyId",
+            header: "Company Id",
+            id: "CompanyId",
+            enableHiding: true
+        },
+        {
             accessorKey: "Name",
             header: `${CategoryName[locale]}`,
         },
@@ -225,15 +254,20 @@ export default function Category() {
             }
         },
         {
-            header: `${Actioni18n[locale]}`,
+            id: "actions",
+            header: ({column}: any) => {
+                return (
+                  <p className="text-center">{Actioni18n[locale]}</p>
+                )
+              },
             cell: ({ row }) => {
                 return (
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 justify-center">
                         <Button
                             variant={"outline"}
                             onClick={() => {
                                 console.log(row)
-                                setSelectedRecord({id: row.original.CategoryId, categoryName: row.original.Name});
+                                setSelectedRecord({id: row.original.CategoryId, categoryName: row.original.Name, companyId: row.original.CompanyId});
                                 setIsEditMode(true);
                                 setOpen(true);
                             }}
@@ -245,7 +279,7 @@ export default function Category() {
                             variant="destructive"
                             onClick={() => {
                                 console.log(row)
-                                setSelectedRecord({id: row.original.CategoryId, categoryName: row.original.Name});
+                                setSelectedRecord({id: row.original.CategoryId, categoryName: row.original.Name, companyId: row.original.CompanyId});
                                 setDeleteOpen(true);
                             }}
                             className="h-max px-4"
@@ -288,6 +322,20 @@ export default function Category() {
                                         <FormLabel ><p className="mb-2">{CategoryName[locale]}</p></FormLabel>
                                         <FormControl>
                                             <Input placeholder={"Vegetables"} {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                            
+                                control={form.control}
+                                name="companyId"
+                                render={({ field }) => (
+                                    <FormItem className={`${userData?.role == 1 ? "" : "hidden"}`}>
+                                        <FormLabel ><p className="mb-2">{CompanyIdi8n[locale]}</p></FormLabel>
+                                        <FormControl>
+                                            <Input placeholder={"1"} {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -343,6 +391,8 @@ export default function Category() {
                             setIsEditMode(false);
                             setOpen(true)
                             form.reset();
+
+                            console.log(userData)
                         }}
                     >
                         {AddCategory[locale]}
@@ -352,6 +402,7 @@ export default function Category() {
                     <DataTable
                         visibility={{
                             CategoryId: false,
+                            CompanyId: false,
                         }}
                         filtering={true}
                         coloumnToFilter={"Name"}
