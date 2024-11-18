@@ -77,38 +77,37 @@ export default function Category() {
     const [selectedRecord, setSelectedRecord] = useState<{id: number, categoryName: string, companyId: number}>({id: 0, categoryName: "", companyId: 0});
     const [deleteOpen, setDeleteOpen] = useState(false);
 
-        const getCategoriesQuery = useQuery({
-            queryKey: ["getCategories", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId],
-            enabled: session.status === "authenticated" && userData.role <= 2,
-            queryFn: async () => {
-                const isAdmin = userData.role === 1;
-                const adminQuery = await axios.get(
-                    `${process.env.NEXT_PUBLIC_API_URL}/product/getCategoriesAll`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${session.data?.token}`,
-                        },
-                    }
-                );
-                const companyQuery = await axios.get(
-                    `${process.env.NEXT_PUBLIC_API_URL}/product/getCategories`,
-                    {
-                        params: {
-                            companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId
-                        },
-                        headers: {
-                            Authorization: `Bearer ${session.data?.token}`,
-                        },
-                    }
-                );
-                
-                console.log(isAdmin, globalCompanyState !== "all" ? globalCompanyState : userData?.companyId)
-                const response = companyQuery;
+    const getCategoriesQuery = useQuery({
+        queryKey: ["getCategories", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId],
+        enabled: session.status === "authenticated" && userData.role <= 2,
+        queryFn: async () => {
+            const isAdmin = userData.role === 1;
+            const adminQuery = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/product/getCategoriesAll`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${session.data?.token}`,
+                    },
+                }
+            );
+            const companyQuery = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/product/getCategories`,
+                {
+                    data: {
+                        companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId
+                    },
+                    headers: {
+                        Authorization: `Bearer ${session.data?.token}`,
+                    },
+                }
+            );
+            
+            const response = isAdmin ? adminQuery : companyQuery;
 
-                return response.data;
-            },
-            refetchOnWindowFocus: false,
-        });    
+            return response.data;
+        },
+        refetchOnWindowFocus: false,
+    });    
 
     const formSchema = z.object({
         categoryName: z.string().min(1 , { message: "Category Name is required" }),
