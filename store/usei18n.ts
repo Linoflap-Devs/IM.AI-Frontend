@@ -811,6 +811,10 @@ export const useI18nStore = create<I18nStore>((set) => ({
   DeleteCategoryDeleteMsg: {
     en: "Are you sure you want to delete this record?",
     ja: "このレコードを削除しますか？"
+  },
+  BatchNo: {
+    en: "Batch Number",
+    ja: "バッチ番号"
   }
 }));
 export interface I18nStore {
@@ -1071,4 +1075,5 @@ export interface I18nStore {
   Update: LocalizedString;
   DeleteCategory: LocalizedString;
   DeleteCategoryDeleteMsg: LocalizedString;
+  BatchNo: LocalizedString;
 }
