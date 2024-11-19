@@ -45,7 +45,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
 import { useI18nStore } from "@/store/usei18n";
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
@@ -56,19 +56,19 @@ import { DatePicker } from "../ui/datepicker";
 /* Msc */
 const formSchema = z.object({
     productName: z
-        .string()
-        .min(2, { message: "Product Name cannot be less than 2 characters" }
+        .number()
+        .min(1, { message: "Select a product." }
     ),
     quantity: z.coerce.number().min(1, {
         message: "Quantity cannot be less than 1",
     }),   
-    supplier: z.coerce.string().min(1, {
+    supplier: z.coerce.number().min(1, {
         message: "Supplier cannot be empty",
     }),
     batchNo: z.coerce.string().min(1, {
         message: "Batch No cannot be empty",
     }),
-    expiry: z.date().optional(),
+    expiry: z.date().optional(),    
 });
 
 function Inventory() {
@@ -181,17 +181,66 @@ function Inventory() {
             }
         },
     });
+
+    const addBatchMutation = useMutation({
+        mutationFn: async (data: z.infer<typeof formSchema>) => {
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/batch/addBatch`,
+                {
+                    batchNo: data.batchNo,
+                    expDate: data.expiry,
+                    productId: data.productName,
+                    quantity: data.quantity,
+                    supplierId: data.supplier ,
+                    companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId,
+                    branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId
+                },
+            )
+
+            const stockResponse = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/stocks/addStocks`,
+                {
+                    productId: data.productName,
+                    expiryDate: data.expiry,
+                    quantity: data.quantity,
+                    branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId,
+                    batchId: response.data.Id
+                }
+            )
+            console.log({
+                batch: response.data,
+                stock: stockResponse.data
+            })
+            return {batch: response.data, stock: stockResponse.data}
+        },
+        onSuccess: () => {
+            setOpenDialog(false);
+            form.reset();
+            getStocksquery.refetch();
+            toast({
+                title: "Success",
+                description: "Stock added successfully."
+            })
+        },
+        onError: (error: any) => {
+            console.log(error);
+            toast({
+                variant: "destructive",
+                title: "Oops!",
+                description: error.response.data.message,
+            })
+        }
+    })
+
     function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values);
+        console.log(values, globalCompanyState !== "all" ? globalCompanyState : userData?.companyId, globalBranchState !== "all" ? globalBranchState : userData?.branchId);
         toast({
-            title: `${SuccessfullyAddedTheProducti18n[locale]} ${values.productName.charAt(0).toUpperCase() +
-                values.productName.slice(1)
-                }`,
+            title: `${SuccessfullyAddedTheProducti18n[locale]}`,
             description: Successi18n[locale],
         });
+        addBatchMutation.mutate(values);
     }
+
     const columns: ColumnDef<InventoryDataTable>[] = [
         {
             accessorKey: "Name",
@@ -442,14 +491,15 @@ function Inventory() {
                                                 <Button
                                                 variant="outline"
                                                 role="combobox"
+                                                type="button"
                                                 className={
                                                     `w-[60%] justify-between px-3
                                                     ${!field.value && "text-muted-foreground"}`
                                                 }
                                                 >
                                                 {field.value
-                                                    ? getStocksquery.data.find(
-                                                        (stock: any) => stock.Name === field.value
+                                                    ? getStocksquery?.data?.find(
+                                                        (stock: any) => stock.ProductId === field.value
                                                     )?.Name
                                                     : "Select Product"}
                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -465,19 +515,19 @@ function Inventory() {
                                                 <CommandList>
                                                 <CommandEmpty>No framework found.</CommandEmpty>
                                                 <CommandGroup>
-                                                    {getStocksquery.data.map((stock: any) => (
+                                                    {getStocksquery?.data?.map((stock: any) => (
                                                     <CommandItem
                                                         value={stock.Name}
                                                         key={stock.ProductId}
                                                         onSelect={() => {
-                                                        form.setValue("productName", stock.Name)
+                                                        form.setValue("productName", stock.ProductId)
                                                         }}
                                                     >
                                                         {stock.Name}
                                                         <CheckIcon
                                                         className={
                                                             `ml-auto h-4 w-4 
-                                                            ${stock.Name === field.value
+                                                            ${stock.ProductId === field.value
                                                             ? "opacity-100"
                                                             : "opacity-0"}`
                                                         }
@@ -550,14 +600,15 @@ function Inventory() {
                                                 <Button
                                                 variant="outline"
                                                 role="combobox"
+                                                type="button"
                                                 className={
                                                     `w-[60%] justify-between px-3
                                                     ${!field.value && "text-muted-foreground"}`
                                                 }
                                                 >
                                                 {field.value
-                                                    ? getSuppliersQuery.data.find(
-                                                        (stock: any) => stock.SupplierName === field.value
+                                                    ? getSuppliersQuery?.data?.find(
+                                                        (stock: any) => stock.SupplierId === field.value
                                                     )?.SupplierName
                                                     : "Select Supplier"}
                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -573,19 +624,19 @@ function Inventory() {
                                                 <CommandList>
                                                 <CommandEmpty>No framework found.</CommandEmpty>
                                                 <CommandGroup>
-                                                    {getSuppliersQuery.data.map((stock: any) => (
+                                                    {getSuppliersQuery?.data?.map((stock: any) => (
                                                     <CommandItem
                                                         value={stock.SupplierName}
                                                         key={stock.SupplierId}
                                                         onSelect={() => {
-                                                        form.setValue("supplier", stock.SupplierName)
+                                                        form.setValue("supplier", stock.SupplierId)
                                                         }}
                                                     >
                                                         {stock.SupplierName}
                                                         <CheckIcon
                                                         className={
                                                             `ml-auto h-4 w-4 
-                                                            ${stock.SupplierName === field.value
+                                                            ${stock.SupplierId === field.value
                                                             ? "opacity-100"
                                                             : "opacity-0"}`
                                                         }
@@ -604,7 +655,7 @@ function Inventory() {
                             />
                             <DialogFooter>
                                 <div className="flex justify-end mt-4">
-                                    <Button type="submit">
+                                    <Button type="submit" onClick={() => console.log(form.formState)}>
                                         {`${Addi18n[locale]}`}
                                     </Button>
                                 </div>
@@ -620,7 +671,15 @@ function Inventory() {
                             {Stocksi18n[locale]}
                         </h1>
                         <div className="flex gap-3">
-                            <Button onClick={() => setOpenDialog(true)}>
+                            <Button 
+                                onClick={() => {
+                                    console.log(globalBranchState)
+                                    globalBranchState == "all" ? 
+                                    toast({title: "Please select a branch", variant: "destructive"}) :
+                                    setOpenDialog(true)  
+                                }}
+                                type="button"
+                            >
                                 {AddStocksi18n[locale]}
                             </Button>
                         </div>
