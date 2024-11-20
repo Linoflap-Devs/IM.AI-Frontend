@@ -20,7 +20,7 @@ import {
     TableRow
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2, Tangent } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useI18nStore } from "@/store/usei18n";
@@ -36,6 +36,7 @@ interface DataTableProps<TData, TValue> {
     visibility?: VisibilityState;
     isLoading?: boolean;
     searchPlaceholder?: string;
+    activeFilter?: {column: string, value: string} | null;
 }
 
 export function DataTable<TData, TValue>({
@@ -49,12 +50,14 @@ export function DataTable<TData, TValue>({
     visibility = {},
     isLoading,
     searchPlaceholder = "Search",
+    activeFilter = null
 
 }: DataTableProps<TData, TValue>) {
     const { locale, Reseti18n, Tablei18n, Searchi18n, Previousi18n, Nexti18n } =
         useI18nStore();
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    //const [activeFilters, setActiveFilters] = useState<{column: string, value: string} | null>(null);
     const [hiddenColoumns, setHiddenColoumn] =
         useState<VisibilityState>(visibility);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({ ...visibility });
@@ -83,6 +86,12 @@ export function DataTable<TData, TValue>({
         autoResetAll: false,
     });
     const currentPage = table.getState().pagination.pageIndex + 1;
+
+    useEffect(() => {
+        console.log(activeFilter, table.getState().columnFilters)
+        activeFilter &&
+        table.getColumn(activeFilter.column)?.setFilterValue(activeFilter?.value);
+    }, [activeFilter]);
     return (
         <div className={`flex flex-col rounded-md pb-2`}>
             {(pagination || resetSortBtn || filtering) && (

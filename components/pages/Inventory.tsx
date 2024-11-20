@@ -82,8 +82,14 @@ function Inventory() {
             "Critical Stocks": 0,
             "Out of Stocks": 0,
         });
+        
     const { globalCompanyState, globalBranchState } = useGlobalStore();
+    const [activeFilter, setActiveFilter] = useState<{column: string, value: string} | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
+    
+    axios.defaults.headers.common[
+        "Authorization"
+    ] = `Bearer ${session.data?.token}`;
 
     const {
         locale,
@@ -117,13 +123,15 @@ function Inventory() {
         }
     });
     const getStocksquery = useQuery({
-        queryKey: ["getStocks"],
+        queryKey: ["getStocks", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId],
         enabled: session.data?.token !== undefined,
         queryFn: async () => {
             let outOfStocks: number = 0;
             let availableProducts: number = 0;
             let restocksNeeded: number = 0;
             let criticalLevel: number = 0;
+            let nearExpiry: number = 0;
+            let expired: number = 0
             if (session.data?.token !== undefined) {
                 const companyId =
                     globalCompanyState !== "all"
@@ -151,6 +159,13 @@ function Inventory() {
                     if ((stock.Total_Quantity <= stock.CriticalLevel) && (stock.Total_Quantity > 0)) {
                         criticalLevel += 1;
                     }
+                    if (stock.Expired > 0 ) {
+                        expired += 1
+                    }
+                    if (stock.NearExpiry > 0 ) {
+                        nearExpiry += 1
+                    }
+
                 });
                 setInventoryDataOverview(() => {
                     return {
@@ -158,11 +173,14 @@ function Inventory() {
                         "Restocks Needed": restocksNeeded,
                         "Critical Stocks": criticalLevel,
                         "Out of Stocks": outOfStocks,
+                        "Near-Expiry Products": nearExpiry,
+                        "Expired Products": expired
                     };
                 });
                 return response.data;
             }
         },
+        refetchOnWindowFocus: false
     });
 
     const getSuppliersQuery = useQuery({
@@ -290,7 +308,7 @@ function Inventory() {
             accessorKey: "Total_Quantity",
             header: ({ column }) => {
                 return (
-                    <div className="flex flex-col items-center">
+                    <div className="flex justify-end">
                         <Button
                             variant="ghost"
                             className="hover:bg-gray-300"
@@ -308,9 +326,34 @@ function Inventory() {
             },
             cell: ({ row }) => {
                 const quantity: number = row.getValue("Total_Quantity");
-                return <div className="text-center">{quantity || 0}</div>;
+                return <div className="text-right">{quantity || 0}</div>;
             },
         },
+        {
+            accessorKey: "Expired",
+            header: () => <div className="text-right">Expired</div>,
+            cell: ({ row }) => {
+                const quantity: number = row.getValue("Expired");
+                return <div className="text-right">{quantity || 0}</div>;
+            }
+        },
+        {
+            accessorKey: "NearExpiry",
+            header: () => <div className="text-right">Near Expiry</div>,
+            cell: ({ row }) => {
+                const quantity: number = row.getValue("NearExpiry");
+                return <div className="text-right">{quantity || 0}</div>;
+            }
+        },
+        {
+            accessorKey: "Valid",
+            header: () => <div className="text-right">Valid</div>,
+            cell: ({ row }) => {
+                const quantity: number = row.getValue("Valid");
+                return <div className="text-right">{quantity || 0}</div>;
+            }
+        },
+        
         {
             accessorKey: "availability",
             header: ({ column, table }) => {
@@ -385,15 +428,38 @@ function Inventory() {
                 <Card className="flex justify-between p-4 gap-4">
                     {Object.keys(inventoryDataOverview).map((key, index) => {
                         const bgColor = (value: string) => {
-                            if(value == "Available Products") return "bg-green-200"
-                            if(value == "Restocks Needed") return "bg-yellow-200"
-                            if(value == "Critical Stocks") return "bg-orange-200"
-                            if(value == "Out of Stocks") return "bg-red-200"
+                            if(value == "Available Products") return "bg-green-100 text-green-800"
+                            if(value == "Restocks Needed") return "bg-yellow-100 text-yellow-800"
+                            if(value == "Critical Stocks") return "bg-orange-100 text-orange-800"
+                            if(value == "Out of Stocks") return "bg-red-100 text-red-800"
+                            if(value == "Near-Expiry Products") return "bg-yellow-50 text-yellow-600"
+                            if(value == "Expired Products") return "bg-gray-200 text-gray-600"
+                        }
+
+                        const filter = () => {
+                            if (key === "Available Products") return { column: "Total_Quantity", value: ">0" };
+                            if (key === "Restocks Needed") return { column: "Quantity", value: "<10" };
+                            if (key === "Critical Stocks") return { column: "Quantity", value: "<5" };
+                            if (key === "Out of Stocks") return { column: "Total_Quantity", value: "0" };
+                            if (key === "Near-Expiry Products") return { column: "NearExpiry", value: ">0" };
+                            if (key === "Expired Products") return { column: "Expired", value: ">0" };
                         }
                         return (
                             <Card
                                 key={index}
                                 className={`bg-color flex  w-1/4 flex-col p-5 border-0 ${bgColor(key)}`}
+                                onClick={() => {
+                                    const newFilter = filter();
+                                    const filterValue = (currentFilter: any) => {
+                                        if (currentFilter?.column === newFilter?.column && currentFilter.value === newFilter?.value) {
+                                            return null;
+                                        }
+                                        return newFilter || null;
+                                    }
+                                    setActiveFilter(filterValue);
+                                    console.log(activeFilter)
+                                    
+                                }}
                             >
                                 <h3 className="text-base">{key}</h3>
                                 <p className="text-4xl font-bold">
@@ -695,11 +761,13 @@ function Inventory() {
                         }}
                         filtering={true}
                         coloumnToFilter="Name"
+                        activeFilter={activeFilter}
                         resetSortBtn={true}
-                        pageSize={userData.role >= 4 ? 12 : 7}
+                        pageSize={userData.role >= 4 ? 12 : 9}
                         data={getStocksquery.data || []}
                         pagination={true}
                         columns={columns}
+                        isLoading={getStocksquery.isLoading}
                     />
                 )}
             </Card>

@@ -200,8 +200,8 @@ export default function Product() {
             actualWeight: values.actualWeight,
             netWeight: values.netWeight,
             category: values.category,
-            lowStocklvl: values.lowStocklvl,
-            criticalStocklvl: values.criticalStocklvl,
+            lowlvlStock: values.lowStocklvl,
+            critLvlStock: values.criticalStocklvl,
             unit: values.unit,
         });
     }

@@ -406,7 +406,7 @@ function Dashboard() {
                         <div className="flex h-max items-center justify-around pt-4">
                             <StoreActivityCard
                                 title={ProductSoldi18n[locale]}
-                                dataKey="Quantity"
+                                dataKey="Total_Quantity"
                                 icon={<PackageOpen />}
                                 isFetching={getStoreActivity.isFetching}
                                 data={getDashboardData.data?.salesOverview}
