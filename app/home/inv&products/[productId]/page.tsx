@@ -7,14 +7,12 @@ async function page({ params }: { params: { productId: string } }) {
     const session = await getServerSession(NextAuthOpt);
     const userData = session?.data;
     if (userData) {
-        if (userData.role >= 4) {
+        if (userData.role >= 3) {
             notFound();
         }
     }
     return (
-        <div>
             <Products />
-        </div>
     );
 }
 

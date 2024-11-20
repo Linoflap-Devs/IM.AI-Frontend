@@ -274,7 +274,7 @@ function Inventory() {
                                     <TooltipTrigger asChild>
                                         <Link
                                             className="w-full text-nowrap p-0 font-medium hover:text-primary hover:underline"
-                                            href={`/home/inventory/${id}`}
+                                            href={`/home/inv&products/${id}`}
                                         >
                                             {row.getValue("Name")}
                                         </Link>

@@ -16,8 +16,8 @@ function Products() {
     } = useI18nStore();
     
     return (
-        <Card className="m-3 p-3">
-            <div className="flex justify-between">
+        <Card className="mx-3 p-3">
+            <div className="flex flex-col">
                 <h1 className="p-2 text-2xl font-semibold">{"ProdId"}</h1>
             </div>
             <div className="p-2">
