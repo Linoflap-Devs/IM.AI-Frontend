@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { Loader } from "lucide-react";
+import { ProductBatches } from "./ProductBatches";
 
 function Products(productId: { productId: string}) {
     const session = useSession();
@@ -111,6 +112,19 @@ function Products(productId: { productId: string}) {
                     {userData?.role <= 2 && (
                         <span
                             className={`   border-b p-2 py-3 hover:cursor-pointer hover:bg-slate-300 ${
+                                tabState == "batches" &&
+                                "border-primary border-b-2"
+                            }`}
+                            onClick={() => {
+                                setTabState("batches");
+                            }}
+                        >
+                            {"Batches"}
+                        </span>
+                    )}
+                    {userData?.role <= 2 && (
+                        <span
+                            className={`   border-b p-2 py-3 hover:cursor-pointer hover:bg-slate-300 ${
                                 tabState == "purchase" &&
                                 "border-primary border-b-2"
                             }`}
@@ -121,8 +135,9 @@ function Products(productId: { productId: string}) {
                             {Purchasesi18n[locale]}
                         </span>
                     )}
+                    
                 </div>
-                {tabState == "overview" ? (
+                {tabState == "overview" && (
                     !(lookupProduct.isLoading) && !(lookupProductBatches.isLoading)
                      ? (
                         <ProductView product={lookupProduct.data} batches={lookupProductBatches.data} />
@@ -133,8 +148,14 @@ function Products(productId: { productId: string}) {
 
                         </div>
                     )
-                ) : (
-                    <InventoryPurchase />
+                )}
+                {tabState == "purchase" && (
+                    <InventoryPurchase></InventoryPurchase>
+                )}
+                {tabState== "batches" && (
+                    !(lookupProductBatches.isLoading) && (
+                        <ProductBatches batches={lookupProductBatches.data}></ProductBatches>
+                    )
                 )}
             </div>
         </Card>

@@ -1,3 +1,4 @@
+"use client"
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { DataTable } from "@/components/ui/data-table";
