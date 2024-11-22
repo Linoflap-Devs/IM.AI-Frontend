@@ -143,7 +143,7 @@ function NavBar() {
             },
             icon: <ShoppingCart />,
             navigation: "managecarts",
-            permission: [3, 4],
+            permission: [1, 2,3, 4],
             state: currentPath.includes("managecarts"),
             subNav: [
                 {
