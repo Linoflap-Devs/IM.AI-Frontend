@@ -14,6 +14,7 @@ import { Loader } from "lucide-react";
 function Products(productId: { productId: string}) {
     const session = useSession();
     const userData = session.data?.data;
+    const status = session.status;
     const [tabState, setTabState] = useState<string>("overview");
     const { globalCompanyState, globalBranchState, globalBranchName } = useGlobalStore();
     const {
@@ -22,10 +23,16 @@ function Products(productId: { productId: string}) {
         Purchasesi18n,
     } = useI18nStore();
 
+    axios.defaults.headers.common[
+        "Authorization"
+    ] = `Bearer ${session.data?.token}`;
+
 
     const lookupProduct = useQuery({
         queryKey: ["lookupProduct", productId.productId],
+        enabled: session.status === 'authenticated',
         queryFn: async () => {
+            console.log(productId)
             if (session.data?.token !== undefined) {
                 const companyId =
                     globalCompanyState !== "all"
@@ -43,6 +50,8 @@ function Products(productId: { productId: string}) {
                         },
                     }
                 );
+                console.log(response.data)
+                if(!response.data) return null
                 return response.data[0];
             }
         }
@@ -50,6 +59,7 @@ function Products(productId: { productId: string}) {
 
     const lookupProductBatches =  useQuery({
         queryKey: ["lookupProductBatches", productId.productId],
+        enabled: session.status === 'authenticated',
         queryFn:  async () => {
             if (session.data?.token !== undefined) {
                 const companyId =
@@ -83,7 +93,7 @@ function Products(productId: { productId: string}) {
     return (
         <Card className="mx-3 p-3">
             <div className="flex flex-col">
-                <h1 className="p-2 text-2xl font-semibold">Product ID: {productId.productId} <span className="p-2 ms-2 bg-blue-200 text-blue-800 w-max rounded text-sm">{globalBranchName == "Select Branch" || globalBranchName == "" ? "All Branches" : globalBranchName}</span></h1>
+                <h1 className="p-2 text-2xl font-semibold">Product ID: {productId.productId} <span className="p-2 ms-2 bg-blue-200 text-blue-800 w-max rounded text-sm" onClick={() => console.log(session.data)}>{globalBranchName == "Select Branch" || globalBranchName == "" ? "All Branches" : globalBranchName}</span></h1>
             </div>
             <div className="p-2">
                 <div className="flex gap-2 border-b">

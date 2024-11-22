@@ -102,14 +102,13 @@ function ProductView({product, batches}: ProductViewProps) {
         }
     ];
 
-    const data = product
     console.log("Batches", batches)
 
-    const totalQuantity = batches.reduce((total: number, batch: any) => {
+    const totalQuantity = (batches || []).reduce((total: number, batch: any) => {
         return total + (batch.Quantity || 0);
     }, 0)
 
-    const stockStatusCount = batches.reduce((totals: any, batch: any) => {
+    const stockStatusCount = (batches || []).reduce((totals: any, batch: any) => {
         const expDate = new Date(batch.ExpirationDate)
         const quantity = batch.Quantity || 0
 
@@ -147,11 +146,11 @@ function ProductView({product, batches}: ProductViewProps) {
                             <div className="flex flex-col justify-between">
                                 <div className="flex flex-col">
                                     <h1 className="text-lg font-bold text-gray-600">
-                                        {data.Name}
+                                        {product.Name}
                                     </h1>
-                                    <span className="p-2 bg-blue-100 text-blue-800 rounded text-sm w-max">{data.Category}</span>
+                                    <span className="p-2 bg-blue-100 text-blue-800 rounded text-sm w-max">{product.Category}</span>
                                 </div>
-                                <p className="text-3xl font-bold">PHP{parseInt(data.Price).toFixed(2)}</p>
+                                <p className="text-3xl font-bold">PHP{parseInt(product.Price).toFixed(2)}</p>
                             </div>
                         </div>
                     </Card>
@@ -163,15 +162,15 @@ function ProductView({product, batches}: ProductViewProps) {
                             <div className="flex flex-col gap-4 ">
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Barcode</p>
-                                    <p className="font-semibold text-right">{data.BarCode}</p>
+                                    <p className="font-semibold text-right">{product.BarCode}</p>
                                 </div>
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Gross Weight</p>
-                                    <p className="font-semibold text-right">{data.ProductWeight}</p>
+                                    <p className="font-semibold text-right">{product.ProductWeight}</p>
                                 </div>
                                 <div className="flex flex-row justify-between">
                                     <p className="">Net Weight</p>
-                                    <p className="font-semibold text-right">{data.ActualWeight}</p>
+                                    <p className="font-semibold text-right">{product.ActualWeight}</p>
                                 </div>
                             </div>
                         </Card>
@@ -182,15 +181,15 @@ function ProductView({product, batches}: ProductViewProps) {
                             <div className="flex flex-col gap-4 ">
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Total In-Stock</p>
-                                    <p className={`font-semibold text-right p-1 rounded ${totalQuantity < data.CriticalLevel ? "bg-red-200 text-red-800" : totalQuantity < data.ReorderLevel ? "bg-yellow-200 text-yellow-800" : ""}`}>{totalQuantity}</p>
+                                    <p className={`font-semibold text-right p-1 rounded ${totalQuantity < product.CriticalLevel ? "bg-red-200 text-red-800" : totalQuantity < product.ReorderLevel ? "bg-yellow-200 text-yellow-800" : ""}`}>{totalQuantity}</p>
                                 </div>
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Low Stock Threshold</p>
-                                    <p className="font-semibold text-right">{data.ReorderLevel || "N/A"} </p>
+                                    <p className="font-semibold text-right">{product.ReorderLevel || "N/A"} </p>
                                 </div>
                                 <div className="flex flex-row justify-between">
                                     <p className="">Critical Stock Threshold</p>
-                                    <p className="font-semibold text-right">{data.CriticalLevel || "N/A"}</p>
+                                    <p className="font-semibold text-right">{product.CriticalLevel || "N/A"}</p>
                                 </div>
                             </div>
                         
