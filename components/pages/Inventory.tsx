@@ -81,6 +81,8 @@ function Inventory() {
             "Restocks Needed": 0,
             "Critical Stocks": 0,
             "Out of Stocks": 0,
+            "Near-Expiry Products": 0,
+            "Expired Products": 0
         });
         
     const { globalCompanyState, globalBranchState } = useGlobalStore();
@@ -305,6 +307,10 @@ function Inventory() {
             },
         },
         {
+            accessorKey: "BranchName",
+            header: "Branch"
+        },
+        {
             accessorKey: "Total_Quantity",
             header: ({ column }) => {
                 return (
@@ -330,11 +336,11 @@ function Inventory() {
             },
         },
         {
-            accessorKey: "Expired",
-            header: () => <div className="text-right">Expired</div>,
+            accessorKey: "Valid",
+            header: () => <div className="text-right">Valid</div>,
             cell: ({ row }) => {
-                const quantity: number = row.getValue("Expired");
-                return <div className="text-right">{quantity || 0}</div>;
+                const quantity: number = row.getValue("Valid");
+                return <div className={`text-right ${ quantity > 0 && "text-green-600 font-semibold"  || "" }`}>{quantity || 0}</div>;
             }
         },
         {
@@ -342,18 +348,17 @@ function Inventory() {
             header: () => <div className="text-right">Near Expiry</div>,
             cell: ({ row }) => {
                 const quantity: number = row.getValue("NearExpiry");
-                return <div className="text-right">{quantity || 0}</div>;
+                return <div className={`text-right ${ quantity > 0 && "text-yellow-600 font-semibold"  || "" }`}>{quantity || 0}</div>;
             }
         },
         {
-            accessorKey: "Valid",
-            header: () => <div className="text-right">Valid</div>,
+            accessorKey: "Expired",
+            header: () => <div className="text-right">Expired</div>,
             cell: ({ row }) => {
-                const quantity: number = row.getValue("Valid");
-                return <div className="text-right">{quantity || 0}</div>;
+                const quantity: number = row.getValue("Expired");
+                return <div className={`text-right ${ quantity > 0 && "text-red-600 font-semibold"  || "" }`}>{quantity || 0}</div>;
             }
         },
-        
         {
             accessorKey: "availability",
             header: ({ column, table }) => {

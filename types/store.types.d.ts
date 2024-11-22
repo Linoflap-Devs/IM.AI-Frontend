@@ -104,4 +104,6 @@ type InventoryDataOverview = {
     "Out of Stocks": number;
     "Critical Stocks": number;
     "Restocks Needed": number;
+    "Near-Expiry Products": number;
+    "Expired Products": number;
 };

@@ -11,9 +11,11 @@ async function page({ params }: { params: { productId: string } }) {
             notFound();
         }
     }
+
     return (
-            <Products />
+            <Products productId={params.productId} />
     );
 }
 
 export default page;
+

@@ -42,7 +42,7 @@ export default function BranchDropDown({
     const { toast } = useToast();
     const [openBranch, setOpenBranch] = useState(false);
     const [open, setOpen] = useState(false);
-    const { globalCompanyState, globalBranchState, setGlobalBranchState } =
+    const { globalCompanyState, globalBranchState, setGlobalBranchState, setGlobalBranchName } =
         useGlobalStore();
     const getBranchQuery = useQuery({
         queryKey: ["getBranch"],
@@ -122,6 +122,7 @@ export default function BranchDropDown({
                                             setGlobalBranchState("all");
                                         } else {
                                             setGlobalBranchState(value);
+                                            setGlobalBranchName(branch.label)
                                         }
                                         setOpenBranch(false);
                                     } else {

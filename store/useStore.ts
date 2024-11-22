@@ -27,6 +27,9 @@ interface GlobalStore {
     globalBranchState: string;
     setGlobalBranchState: (value: string) => void;
 
+    globalBranchName: string;
+    setGlobalBranchName: (value: string) => void;
+
     /*Global Date States */
     // Global Report Date States {#8af,4}
     fromReportDate: Date;
@@ -68,6 +71,10 @@ export const useGlobalStore = create<GlobalStore>()((set) => ({
     globalBranchState: "all",
     setGlobalBranchState: (value) =>
         set((state) => ({ ...state, globalBranchState: value })),
+
+    globalBranchName: "",
+    setGlobalBranchName: (value) =>
+        set((state) => ({ ...state, globalBranchName: value })),
 
     fromReportDate: new Date(),
     setFromReportDate: (value) =>

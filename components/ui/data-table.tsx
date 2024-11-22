@@ -226,7 +226,7 @@ export function DataTable<TData, TValue>({
             </Table>
             <div className="flex justify-end w-full border-t pt-4 pr-2">
                 <p className="text-sm text-black ">
-                Showing {table.getRowModel().rows.length.toLocaleString()} of {data?.length.toLocaleString()} rows.  
+                    Showing {table.getRowModel().rows.length.toLocaleString()} of {data?.length.toLocaleString()} rows.  
                 </p>
             </div>
         </div>

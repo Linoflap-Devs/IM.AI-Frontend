@@ -5,14 +5,21 @@ import { useI18nStore } from "@/store/usei18n";
 import { Card, CardHeader } from "../ui/card";
 import { Doughnut,} from "react-chartjs-2";
 import { Chart, ArcElement } from "chart.js";
+import { Loader } from "lucide-react";
+import { addDays, format } from "date-fns";
 Chart.register(ArcElement)
 type SupplyInfo = {
     storeName: string;
     stockInHand: number;
 };
+
+interface ProductViewProps {
+    product: any;
+    batches: any[];
+}
 /* Query */
 
-function ProductView() {
+function ProductView({product, batches}: ProductViewProps) {
     const {
         locale,
         localeExtended,
@@ -53,17 +60,76 @@ function ProductView() {
         { storeName: "Save More", stockInHand: 10 },
         { storeName: "Save More", stockInHand: 10 },
     ];
-    const column: ColumnDef<SupplyInfo>[] = [
+    const column: ColumnDef<any>[] = [
         {
-            accessorKey: "storeName",
-            header: StoreNamei18n[locale],
+            accessorKey: "BatchNo",
+            header: "Batch Name",
         },
         {
-            accessorKey: "stockInHand",
-            header: StockInHandi18n[locale],
+            accessorKey: "Quantity",
+            header: "Quantity",
+            cell: ({ row }) => {
+                return row.getValue("Quantity") || 0
+            }
         },
+        {
+            accessorKey: "ExpirationDate",
+            header: "Expiration Date",
+            cell: ({ row, cell }) => {
+                return format(new Date(row.getValue("ExpirationDate")), "MMM dd, yyyy");
+            }
+        },
+        {
+            accessorKey: "BranchName",
+            header: "Branch",
+        },
+        {
+            id: "Status",
+            header: "Status",
+            cell: ({ row }) => {
+                const expiry: string = row.getValue("ExpirationDate");
+                const status: string = new Date(expiry) < new Date() 
+                                        ? "Expired" 
+                                        : new Date(expiry) <= addDays(new Date(), 30) 
+                                        ? "Near-Expiry" 
+                                        : "In-Stock";
+                return (
+                    <span className={`p-1 font-semibold text-sm ${status == "In-Stock" ? "bg-green-100 text-green-800" : status== "Near-Expiry" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
+                       {status}
+                    </span>
+                );
+            }
+        }
     ];
 
+    const data = product
+    console.log("Batches", batches)
+
+    const totalQuantity = batches.reduce((total: number, batch: any) => {
+        return total + (batch.Quantity || 0);
+    }, 0)
+
+    const stockStatusCount = batches.reduce((totals: any, batch: any) => {
+        const expDate = new Date(batch.ExpirationDate)
+        const quantity = batch.Quantity || 0
+
+        if (expDate < new Date()) {
+            totals.expired += quantity;
+        } else if (expDate <= addDays(new Date(), 30)) {
+            totals.expiring += quantity;
+        } else {
+            totals.inStock += quantity;
+        }
+        return totals;
+    }, { expired: 0, expiring: 0, inStock: 0 });
+
+    console.log(stockStatusCount)
+
+    if(!product) {
+        return (
+            "Loading..."
+        )
+    }
    
     return (
          <div className="flex flex-col gap-3 mb-3">
@@ -81,12 +147,11 @@ function ProductView() {
                             <div className="flex flex-col justify-between">
                                 <div className="flex flex-col">
                                     <h1 className="text-lg font-bold text-gray-600">
-                                        Lucky Me! Beef Chilimansi
+                                        {data.Name}
                                     </h1>
-                                    <p className="text-xs text-gray-500">ID: 012323</p>
-                                    <span className="p-2 bg-blue-100 text-blue-800 rounded text-sm w-max">Instant Noodles</span>
+                                    <span className="p-2 bg-blue-100 text-blue-800 rounded text-sm w-max">{data.Category}</span>
                                 </div>
-                                <p className="text-3xl font-bold">21.00 PHP</p>
+                                <p className="text-3xl font-bold">PHP{parseInt(data.Price).toFixed(2)}</p>
                             </div>
                         </div>
                     </Card>
@@ -98,15 +163,15 @@ function ProductView() {
                             <div className="flex flex-col gap-4 ">
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Barcode</p>
-                                    <p className="font-semibold text-right">12985798123987</p>
+                                    <p className="font-semibold text-right">{data.BarCode}</p>
                                 </div>
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Gross Weight</p>
-                                    <p className="font-semibold text-right">12g</p>
+                                    <p className="font-semibold text-right">{data.ProductWeight}</p>
                                 </div>
                                 <div className="flex flex-row justify-between">
                                     <p className="">Net Weight</p>
-                                    <p className="font-semibold text-right">15g</p>
+                                    <p className="font-semibold text-right">{data.ActualWeight}</p>
                                 </div>
                             </div>
                         </Card>
@@ -117,15 +182,15 @@ function ProductView() {
                             <div className="flex flex-col gap-4 ">
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Total In-Stock</p>
-                                    <p className="font-semibold text-right">451</p>
+                                    <p className={`font-semibold text-right p-1 rounded ${totalQuantity < data.CriticalLevel ? "bg-red-200 text-red-800" : totalQuantity < data.ReorderLevel ? "bg-yellow-200 text-yellow-800" : ""}`}>{totalQuantity}</p>
                                 </div>
                                 <div className="flex flex-row justify-between border-b pb-2">
                                     <p className="">Low Stock Threshold</p>
-                                    <p className="font-semibold text-right">12g</p>
+                                    <p className="font-semibold text-right">{data.ReorderLevel || "N/A"} </p>
                                 </div>
                                 <div className="flex flex-row justify-between">
                                     <p className="">Critical Stock Threshold</p>
-                                    <p className="font-semibold text-right">15g</p>
+                                    <p className="font-semibold text-right">{data.CriticalLevel || "N/A"}</p>
                                 </div>
                             </div>
                         
@@ -138,13 +203,13 @@ function ProductView() {
                         <CardHeader className="p-0  mb-3">
                             <span className="font-bold text-lg">Stock Status</span>
                         </CardHeader>
-                        <div className="h-[180px] w-full flex justify-center">
+                        <div className="h-[185px] w-full flex justify-center">
                             <Doughnut 
                                 data={{
                                     labels: ["In-Stock", "Near-Expiry", "Expired"],
                                     datasets: [
                                         {
-                                            data: [300, 50,30],
+                                            data: [stockStatusCount.inStock, stockStatusCount.expiring, stockStatusCount.expired],
                                             backgroundColor: ["#86efac", "#fde047", "#fca5a5"],
                                             hoverOffset: 4,
                                             
@@ -163,15 +228,15 @@ function ProductView() {
                         <div className="flex flex-col gap-3 mt-1 ">
                                 <div className="flex flex-row justify-between items-center border-b pb-2">
                                     <p className="">In-Stock</p>
-                                    <span className="font-semibold text-right bg-green-200 text-green-800 rounded p-1">300</span>
+                                    <span className="font-semibold text-right bg-green-200 text-green-800 rounded p-1">{stockStatusCount.inStock}</span>
                                 </div>
                                 <div className="flex flex-row justify-between items-center border-b pb-2">
                                     <p className="">Near-Expiry</p>
-                                    <span className="font-semibold text-right bg-yellow-200 text-yellow-800 rounded p-1">300</span>
+                                    <span className="font-semibold text-right bg-yellow-200 text-yellow-800 rounded p-1">{stockStatusCount.expiring}</span>
                                 </div>
                                 <div className="flex flex-row justify-between items-center">
                                     <p className="">Expired</p>
-                                    <span className="font-semibold text-right bg-red-200 text-red-800 rounded p-1">300</span>
+                                    <span className="font-semibold text-right bg-red-200 text-red-800 rounded p-1">{stockStatusCount.expired}</span>
                                 </div>
                         </div>
                     </Card>
@@ -179,12 +244,22 @@ function ProductView() {
             </div>
             
             <div className="flex flex-col border-t pt-4 px-2">
-                <h1 className="font-bold">Recent Batches</h1>
-                <DataTable
-                    data={supplyData}
-                    columns={column}
-                    pageSize={2}
-                />
+                <h1 className="font-bold" onClick={() => {console.log(batches)}}>Recent Batches</h1>
+                {
+                    batches ? (
+                        <DataTable
+                            data={batches}
+                            columns={column}
+                            pageSize={2}
+                        />
+                    ):(
+                        <div className="flex flex-col items-center">
+                            <p className="text-center text-gray-300">Loading...</p>
+                            <Loader size={40} className="animate-spin" />
+
+                        </div>
+                    )
+                }
             </div>
         </div>
             
