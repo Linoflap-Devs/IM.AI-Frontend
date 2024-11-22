@@ -82,12 +82,13 @@ function ManageStore() {
         Continuei18n,
         AlertDialogue1i18n,
         Searchi18n,
-        BranchListi18n,
+        BranchListi18n, 
         AddBranchi18n,
         Contacti18n,
         AreYouAbsolutelySurei18n,
         Savei18n,
-        TINNumber
+        TINNumber,
+        Deletei18n
     } = useI18nStore();
     const [isOpenDial, setIsOpenDial] = useState<boolean>(false);
     const [isOpenDelDial, setIsOpenDelDial] = useState<boolean>(false);
@@ -642,7 +643,7 @@ function ManageStore() {
                                                     }}
                                                     variant="destructive"
                                                 >
-                                                    {Removei18n[locale]}
+                                                    {Deletei18n[locale]}
                                                 </Button>
                                             </div>
                                         </Card>
