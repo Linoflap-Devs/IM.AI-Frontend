@@ -44,7 +44,12 @@ ChartJS.register(
     Tooltip,
     Legend
 );
-function InventoryPurchase() {
+
+interface InventoryPurchaseProps {
+    transactions: any[];
+}
+
+function InventoryPurchase({transactions}: InventoryPurchaseProps) {
     const session = useSession();
     const userData = session.data?.data;
     const {
@@ -95,21 +100,33 @@ function InventoryPurchase() {
 
     const coloumn: ColumnDef<PurchaseHistory>[] = [
         {
-            accessorKey: "branchName",
+            accessorKey: "BranchName",
             header: BranchNamei18n[locale],
         },
         {
-            accessorKey: "purchaseDate",
+            accessorKey: "UpdatedAt",
             header: PurchaseDatei18n[locale],
+            cell: ({ row }) => {
+                return format(new Date(row.getValue("UpdatedAt")), "MMM dd, yyyy | hh:mm a");
+            }
         },
         {
-            accessorKey: "quantitySold",
+            accessorKey: "Quantity",
             header: QuantitySoldi18n[locale],
         },
         {
-            accessorKey: "totalCost",
+            accessorKey: "Price",
             header: TotalCosti18n[locale],
         },
+        {
+            id: "Total",
+            header: "Total",
+            cell: ({ row }) => {
+                const price: number = row.getValue("Price");
+                const quantity: number = row.getValue("Quantity");
+                return price * quantity
+            }
+        }
     ];
     const [loadingState, setLoadingState] = useState(true);
     setTimeout(() => {
@@ -118,9 +135,9 @@ function InventoryPurchase() {
     return (
         <div>
             <div className="flex">
-                <div className="w-2/5 border-r px-2 py-3">
+                <div className="w-4/6 border-r px-2 py-3">
                     <DataTable
-                        data={purchasePerfTableData}
+                        data={transactions}
                         columns={coloumn}
                         pagination={true}
                         pageSize={9}
@@ -128,7 +145,7 @@ function InventoryPurchase() {
                         coloumnToFilter="storeName"
                     />
                 </div>
-                <div className="w-3/5">
+                <div className="w-2/6">
                     <div className="flex flex-row items-center justify-end gap-2 py-5">
                         <Popover>
                             <PopoverTrigger asChild>

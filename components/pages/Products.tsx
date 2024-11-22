@@ -86,8 +86,38 @@ function Products(productId: { productId: string}) {
         },
     })
 
+    const lookupProductTransactions = useQuery({
+        queryKey: ["lookupProductTransactions", productId.productId],
+        enabled: session.status === 'authenticated',
+        queryFn:  async () => {
+            if (session.data?.token !== undefined) {
+                const companyId =
+                    globalCompanyState !== "all"
+                        ? globalCompanyState
+                        : userData?.companyId;
+                const branchId =
+                    globalBranchState !== "all"
+                        ? globalBranchState
+                        : "all";
+                console.log(companyId, branchId, productId.productId);
+                console.log(`${process.env.NEXT_PUBLIC_API_URL}/transaction/getTransactionsProduct?cId=${companyId}&bId=${branchId}&pId=${productId.productId}`)
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_URL}/transaction/getProductSales?cId=${companyId}&bId=${branchId}&from=${'2024-11-01 01:00:00'}&to=${'2024-11-21 01:00:00'}&pId=${productId.productId}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${session.data?.token}`,
+                        },
+                    }
+                )
+
+                return response.data
+            }
+        }
+    })
+
     useEffect(() => {
         lookupProductBatches.refetch();
+        lookupProductTransactions.refetch();
     }, [globalBranchState])
 
     
@@ -150,7 +180,9 @@ function Products(productId: { productId: string}) {
                     )
                 )}
                 {tabState == "purchase" && (
-                    <InventoryPurchase></InventoryPurchase>
+                    !(lookupProductTransactions.isLoading) && (
+                        <InventoryPurchase transactions={lookupProductTransactions.data}></InventoryPurchase>
+                    )
                 )}
                 {tabState== "batches" && (
                     !(lookupProductBatches.isLoading) && (
