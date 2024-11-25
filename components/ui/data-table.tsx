@@ -32,7 +32,7 @@ interface DataTableProps<TData, TValue> {
     pageSize?: number;
     resetSortBtn?: boolean;
     filtering?: boolean;
-    coloumnToFilter?: string;
+    columnsToSearch?: string[];
     visibility?: VisibilityState;
     isLoading?: boolean;
     searchPlaceholder?: string;
@@ -46,7 +46,7 @@ export function DataTable<TData, TValue>({
     pageSize = 10,
     resetSortBtn = false,
     filtering = false,
-    coloumnToFilter = "",
+    columnsToSearch = [],
     visibility = {},
     isLoading,
     searchPlaceholder = "Search",
@@ -62,6 +62,7 @@ export function DataTable<TData, TValue>({
         useState<VisibilityState>(visibility);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({ ...visibility });
     const [rowSelection, setRowSelection] = useState({});
+    const [globalFilter, setGlobalFilter] = useState<string>("");
     const table = useReactTable({
         data,
         columns,
@@ -79,11 +80,18 @@ export function DataTable<TData, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         state: {
             sorting,
+            globalFilter,
             columnFilters,
             columnVisibility,
             rowSelection
         },
         autoResetAll: false,
+        globalFilterFn: (row, columnId, filterValue) => {
+            return columnsToSearch.some((col: any) => {
+                const cellValue = row.getValue(col);
+                return cellValue?.toString().toLowerCase().includes(filterValue.toLowerCase());
+            })
+        }
     });
     const currentPage = table.getState().pagination.pageIndex + 1;
 
@@ -121,12 +129,9 @@ export function DataTable<TData, TValue>({
                                             locale
                                         ] /* Add Search Column */
                                     }
+                                    value={globalFilter}
                                     onChange={(event) => {
-                                        return table
-                                            .getColumn(coloumnToFilter)
-                                            ?.setFilterValue(
-                                                event.target.value
-                                            );
+                                        setGlobalFilter(event.target.value)
                                     }}
                                     className="max-w-sm"
                                 />
