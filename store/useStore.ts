@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { create } from "zustand";
 
 interface SalesOverviewStoreActivity {
@@ -36,6 +37,9 @@ interface GlobalStore {
     setFromReportDate: (value: Date) => void;
     toReportDate: Date;
     setToReportDate: (value: Date) => void;
+
+    productPurchaseDateRange: {from: Date, to: Date};
+    setProductPurchaseDateRange: (value: {from: Date, to: Date}) => void;
 
     /* Dashboard Interface */
 
@@ -76,12 +80,16 @@ export const useGlobalStore = create<GlobalStore>()((set) => ({
     setGlobalBranchName: (value) =>
         set((state) => ({ ...state, globalBranchName: value })),
 
-    fromReportDate: new Date(),
+    fromReportDate: addDays(new Date(), -7),
     setFromReportDate: (value) =>
         set((state) => ({ ...state, fromReportDate: value })),
     toReportDate: new Date(),
     setToReportDate: (value) =>
         set((state) => ({ ...state, toReportDate: value })),
+
+    productPurchaseDateRange: {from: addDays(new Date(), -7), to: new Date()},
+    setProductPurchaseDateRange: (value: any) =>
+        set((state) => ({ ...state, productPurchaseDateRange: value })),
 
     /* Dashboard States */
     dashboardSalesOverview: [

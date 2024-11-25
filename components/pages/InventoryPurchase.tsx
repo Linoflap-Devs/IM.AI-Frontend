@@ -61,7 +61,7 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
         TotalCosti18n,
         Viewi18n,
     } = useI18nStore();
-    const { purchasePerfTableData, globalCompanyState, globalBranchState } =
+    const { purchasePerfTableData, globalCompanyState, globalBranchState, fromReportDate, toReportDate, setProductPurchaseDateRange, productPurchaseDateRange } =
         useGlobalStore();
     const options: ChartOptions<"line"> = {
         responsive: true as boolean,
@@ -158,11 +158,11 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                                     )}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {date?.from ? (
-                                        date.to ? (
+                                    {productPurchaseDateRange.from ? (
+                                        productPurchaseDateRange.to ? (
                                             <>
                                                 {format(
-                                                    date.from,
+                                                    productPurchaseDateRange.from,
                                                     "LLL dd, y",
                                                     {
                                                         locale: localeExtended[
@@ -171,14 +171,14 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                                                     }
                                                 )}{" "}
                                                 -{" "}
-                                                {format(date.to, "LLL dd, y", {
+                                                {format(productPurchaseDateRange.to, "LLL dd, y", {
                                                     locale: localeExtended[
                                                         locale
                                                     ],
                                                 })}
                                             </>
                                         ) : (
-                                            format(date.from, "LLL dd, y")
+                                            format(productPurchaseDateRange.from, "LLL dd, y")
                                         )
                                     ) : (
                                         <span>Pick a date</span>
@@ -192,9 +192,14 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                                 <Calendar
                                     initialFocus
                                     mode="range"
-                                    defaultMonth={date?.from}
-                                    selected={date}
-                                    onSelect={setDate}
+                                    defaultMonth={productPurchaseDateRange.from}
+                                    selected={productPurchaseDateRange}
+                                    onSelect={(range) => {
+                                        setProductPurchaseDateRange({
+                                            from: range?.from || new Date(),
+                                            to: range?.to || new Date(),
+                                        })
+                                    }}
                                     numberOfMonths={2}
                                 />
                             </PopoverContent>

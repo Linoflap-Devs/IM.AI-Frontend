@@ -11,13 +11,14 @@ import { useParams } from "next/navigation";
 import axios from "axios";
 import { Loader } from "lucide-react";
 import { ProductBatches } from "./ProductBatches";
+import { format } from "date-fns";
 
 function Products(productId: { productId: string}) {
     const session = useSession();
     const userData = session.data?.data;
     const status = session.status;
     const [tabState, setTabState] = useState<string>("overview");
-    const { globalCompanyState, globalBranchState, globalBranchName } = useGlobalStore();
+    const { globalCompanyState, globalBranchState, globalBranchName, fromReportDate, toReportDate, productPurchaseDateRange } = useGlobalStore();
     const {
         locale,
         Overviewi18n,
@@ -99,10 +100,12 @@ function Products(productId: { productId: string}) {
                     globalBranchState !== "all"
                         ? globalBranchState
                         : "all";
+                const fromDate = format(new Date(productPurchaseDateRange.from), "yyyy-MM-dd HH:mm:ss");
+                const toDate = format(new Date(productPurchaseDateRange.to), "yyyy-MM-dd HH:mm:ss");
                 console.log(companyId, branchId, productId.productId);
                 console.log(`${process.env.NEXT_PUBLIC_API_URL}/transaction/getTransactionsProduct?cId=${companyId}&bId=${branchId}&pId=${productId.productId}`)
                 const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_API_URL}/transaction/getProductSales?cId=${companyId}&bId=${branchId}&from=${'2024-11-01 01:00:00'}&to=${'2024-11-21 01:00:00'}&pId=${productId.productId}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/transaction/getProductSales?cId=${companyId}&bId=${branchId}&from=${fromDate}&to=${toDate}&pId=${productId.productId}`,
                     {
                         headers: {
                             Authorization: `Bearer ${session.data?.token}`,
@@ -120,9 +123,14 @@ function Products(productId: { productId: string}) {
         lookupProductTransactions.refetch();
     }, [globalBranchState])
 
+    useEffect(() =>  {
+        lookupProductTransactions.refetch();
+    }, [productPurchaseDateRange])
+
     
     return (
         <Card className="mx-3 p-3">
+            {/* <p>{format(new Date(productPurchaseDateRange.from), "MMM dd, yyyy")} - {format(new Date(productPurchaseDateRange.to), "MMM dd, yyyy")}</p> */}
             <div className="flex flex-col">
                 <h1 className="p-2 text-2xl font-semibold">Product ID: {productId.productId} <span className="p-2 ms-2 bg-blue-200 text-blue-800 w-max rounded text-sm" onClick={() => console.log(session.data)}>{globalBranchName == "Select Branch" || globalBranchName == "" ? "All Branches" : globalBranchName}</span></h1>
             </div>

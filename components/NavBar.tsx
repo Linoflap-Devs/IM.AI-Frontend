@@ -105,7 +105,7 @@ function NavBar() {
                     },
                     icon: <LayoutGrid />,
                     navigation: "category",
-                    permission: [1, 2, 3, 4],
+                    permission: [1, 2],
                 },
                 {
                     name: {
