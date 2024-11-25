@@ -60,6 +60,9 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
         QuantitySoldi18n,
         TotalCosti18n,
         Viewi18n,
+        Pricei18n,
+        Quantityi18n,
+        CurrencyMarker
     } = useI18nStore();
     const { purchasePerfTableData, globalCompanyState, globalBranchState, fromReportDate, toReportDate, setProductPurchaseDateRange, productPurchaseDateRange } =
         useGlobalStore();
@@ -112,19 +115,31 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
         },
         {
             accessorKey: "Quantity",
-            header: QuantitySoldi18n[locale],
+            header: () => <div className="text-end">{Quantityi18n[locale]}</div>,
+            cell: ({ row }) => {
+                return (
+                    <p className="text-end">{parseInt(row.getValue("Quantity"))}</p>
+                )
+            }
         },
         {
             accessorKey: "Price",
-            header: TotalCosti18n[locale],
+            header: () => <div className="text-end">{Pricei18n[locale]}</div>,
+            cell: ({ row }) => {
+                return (
+                    <p className="text-end">{CurrencyMarker[locale]}{parseInt(row.getValue("Price")).toFixed(2)}</p>
+                )
+            }
         },
         {
             id: "Total",
-            header: "Total",
+            header: () => <div className="text-end">{TotalCosti18n[locale]}</div>,
             cell: ({ row }) => {
-                const price: number = row.getValue("Price");
-                const quantity: number = row.getValue("Quantity");
-                return price * quantity
+                const price = parseInt(row.getValue("Price"))
+                const quantity = parseInt(row.getValue("Quantity"))
+                return (
+                    <p className="text-end">{CurrencyMarker[locale]}{(price * quantity).toFixed(2)}</p>
+                )
             }
         }
     ];

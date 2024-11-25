@@ -815,6 +815,11 @@ export const useI18nStore = create<I18nStore>((set) => ({
   BatchNo: {
     en: "Batch Number",
     ja: "バッチ番号"
+  },
+
+  CurrencyMarker: {
+    en: "₱",
+    ja: "¥"
   }
 }));
 export interface I18nStore {
@@ -1076,4 +1081,5 @@ export interface I18nStore {
   DeleteCategory: LocalizedString;
   DeleteCategoryDeleteMsg: LocalizedString;
   BatchNo: LocalizedString;
+  CurrencyMarker: LocalizedString;
 }
