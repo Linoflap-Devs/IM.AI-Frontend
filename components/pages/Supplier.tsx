@@ -848,7 +848,7 @@ export default function Supplier() {
                         CompanyId: false,
                     }}
                     filtering={true}
-                    coloumnToFilter={"SupplierName"}
+                    columnsToSearch={["SupplierName", "Contact", "ContactPerson", "Email", "Address"]}
                     resetSortBtn={true}
                     pageSize={11}
                     data={getSuppliersQuery.data || []}

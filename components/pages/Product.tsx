@@ -721,7 +721,7 @@ export default function Product() {
             <div>
                 <DataTable
                     filtering={true}
-                    coloumnToFilter="Name"
+                    columnsToSearch={["Name", "Barcode"]}
                     resetSortBtn={true}
                     pageSize={12}
                     data={getProductsQuery.data ? getProductsQuery.data : []}

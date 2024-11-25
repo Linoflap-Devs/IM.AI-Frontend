@@ -407,7 +407,7 @@ function Cart() {
                     resetSortBtn={true}
                     columns={columns}
                     filtering={true}
-                    coloumnToFilter="CartCode"
+                    columnsToSearch={["CartCode"]}
                     isLoading={cartQuery.isPending}
                     visibility={{
                         Firstname: false,

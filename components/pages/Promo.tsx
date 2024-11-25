@@ -646,7 +646,7 @@ function Promo() {
                     data={promoQuery.data ?? []}
                     isLoading={promoQuery.isPending}
                     filtering={true}
-                    coloumnToFilter="Name"
+                    columnsToSearch={["Name"]}
                     pageSize={10}
                     visibility={{ PromoId: false }}
                 />
@@ -663,7 +663,7 @@ function Promo() {
                             data={promoDetailsQuery.data ?? []}
                             pageSize={10}
                             filtering={true}
-                            coloumnToFilter="name"
+                            columnsToSearch={["name"]}
                         />
                     </div>
                 </SheetContent>

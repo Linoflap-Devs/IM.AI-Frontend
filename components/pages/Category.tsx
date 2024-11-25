@@ -404,7 +404,7 @@ export default function Category() {
                             CompanyId: false,
                         }}
                         filtering={true}
-                        coloumnToFilter={"Name"}
+                        columnsToSearch={["Name"]}
                         resetSortBtn={true}
                         pageSize={11}
                         data={getCategoriesQuery.data || []}

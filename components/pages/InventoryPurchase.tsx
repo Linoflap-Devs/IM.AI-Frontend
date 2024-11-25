@@ -157,7 +157,7 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                         pagination={true}
                         pageSize={9}
                         filtering={true}
-                        coloumnToFilter="storeName"
+                        columnsToSearch={["BranchName"]}
                     />
                 </div>
                 <div className="w-2/6">

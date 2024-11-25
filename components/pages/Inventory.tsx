@@ -262,6 +262,11 @@ function Inventory() {
     }
 
     const columns: ColumnDef<InventoryDataTable>[] = [
+        
+        {
+            accessorKey: "ProductId",
+            id: "id"
+        },
         {
             accessorKey: "Name",
             header: ProdNamei18n[locale],
@@ -411,10 +416,6 @@ function Inventory() {
         },
         {
             accessorKey: "CriticalLevel",
-        },
-        {
-            accessorKey: "ProductId",
-            id: "id"
         },
     ];
     useEffect(() => {
@@ -759,13 +760,13 @@ function Inventory() {
                 {userData && (
                     <DataTable
                         visibility={{
-                            id: false,
+                            id: true,
                             action: userData.role == 4 && false,
                             ReorderLevel: false,
                             CriticalLevel: false,
                         }}
                         filtering={true}
-                        coloumnToFilter="Name"
+                        columnsToSearch={["Name", "BranchName", "id"]}
                         activeFilter={activeFilter}
                         resetSortBtn={true}
                         pageSize={userData.role >= 4 ? 12 : 9}

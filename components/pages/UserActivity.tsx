@@ -234,7 +234,7 @@ function UserActivity() {
                 </div>
                 <DataTable
                     filtering={true}
-                    coloumnToFilter={"Costumer"}
+                    columnsToSearch={["Costumer"]}
                     resetSortBtn={true}
                     pageSize={8}
                     data={userActivityQuery.data ?? []}

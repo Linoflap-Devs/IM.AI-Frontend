@@ -344,7 +344,7 @@ function TransactionHistory() {
                 </div>
                 <DataTable
                     filtering={true}
-                    coloumnToFilter={"ReferenceNumber"}
+                    columnsToSearch={["ReferenceNumber"]}
                     resetSortBtn={true}
                     pageSize={11}
                     data={transactionQuery.data ?? []}

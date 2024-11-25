@@ -361,7 +361,7 @@ function Reports() {
                     pageSize={5}
                     resetSortBtn={true}
                     filtering={true}
-                    coloumnToFilter="productName"
+                    columnsToSearch={["productName"]}
                 />
             </Card>
         </div>

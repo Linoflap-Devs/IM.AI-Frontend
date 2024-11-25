@@ -43,6 +43,10 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
             header: "Branch",
         },
         {
+            accessorKey: "Supplier",
+            header: "Supplier",
+        },
+        {
             id: "Status",
             header: "Status",
             cell: ({ row }) => {
@@ -75,7 +79,7 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
                 columns={column}
                 filtering={true}
                 pagination={true}
-                coloumnToFilter="BatchNo"
+                columnsToSearch={["BatchNo", "BranchName", "Supplier"]}
                 pageSize={10}
             />
         </div>
