@@ -8,8 +8,8 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { addDays, format } from "date-fns";
+import { useEffect, useState } from "react";
+import { addDays, differenceInCalendarMonths, differenceInCalendarWeeks, format, getDay, getWeekOfMonth } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import type { ChartOptions, ChartData } from "chart.js";
@@ -32,8 +32,11 @@ import { useI18nStore } from "@/store/usei18n";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { get } from "http";
+import { dailyTotal, getDayDifferenceArray, getMonthDifferenceArray, getMonthIndex, getWeekDifferenceArray, monthlyTotal, weeklyTotal } from "@/lib/dateoperators";
+import LoaderComponent from "../Loader";
 
-const labels = ["January", "February", "March", "April", "May", "June", "July"];
+
 
 ChartJS.register(
     CategoryScale,
@@ -83,16 +86,53 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
             },
         },
     };
+
+    const [chartMode, setChartMode] = useState("");
+    const [chartLabels, setChartLabels] = useState<string[]>([]);
+    const [chartData, setChartData] = useState<number[]>([]);
+
+    useEffect(() => {
+        const startDate = new Date(productPurchaseDateRange.from);
+        const endDate = new Date(productPurchaseDateRange.to);
+
+        const startMonth = startDate.getMonth();
+        const endMonth = endDate.getMonth();
+
+        const startWeek = getWeekOfMonth(startDate);
+        const endWeek = getWeekOfMonth(endDate);
+
+        if(startMonth !== endMonth) {
+            const months = getMonthDifferenceArray(productPurchaseDateRange.from, productPurchaseDateRange.to)
+            setChartLabels(months)
+            setChartMode("month");
+            setChartData(monthlyTotal(transactions, months))
+        }
+
+
+        else if(startWeek !== endWeek) {
+            const weeks = getWeekDifferenceArray(productPurchaseDateRange.from, productPurchaseDateRange.to)
+            setChartLabels(weeks.map((week) => `Week ${week}`))
+            setChartMode("week");
+            setChartData(weeklyTotal(transactions, weeks))
+        }
+
+        else if(startWeek === endWeek && startMonth === endMonth) {
+            const days = getDayDifferenceArray(productPurchaseDateRange.from, productPurchaseDateRange.to)
+            setChartMode("day");
+            setChartLabels(days)
+            setChartData(dailyTotal(transactions, days))
+        }
+
+    }, [productPurchaseDateRange, transactions])
+
     const data: ChartData<"line"> = {
-        labels,
+        labels: chartLabels,
         datasets: [
             {
-                label: "Sales",
-                data: labels.map(() =>
-                    faker.number.int({ min: 10000, max: 20000 })
-                ),
-                borderColor: "rgb(255, 99, 132)",
-                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                label: "Sales (PHP)",
+                data: chartData,
+                borderColor: "rgb(59, 130, 246)",
+                backgroundColor: "rgb(59, 130, 246)",
             },
         ],
     };
@@ -230,9 +270,11 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                     <div className="m-4">
                         <Card>
                             {loadingState ? (
-                                <Skeleton className="h-[450px]" />
+                               <LoaderComponent />
                             ) : (
-                                <Line options={options} data={data} />
+                                <>
+                                    <Line options={options} data={data} />
+                                </>
                             )}
                         </Card>
                     </div>

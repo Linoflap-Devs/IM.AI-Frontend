@@ -13,6 +13,7 @@ import { ArrowLeft, ArrowLeftIcon, Loader } from "lucide-react";
 import { ProductBatches } from "./ProductBatches";
 import { format } from "date-fns";
 import { Button } from "../ui/button";
+import { getMonthDifferenceArray, monthlyTotal } from "@/lib/dateoperators";
 
 function Products(productId: { productId: string}) {
     const session = useSession();
@@ -185,10 +186,9 @@ function Products(productId: { productId: string}) {
                      ? (
                         <ProductView product={lookupProduct.data} batches={lookupProductBatches.data} />
                     ) : (
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center py-6">
                             <p className="text-center text-gray-300">Loading...</p>
                             <Loader size={40} className="animate-spin" />
-
                         </div>
                     )
                 )}
