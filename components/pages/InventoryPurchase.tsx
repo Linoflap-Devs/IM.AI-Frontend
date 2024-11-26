@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { addDays, differenceInCalendarMonths, differenceInCalendarWeeks, format, getDay, getWeekOfMonth } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronDown } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import type { ChartOptions, ChartData } from "chart.js";
 import { Line } from "react-chartjs-2";
@@ -200,7 +200,7 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                         columnsToSearch={["BranchName"]}
                     />
                 </div>
-                <div className="w-2/6">
+                <div className="w-2/6 px-4">
                     <div className="flex flex-row items-center justify-end gap-2 py-5">
                         <Popover>
                             <PopoverTrigger asChild>
@@ -208,7 +208,7 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                                     id="date"
                                     variant={"outline"}
                                     className={cn(
-                                        "w-[300px] justify-start text-left font-normal",
+                                        "w-full justify-start text-left font-normal",
                                         !date && "text-muted-foreground"
                                     )}
                                 >
@@ -238,6 +238,9 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                                     ) : (
                                         <span>Pick a date</span>
                                     )}
+                                    <span className="ml-auto text-gray-500">
+                                        <ChevronDown size={16} color="currentColor"></ChevronDown>
+                                    </span>
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent
@@ -259,16 +262,16 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                                 />
                             </PopoverContent>
                         </Popover>
-                        <Button
+                        {/* <Button
                             onClick={() => {
                                 console.log(date);
                             }}
                         >
                             {Viewi18n[locale]}
-                        </Button>
+                        </Button> */}
                     </div>
-                    <div className="m-4">
-                        <Card>
+                    <div className="">
+                        <Card className="p-1">
                             {loadingState ? (
                                <LoaderComponent />
                             ) : (
