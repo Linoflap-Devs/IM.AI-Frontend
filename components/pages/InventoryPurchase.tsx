@@ -70,6 +70,12 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
     const { purchasePerfTableData, globalCompanyState, globalBranchState, fromReportDate, toReportDate, setProductPurchaseDateRange, productPurchaseDateRange } =
         useGlobalStore();
     const options: ChartOptions<"line"> = {
+        elements: {
+            point: {
+                hitRadius: 50,
+                hoverRadius: 10
+            }
+        },
         responsive: true as boolean,
         aspectRatio: 2 as number,
         plugins: {
