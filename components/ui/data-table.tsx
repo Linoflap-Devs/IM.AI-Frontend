@@ -158,10 +158,10 @@ export function DataTable<TData, TValue>({
                             >
                                 {Previousi18n[locale]}
                             </Button>
-                            {/* <span className="w-28 text-center">
-                                {Pagei18n[locale]} {`${currentPage}`}{" "}
-                                {Ofi18n[locale]} {table.getPageCount()}
-                            </span> */}
+                            <div className="w-28 text-center">
+                                {"Page"} {`${currentPage}`}{" "}
+                                {"of"} {table.getPageCount()}
+                            </div>
                             <Button
                                 variant="outline"
                                 size="sm"
