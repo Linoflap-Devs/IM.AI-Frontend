@@ -7,11 +7,12 @@ import { useI18nStore } from "@/store/usei18n";
 import { useSession } from "next-auth/react";
 import { useGlobalStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
-import { Loader } from "lucide-react";
+import { ArrowLeft, ArrowLeftIcon, Loader } from "lucide-react";
 import { ProductBatches } from "./ProductBatches";
 import { format } from "date-fns";
+import { Button } from "../ui/button";
 
 function Products(productId: { productId: string}) {
     const session = useSession();
@@ -24,6 +25,8 @@ function Products(productId: { productId: string}) {
         Overviewi18n,
         Purchasesi18n,
     } = useI18nStore();
+
+    const router = useRouter();
 
     axios.defaults.headers.common[
         "Authorization"
@@ -131,8 +134,10 @@ function Products(productId: { productId: string}) {
     return (
         <Card className="mx-3 p-3">
             {/* <p>{format(new Date(productPurchaseDateRange.from), "MMM dd, yyyy")} - {format(new Date(productPurchaseDateRange.to), "MMM dd, yyyy")}</p> */}
-            <div className="flex flex-col">
-                <h1 className="p-2 text-2xl font-semibold">Product ID: {productId.productId} <span className="p-2 ms-2 bg-blue-200 text-blue-800 w-max rounded text-sm" onClick={() => console.log(session.data)}>{globalBranchName == "Select Branch" || globalBranchName == "" ? "All Branches" : globalBranchName}</span></h1>
+            <div className="flex gap-2 items-center">
+                <Button onClick={() => router.back()} variant={"ghost"}><ArrowLeft /></Button>
+                <h1 className="p-2 text-2xl font-semibold">Product ID: {productId.productId}</h1>
+                <span className="p-2 ms-2 bg-blue-200 text-blue-800 w-max rounded text-sm">{globalBranchName == "Select Branch" || globalBranchName == "" ? "All Branches" : globalBranchName}</span>
             </div>
             <div className="p-2">
                 <div className="flex gap-2 border-b">

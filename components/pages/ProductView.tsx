@@ -204,26 +204,35 @@ function ProductView({product, batches}: ProductViewProps) {
                             <span className="font-bold text-lg">Stock Status</span>
                         </CardHeader>
                         <div className="h-[185px] w-full flex justify-center">
-                            <Doughnut 
-                                data={{
-                                    labels: ["In-Stock", "Near-Expiry", "Expired"],
-                                    datasets: [
-                                        {
-                                            data: [stockStatusCount.inStock, stockStatusCount.expiring, stockStatusCount.expired],
-                                            backgroundColor: ["#86efac", "#fde047", "#fca5a5"],
-                                            hoverOffset: 4,
-                                            
-                                        }
-                                    ],
-                                }}
-                                options={{
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        }
-                                    }
-                                }}
-                                />
+
+                            {
+                                (stockStatusCount.expired === 0 && stockStatusCount.expiring === 0 && stockStatusCount.inStock === 0) ? (
+                                    <div className="flex items-center justify-center">
+                                        <p className="text-xl font-semibold text-gray-400">No Stock</p>
+                                    </div>
+                                ) : (
+                                    <Doughnut 
+                                        data={{
+                                            labels: ["In-Stock", "Near-Expiry", "Expired"],
+                                            datasets: [
+                                                {
+                                                    data: [stockStatusCount.inStock, stockStatusCount.expiring, stockStatusCount.expired],
+                                                    backgroundColor: ["#86efac", "#fde047", "#fca5a5"],
+                                                    hoverOffset: 4,
+                                                    
+                                                }
+                                            ],
+                                        }}
+                                        options={{
+                                            plugins: {
+                                                legend: {
+                                                    display: false
+                                                }
+                                            }
+                                        }}
+                                    />
+                                ) 
+                            }
                         </div>
                         <div className="flex flex-col gap-3 mt-1 ">
                                 <div className="flex flex-row justify-between items-center border-b pb-2">

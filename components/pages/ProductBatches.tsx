@@ -26,9 +26,16 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
         },
         {
             accessorKey: "Quantity",
-            header: "Quantity",
+            header: () => <p className="text-end">Quantity</p>,
             cell: ({ row }) => {
-                return row.getValue("Quantity") || 0
+                return <p className="text-end">{row.getValue("Quantity") || 0}</p>
+            }
+        },
+        {
+            accessorKey: "Initial",
+            header: () => <p className="text-end">Initial Quantity</p> ,
+            cell: ({ row }) => {
+                return <p className="text-end">{row.getValue("Initial") || 0}</p>
             }
         },
         {

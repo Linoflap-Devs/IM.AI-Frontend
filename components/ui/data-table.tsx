@@ -9,7 +9,8 @@ import {
     getFilteredRowModel,
     SortingState,
     ColumnFiltersState,
-    VisibilityState
+    VisibilityState,
+    FiltersColumnDef
 } from "@tanstack/react-table";
 import {
     Table,
@@ -33,10 +34,19 @@ interface DataTableProps<TData, TValue> {
     resetSortBtn?: boolean;
     filtering?: boolean;
     columnsToSearch?: string[];
+    columnsToFilter?: any; 
     visibility?: VisibilityState;
     isLoading?: boolean;
     searchPlaceholder?: string;
     activeFilter?: {column: string, value: string} | null;
+    filterByCol?: {column: string, filterValue: string}[];
+    filterPresets?: FilterPreset[]
+}
+
+interface FilterPreset {
+    id: string,
+    label: string,
+    filter: (row: any) => boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -47,22 +57,23 @@ export function DataTable<TData, TValue>({
     resetSortBtn = false,
     filtering = false,
     columnsToSearch = [],
+    columnsToFilter = [],
     visibility = {},
     isLoading,
     searchPlaceholder = "Search",
-    activeFilter = null
-
+    activeFilter = null,
+    filterPresets = [],
 }: DataTableProps<TData, TValue>) {
     const { locale, Reseti18n, Tablei18n, Searchi18n, Previousi18n, Nexti18n } =
         useI18nStore();
     const [sorting, setSorting] = useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    //const [activeFilters, setActiveFilters] = useState<{column: string, value: string} | null>(null);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([...columnsToFilter]);
     const [hiddenColoumns, setHiddenColoumn] =
         useState<VisibilityState>(visibility);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({ ...visibility });
     const [rowSelection, setRowSelection] = useState({});
     const [globalFilter, setGlobalFilter] = useState<string>("");
+    const [activeFilterId, setActiveFilterId] = useState<string|null>(null)
     const table = useReactTable({
         data,
         columns,
@@ -73,6 +84,7 @@ export function DataTable<TData, TValue>({
                 pageSize: pageSize,
             },
             columnVisibility: hiddenColoumns,
+            columnFilters: columnFilters
         },
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
@@ -85,6 +97,7 @@ export function DataTable<TData, TValue>({
             columnVisibility,
             rowSelection
         },
+
         autoResetAll: false,
         globalFilterFn: (row, columnId, filterValue) => {
             return columnsToSearch.some((col: any) => {
@@ -95,11 +108,6 @@ export function DataTable<TData, TValue>({
     });
     const currentPage = table.getState().pagination.pageIndex + 1;
 
-    useEffect(() => {
-        console.log(activeFilter, table.getState().columnFilters)
-        activeFilter &&
-        table.getColumn(activeFilter.column)?.setFilterValue(activeFilter?.value);
-    }, [activeFilter]);
     return (
         <div className={`flex flex-col rounded-md pb-2`}>
             {(pagination || resetSortBtn || filtering) && (

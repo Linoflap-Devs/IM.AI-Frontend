@@ -418,6 +418,11 @@ function Inventory() {
             accessorKey: "CriticalLevel",
         },
     ];
+
+    // filters = [
+
+    // ]
+
     useEffect(() => {
         getStocksquery.refetch();
     }, [globalBranchState, globalCompanyState]);
