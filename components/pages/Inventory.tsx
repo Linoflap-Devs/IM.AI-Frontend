@@ -116,6 +116,7 @@ function Inventory() {
         SuccessfullyAddedTheProducti18n,
         Successi18n,
         BatchNo,
+        InventoryI18n
     } = useI18nStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -745,7 +746,7 @@ function Inventory() {
                 {userData && userData.role <= 3 && (
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-semibold">
-                            {Stocksi18n[locale]}
+                            {InventoryI18n[locale]}
                         </h1>
                         <div className="flex gap-3">
                             <Button 

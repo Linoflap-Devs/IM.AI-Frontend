@@ -33,6 +33,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "../ui/alert-dialog";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Link from "next/link";
 
 function TransactionHistory() {
     const session = useSession();
@@ -112,7 +119,30 @@ function TransactionHistory() {
         },
     });
     const columns: ColumnDef<TransactionTableData>[] = [
-        { accessorKey: "ReferenceNumber", header: ReferenceNumberi18n[locale] },
+        { 
+            accessorKey: "ReferenceNumber", 
+            header: ReferenceNumberi18n[locale],
+            cell: ({row}) => {
+                const id = row.getValue("TransactionId");
+                return (
+                    <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link
+                                            className="w-full text-nowrap p-0 font-medium hover:text-primary hover:underline"
+                                            href={`/home/reports/${id}`}
+                                        >
+                                            {row.getValue("ReferenceNumber")}
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        {row.getValue("ReferenceNumber")}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                );
+            } 
+        },
         {
             accessorKey: "CreatedAt",
             header: ({ column }) => {

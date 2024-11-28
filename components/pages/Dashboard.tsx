@@ -666,6 +666,7 @@ const StoreActivityCard: FC<StoreActivityCardProps> = ({
     isFetching,
     data,
 }) => {
+    console.log(title, data)
     return (
         <Card className="flex w-52 flex-col items-center gap-3 py-2">
             <h1 className="text-start font-medium">{title}</h1>
@@ -675,7 +676,7 @@ const StoreActivityCard: FC<StoreActivityCardProps> = ({
                     <Loader2 className="animate-spin" size={30} />
                 ) : (
                     <p className="text-3xl font-bold">
-                        {commafy(data[dataKey] || 0)}
+                        {data[dataKey] || 0}
                     </p>
                 )}
             </div>

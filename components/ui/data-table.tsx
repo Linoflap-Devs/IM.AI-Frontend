@@ -40,7 +40,9 @@ interface DataTableProps<TData, TValue> {
     searchPlaceholder?: string;
     activeFilter?: {column: string, value: string} | null;
     filterByCol?: {column: string, filterValue: string}[];
-    filterPresets?: FilterPreset[]
+    filterPresets?: FilterPreset[];
+    tableBodyClass?: string;
+    tableHeaderClass?: string;
 }
 
 interface FilterPreset {
@@ -63,6 +65,8 @@ export function DataTable<TData, TValue>({
     searchPlaceholder = "Search",
     activeFilter = null,
     filterPresets = [],
+    tableBodyClass = "",
+    tableHeaderClass = ""
 }: DataTableProps<TData, TValue>) {
     const { locale, Reseti18n, Tablei18n, Searchi18n, Previousi18n, Nexti18n } =
         useI18nStore();
@@ -109,7 +113,7 @@ export function DataTable<TData, TValue>({
     const currentPage = table.getState().pagination.pageIndex + 1;
 
     return (
-        <div className={`flex flex-col rounded-md pb-2`}>
+        <div className={`flex flex-col rounded-md pb-2 sticky top-0`}>
             {(pagination || resetSortBtn || filtering) && (
                 <div
                     className={`flex items-center gap-2 ${
@@ -177,7 +181,7 @@ export function DataTable<TData, TValue>({
                 </div>
             )}
             <Table className="mt-4">
-                <TableHeader>
+                <TableHeader className="sticky top-0">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow className="bg-gray-200" key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
@@ -196,7 +200,7 @@ export function DataTable<TData, TValue>({
                         </TableRow>
                     ))}
                 </TableHeader>
-                <TableBody>
+                <TableBody className={`${tableBodyClass}`}>
                     {table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
                             <TableRow
@@ -239,7 +243,7 @@ export function DataTable<TData, TValue>({
             </Table>
             <div className="flex justify-end w-full border-t pt-4 pr-2">
                 <p className="text-sm text-black ">
-                    Showing {table.getRowModel().rows.length.toLocaleString()} of {data?.length.toLocaleString()} rows.  
+                    Showing {table.getRowModel().rows.length.toLocaleString()} of {data?.length?.toLocaleString() || 0} rows.  
                 </p>
             </div>
         </div>

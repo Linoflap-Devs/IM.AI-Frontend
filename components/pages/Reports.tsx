@@ -164,32 +164,16 @@ function Reports() {
             accessorKey: "Price",
             header: ({ table }) => {
                 return (
-                    <div className="flex justify-center">
-                        {" "}
-                        <Button
-                            variant="ghost"
-                            className="hover:bg-gray-300"
-                            onClick={() => {
-                                table
-                                    .getColumn("Price")
-                                    ?.toggleSorting(
-                                        table
-                                            .getColumn("Price")
-                                            ?.getIsSorted() === "asc"
-                                    );
-                            }}
-                        >
-                            {Pricei18n[locale]}
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
+                    <div className="flex justify-end">
+                        {Pricei18n[locale]}
                     </div>
                 );
             },
             cell: ({ row }) => {
                 return (
-                    <div className="text-center">
-                        <span className="font-bold">¥</span>{" "}
-                        {row.getValue("Price")}
+                    <div className="text-end">
+                        <span className="font-bold">¥</span>
+                        {parseInt(row.getValue("Price")).toFixed(2)}
                     </div>
                 );
             },
@@ -361,7 +345,7 @@ function Reports() {
                     pageSize={5}
                     resetSortBtn={true}
                     filtering={true}
-                    columnsToSearch={["productName"]}
+                    columnsToSearch={["ReferenceNumber", "CreatedAt"]}
                 />
             </Card>
         </div>

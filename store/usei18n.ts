@@ -820,6 +820,11 @@ export const useI18nStore = create<I18nStore>((set) => ({
   CurrencyMarker: {
     en: "₱",
     ja: "¥"
+  },
+
+  InventoryI18n: {
+    en: "Inventory",
+    ja: "在庫"
   }
 }));
 export interface I18nStore {
@@ -835,6 +840,7 @@ export interface I18nStore {
   cartsi18n: LocalizedString;
 
   /* Inventory */
+  InventoryI18n: LocalizedString;
   LowStockLvli18n: LocalizedString;
   CriticalStockLvli18n: LocalizedString;
 
