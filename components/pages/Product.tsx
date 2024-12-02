@@ -280,7 +280,7 @@ export default function Product() {
                     </h1>
                     <div className="flex items-center gap-3">
                         <Button className="bg-green-400">
-                            {`${Downloadi18n[locale]} ${Datai18n[locale]}`}
+                            {`${Downloadi18n[locale]}`}
                         </Button>
                         <AlertDialog open={open} onOpenChange={setOpen}>
                             <AlertDialogTrigger asChild>

@@ -147,7 +147,7 @@ export default function UnusualTransaction() {
                     "Cart ID": "Cart-001-01",
                     Note: "Product Switch",
                     Remarks: "Accidental",
-                    Status: "Resolved",
+                    Status: "Fake",
                     Date: new Date("2024-09-23"),
                 },
                 {
@@ -235,7 +235,7 @@ export default function UnusualTransaction() {
                     "Cart ID": "Cart-001-01",
                     Note: "Product Switch",
                     Remarks: "Accidental",
-                    Status: "Resolved",
+                    Status: "Unresolved",
                     Date: new Date("2024-09-23"),
                 },
             ];
@@ -249,7 +249,7 @@ export default function UnusualTransaction() {
                     isLoading={getUnusualTransaction.isLoading}
                     filtering={true}
                     pagination={true}
-                    coloumnToFilter="Cart ID"
+                    columnsToSearch={["Cart ID"]}
                     data={getUnusualTransaction.data || []}
                     columns={columns}
                     visibility={{ UnTransactionId: false }}

@@ -858,7 +858,7 @@ export default function TransferOrder() {
             </h1>
             <div className="flex gap-3">
               <Button className="bg-green-400">
-                {`${Downloadi18n[locale]} ${Datai18n[locale]}`}
+                {`${Downloadi18n[locale]}`}
               </Button>
               {userData.role === 3 && (
                 <AlertDialog open={open} onOpenChange={setOpen}>
@@ -927,7 +927,7 @@ export default function TransferOrder() {
           {userData && (
             <DataTable
               filtering={true}
-              coloumnToFilter="TransferOrderId"
+              columnsToSearch={["TransferOrderId"]}
               resetSortBtn={true}
               pageSize={userData.role === 1 ? 13 : 11}
               data={getTransferOrder?.data ? getTransferOrder.data : []}

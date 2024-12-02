@@ -9,6 +9,9 @@ import axios from "axios";
 import { TransactionProducts } from "./TransactionProducts";
 import LoaderComponent from "../Loader";
 import { TransactionDetailsPanel } from "./TransactionDetailsPanel";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import { ArrowLeft } from "lucide-react";
 
 interface TransactionDetailsProps {
 
@@ -21,6 +24,8 @@ export function TransactionDetails({transactionId}: TransactionDetailsProps) {
     const status = session.status;
     const [tabState, setTabState] = useState<string>("overview");
     const { globalCompanyState, globalBranchState, globalBranchName, fromReportDate, toReportDate, productPurchaseDateRange } = useGlobalStore();
+
+    const router = useRouter();
 
     const transactionDetailQuery = useQuery({
         queryKey: ["transactionDetail", transactionId],
@@ -54,7 +59,8 @@ export function TransactionDetails({transactionId}: TransactionDetailsProps) {
     return (
         <div className="mx-3 h-full pb-3">
             <Card className="p-4 h-full">
-                <div>
+                <div className="flex gap-4 items-center">
+                    <Button onClick={() => router.back()} variant={"ghost"}><ArrowLeft /></Button>
                     <span className="font-bold text-2xl">Transaction #{transactionId}</span>
                 </div>
 

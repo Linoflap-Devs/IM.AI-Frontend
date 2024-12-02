@@ -56,7 +56,7 @@ export function TransactionProducts({data, className}: TransacationProductsProps
             <div className={`border p-4 h-full rounded w-full flex flex-col gap-4`}>
                 <span className="text-lg font-semibold">Items Bought</span>
 
-                <div className="h-[630px] overflow-auto p-1">
+                <div className="h-[625px] overflow-auto p-1">
                     <DataTable 
                         columns={columns} 
                         data={data || []} 

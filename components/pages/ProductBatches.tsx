@@ -10,9 +10,11 @@ import { useGlobalStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { Loader } from "lucide-react";
+import { ArrowsUpFromLine, Ellipsis, Loader, Pencil, Trash } from "lucide-react";
 import { addDays, format } from "date-fns";
 import { DataTable } from "../ui/data-table";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { Button } from "../ui/button";
 
 interface ProductBatchesProps {
     batches: any[];
@@ -33,7 +35,7 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
         },
         {
             accessorKey: "Initial",
-            header: () => <p className="text-end">Initial Quantity</p> ,
+            header: () => <p className="text-end">Initial Qty</p> ,
             cell: ({ row }) => {
                 return <p className="text-end">{row.getValue("Initial") || 0}</p>
             }
@@ -64,8 +66,24 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
                                         ? "Near-Expiry" 
                                         : "In-Stock";
                 return (
-                    <span className={`p-1 font-semibold text-sm ${status == "In-Stock" ? "bg-green-100 text-green-800" : status== "Near-Expiry" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
+                    <span className={`p-1 font-semibold rounded text-sm ${status == "In-Stock" ? "bg-green-100 text-green-800" : status== "Near-Expiry" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
                        {status}
+                    </span>
+                );
+            }
+        },
+        {
+            accessorKey: "LocationStatus",
+            header: "Location",
+            cell: ({ row }) => {
+                const classes = (status: string) => {
+                    if (status == "On Display") return "bg-green-100 text-green-800";
+                    if (status == "In Storage") return "bg-orange-100 text-orange-800";
+                    return "bg-gray-100 text-gray-800"
+                }
+                return (
+                    <span className={`p-1 font-semibold rounded text-sm ${classes(row.getValue("LocationStatus"))}`}>
+                       {row.getValue("LocationStatus") || "Unknown"}
                     </span>
                 );
             }
@@ -76,6 +94,52 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
             cell: ({ row }) => {
                 return format(new Date(row.getValue("CreatedAt")), "MMM dd, yyyy | hh:mm a");
             }
+        },
+        {
+            id: "actions",
+            enableHiding: false,
+            cell: ({ row }: any) => {
+              const record = row.original;
+              return (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <Ellipsis className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {
+                        row.getValue("LocationStatus") == "In Storage" && (
+                            <DropdownMenuItem
+                            onClick={() => {
+                                
+                            }}
+                            >
+                                <div className="flex justify-between w-full items-center">
+                                    <p>Move to Shelves</p>
+                                    <ArrowsUpFromLine size={12} color="currentColor" />  
+                                </div>
+                            </DropdownMenuItem>
+                        )
+                    }
+                    <DropdownMenuItem
+                      onClick={() => {
+                       
+                      }}
+                      className="font-medium text-red-500"
+                    >
+                      <div className="flex justify-between w-full items-center">
+                          <p>Delete</p>
+                          <Trash size={12} color="currentColor" />  
+                        </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+            },
         }
     ];
 
