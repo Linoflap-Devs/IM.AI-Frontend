@@ -8,6 +8,7 @@ import { Doughnut,} from "react-chartjs-2";
 import { Chart, ArcElement } from "chart.js";
 import { Loader } from "lucide-react";
 import { addDays, format } from "date-fns";
+import { Button } from "../ui/button";
 Chart.register(ArcElement)
 type SupplyInfo = {
     storeName: string;
@@ -113,6 +114,22 @@ function ProductView({product, batches}: ProductViewProps) {
         return total + (batch.Quantity || 0);
     }, 0)
 
+    const totalOnDisplay = (batches || []).reduce((total: number, batch: any) => {
+        if (batch.LocationStatus === 'In Storage') {
+            return total
+        } 
+
+        return total + (batch.Quantity || 0);
+    }, 0)
+
+    const totalInStorage = (batches || []).reduce((total: number, batch: any) => {
+        if (batch.LocationStatus === 'On Display') {
+            return total
+        } 
+
+        return total + (batch.Quantity || 0);
+    }, 0)
+
     const stockStatusCount = (batches || []).reduce((totals: any, batch: any) => {
         const expDate = new Date(batch.ExpirationDate)
         const quantity = batch.Quantity || 0
@@ -165,17 +182,17 @@ function ProductView({product, batches}: ProductViewProps) {
                                 <span className="font-bold text-lg">Product Information</span>
                             </CardHeader>
                             <div className="flex flex-col gap-4 ">
-                                <div className="flex flex-row justify-between border-b pb-2">
+                                <div className="flex flex-row justify-between items-center border-b pb-2">
                                     <p className="">Barcode</p>
-                                    <p className="font-semibold text-right">{product.BarCode}</p>
+                                    <p className="font-semibold text-right p-1">{product.BarCode}</p>
                                 </div>
-                                <div className="flex flex-row justify-between border-b pb-2">
+                                <div className="flex flex-row justify-between items-center border-b pb-2">
                                     <p className="">Gross Weight</p>
-                                    <p className="font-semibold text-right">{product.ProductWeight}</p>
+                                    <p className="font-semibold text-right p-1">{product.ProductWeight}</p>
                                 </div>
-                                <div className="flex flex-row justify-between">
+                                <div className="flex flex-row justify-between items-center">
                                     <p className="">Net Weight</p>
-                                    <p className="font-semibold text-right">{product.ActualWeight}</p>
+                                    <p className="font-semibold text-right p-1">{product.ActualWeight}</p>
                                 </div>
                             </div>
                         </Card>
@@ -184,17 +201,17 @@ function ProductView({product, batches}: ProductViewProps) {
                                 <span className="font-bold text-lg">Stock Information</span>
                             </CardHeader>
                             <div className="flex flex-col gap-4 ">
-                                <div className="flex flex-row justify-between border-b pb-2">
+                                <div className="flex flex-row justify-between items-center border-b pb-2">
                                     <p className="">Total In-Stock</p>
                                     <p className={`font-semibold text-right p-1 rounded ${totalQuantity < product.CriticalLevel ? "bg-red-200 text-red-800" : totalQuantity < product.ReorderLevel ? "bg-yellow-200 text-yellow-800" : ""}`}>{totalQuantity}</p>
                                 </div>
-                                <div className="flex flex-row justify-between border-b pb-2">
-                                    <p className="">Low Stock Threshold</p>
-                                    <p className="font-semibold text-right">{product.ReorderLevel || "N/A"} </p>
+                                <div className="flex flex-row justify-between items-center border-b pb-2">
+                                    <p className="">Stock On-Display</p>
+                                    <p className="font-semibold text-right p-1">{totalOnDisplay} </p>
                                 </div>
-                                <div className="flex flex-row justify-between">
-                                    <p className="">Critical Stock Threshold</p>
-                                    <p className="font-semibold text-right">{product.CriticalLevel || "N/A"}</p>
+                                <div className="flex flex-row justify-between items-center">
+                                    <p className="">Stock In-Storage</p>
+                                    <p className="font-semibold text-right p-1">{totalInStorage}</p>
                                 </div>
                             </div>
                         
@@ -207,7 +224,7 @@ function ProductView({product, batches}: ProductViewProps) {
                         <CardHeader className="p-0  mb-3">
                             <span className="font-bold text-lg">Stock Status</span>
                         </CardHeader>
-                        <div className="h-[185px] w-full flex justify-center">
+                        <div className="h-[200px] w-full flex justify-center">
 
                             {
                                 (stockStatusCount.expired === 0 && stockStatusCount.expiring === 0 && stockStatusCount.inStock === 0) ? (
@@ -215,26 +232,31 @@ function ProductView({product, batches}: ProductViewProps) {
                                         <p className="text-xl font-semibold text-gray-400">No Stock</p>
                                     </div>
                                 ) : (
-                                    <Doughnut 
-                                        data={{
-                                            labels: ["In-Stock", "Near-Expiry", "Expired"],
-                                            datasets: [
-                                                {
-                                                    data: [stockStatusCount.inStock, stockStatusCount.expiring, stockStatusCount.expired],
-                                                    backgroundColor: ["#86efac", "#fde047", "#fca5a5"],
-                                                    hoverOffset: 4,
-                                                    
+                                    <div className="relative">
+                                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                            <p className="text-xl font-semibold text-gray-400">{totalQuantity}</p>
+                                        </div>
+                                        <Doughnut 
+                                            data={{
+                                                labels: ["In-Stock", "Near-Expiry", "Expired"],
+                                                datasets: [
+                                                    {
+                                                        data: [stockStatusCount.inStock, stockStatusCount.expiring, stockStatusCount.expired],
+                                                        backgroundColor: ["#86efac", "#fde047", "#fca5a5"],
+                                                        hoverOffset: 4,
+                                                        
+                                                    }
+                                                ],
+                                            }}
+                                            options={{
+                                                plugins: {
+                                                    legend: {
+                                                        display: false
+                                                    }
                                                 }
-                                            ],
-                                        }}
-                                        options={{
-                                            plugins: {
-                                                legend: {
-                                                    display: false
-                                                }
-                                            }
-                                        }}
-                                    />
+                                            }}
+                                        />
+                                    </div>
                                 ) 
                             }
                         </div>

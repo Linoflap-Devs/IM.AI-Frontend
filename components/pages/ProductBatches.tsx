@@ -7,20 +7,82 @@ import ProductView from "@/components/pages/ProductView";
 import { useI18nStore } from "@/store/usei18n";
 import { useSession } from "next-auth/react";
 import { useGlobalStore } from "@/store/useStore";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { ArrowsUpFromLine, Ellipsis, Loader, Pencil, Trash } from "lucide-react";
+import { ArrowsUpFromLine, Box, Ellipsis, Loader, Pencil, Trash } from "lucide-react";
 import { addDays, format } from "date-fns";
 import { DataTable } from "../ui/data-table";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Button } from "../ui/button";
+import { 
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+ } from "../ui/dialog";
+import { useToast } from "../ui/use-toast";
 
 interface ProductBatchesProps {
     batches: any[];
+    refetchMethod: () => void
 }
 
-export async function ProductBatches({batches}: ProductBatchesProps) {
+export async function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
+
+    const [moveDialogOpen, setMoveDialogOpen] = useState(false);
+    const { toast } = useToast();
+
+    const toDisplayMutation = useMutation({
+        mutationFn: async (id: string) => {
+            const response = await axios.patch(
+                `${process.env.NEXT_PUBLIC_API_URL}/batch/displayBatch`,
+                {
+                    id: id
+                }
+            );
+
+            return response.data;
+        },
+        onSuccess: (data) => {
+            console.log("Success", data)
+            toast({
+                title: "Success!",
+                description: `${data.BatchNo} has been moved to Display.`,
+            })
+            refetchMethod();
+        },
+        onError: (error) => {
+            console.log("Failed", error.message)
+        }
+    })
+
+    const toStoreMutation = useMutation({
+        mutationFn: async (id: string) => {
+            const response =  await axios.patch(
+                `${process.env.NEXT_PUBLIC_API_URL}/batch/storeBatch`,
+                {
+                    id: id
+                }
+            );
+
+            return response.data
+        },
+        onSuccess: (data) => {
+            console.log("Success")
+            toast({
+                title: "Success!",
+                description: `${data.BatchNo} has been moved to Storage.`,
+            })
+            refetchMethod();
+        },
+        onError: (error) => {
+            console.log("Failed", error.message)
+        }
+    })
+
     const column: ColumnDef<any>[] = [
         {
             accessorKey: "BatchNo",
@@ -112,15 +174,26 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {
-                        row.getValue("LocationStatus") == "In Storage" && (
+                        row.getValue("LocationStatus") == "In Storage" ? (
                             <DropdownMenuItem
                             onClick={() => {
-                                
+                                toDisplayMutation.mutate(record.Id)
                             }}
                             >
                                 <div className="flex justify-between w-full items-center">
                                     <p>Move to Shelves</p>
                                     <ArrowsUpFromLine size={12} color="currentColor" />  
+                                </div>
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem
+                            onClick={() => {
+                                toStoreMutation.mutate(record.Id)
+                            }}
+                            >
+                                <div className="flex justify-between w-full items-center">
+                                    <p>Move to Storage</p>
+                                    <Box size={12} color="currentColor" />  
                                 </div>
                             </DropdownMenuItem>
                         )
@@ -144,15 +217,28 @@ export async function ProductBatches({batches}: ProductBatchesProps) {
     ];
 
     return (
-        <div className="w-full mt-4">
-            <DataTable
-                data={batches}
-                columns={column}
-                filtering={true}
-                pagination={true}
-                columnsToSearch={["BatchNo", "BranchName", "Supplier"]}
-                pageSize={10}
-            />
-        </div>
+        <>
+            
+            {/* <Dialog
+                open={moveDialogOpen}
+                onOpenChange={setMoveDialogOpen}
+            >  
+                <DialogContent>
+                    Hello
+                </DialogContent>
+            </Dialog> */}
+            <div className="w-full mt-4">
+                <DataTable
+                    data={batches}
+                    columns={column}
+                    filtering={true}
+                    pagination={true}
+                    columnsToSearch={["BatchNo", "BranchName", "Supplier"]}
+                    pageSize={10}
+                />
+
+
+            </div>
+        </>
     )
 }

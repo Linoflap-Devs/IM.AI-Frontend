@@ -14,6 +14,7 @@ import { ProductBatches } from "./ProductBatches";
 import { format } from "date-fns";
 import { Button } from "../ui/button";
 import { getMonthDifferenceArray, monthlyTotal } from "@/lib/dateoperators";
+import { toast } from "../ui/use-toast";
 
 function Products(productId: { productId: string}) {
     const session = useSession();
@@ -129,7 +130,7 @@ function Products(productId: { productId: string}) {
 
     useEffect(() =>  {
         lookupProductTransactions.refetch();
-    }, [productPurchaseDateRange])
+    }, [productPurchaseDateRange, globalBranchState])
 
     
     return (
@@ -140,6 +141,7 @@ function Products(productId: { productId: string}) {
                 <h1 className="p-2 text-2xl font-semibold">Product ID: {productId.productId}</h1>
                 <span className="p-2 ms-2 bg-blue-200 text-blue-800 w-max rounded text-sm">{globalBranchName == "Select Branch" || globalBranchName == "" ? "All Branches" : globalBranchName}</span>
             </div>
+
             <div className="p-2">
                 <div className="flex gap-2 border-b">
                     <span
@@ -199,7 +201,7 @@ function Products(productId: { productId: string}) {
                 )}
                 {tabState== "batches" && (
                     !(lookupProductBatches.isLoading) && (
-                        <ProductBatches batches={lookupProductBatches.data}></ProductBatches>
+                        <ProductBatches batches={lookupProductBatches.data} refetchMethod={lookupProductBatches.refetch}></ProductBatches>
                     )
                 )}
             </div>
