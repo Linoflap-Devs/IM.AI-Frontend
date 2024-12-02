@@ -262,7 +262,7 @@ function CustomerList() {
                     resetSortBtn={true}
                     columns={clientListColoumns}
                     filtering={true}
-                    columnsToSearch={["Email", "UserClient", "ContactNumber"]}
+                    columnsToSearch={["Email", "UserClientId", "ContactNumber"]}
                     data={clientList}
                     pageSize={11}
                     pagination={true}

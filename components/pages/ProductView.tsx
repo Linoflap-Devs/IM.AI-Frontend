@@ -81,6 +81,10 @@ function ProductView({product, batches}: ProductViewProps) {
             }
         },
         {
+            accessorKey: "Supplier",
+            header: "Supplier",
+        },
+        {
             accessorKey: "BranchName",
             header: "Branch",
         },

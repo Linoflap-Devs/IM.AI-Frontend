@@ -149,6 +149,10 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
 
     const coloumn: ColumnDef<PurchaseHistory>[] = [
         {
+            accessorKey: "ReferenceNumber",
+            header: "Reference No."
+        },
+        {
             accessorKey: "BranchName",
             header: BranchNamei18n[locale],
         },
@@ -187,6 +191,13 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                     <p className="text-end">{CurrencyMarker[locale]}{(price * quantity).toFixed(2)}</p>
                 )
             }
+        },
+        {
+            accessorKey: "UserClientId",
+            header: "User ID",
+            cell: ({ row }) => {
+                return <p className="text-end">{row.getValue("UserClientId")}</p>;
+            }
         }
     ];
     const [loadingState, setLoadingState] = useState(true);
@@ -203,7 +214,7 @@ function InventoryPurchase({transactions}: InventoryPurchaseProps) {
                         pagination={true}
                         pageSize={9}
                         filtering={true}
-                        columnsToSearch={["BranchName"]}
+                        columnsToSearch={["BranchName", "ReferenceNumber"]}
                     />
                 </div>
                 <div className="w-2/6 px-4">
