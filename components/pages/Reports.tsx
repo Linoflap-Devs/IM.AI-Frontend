@@ -322,13 +322,6 @@ function Reports() {
                         </PopoverContent>
                     </Popover>
                     <Button
-                        onClick={() => {
-                            console.log(date);
-                        }}
-                    >
-                        {Viewi18n[locale]}
-                    </Button>
-                    <Button
                         className="bg-green-500 hover:bg-green-600"
                         onClick={() => {
                             console.log(currentPath);

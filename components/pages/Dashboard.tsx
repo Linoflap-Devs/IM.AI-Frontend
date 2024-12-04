@@ -409,6 +409,7 @@ function Dashboard() {
                                 dataKey="Total_Quantity"
                                 icon={<PackageOpen />}
                                 isFetching={getStoreActivity.isFetching}
+                                isLoading={getStoreActivity.isLoading}
                                 data={getDashboardData.data?.salesOverview}
                             />
                             <StoreActivityCard
@@ -416,6 +417,7 @@ function Dashboard() {
                                 dataKey="Price"
                                 icon={<JapaneseYen />}
                                 isFetching={getStoreActivity.isFetching}
+                                isLoading={getStoreActivity.isLoading}
                                 data={getDashboardData.data?.salesOverview}
                             />
                             <StoreActivityCard
@@ -423,6 +425,7 @@ function Dashboard() {
                                 dataKey="PricePurchase"
                                 icon={<JapaneseYen />}
                                 isFetching={getStoreActivity.isFetching}
+                                isLoading={getStoreActivity.isLoading}
                                 data={getDashboardData.data?.salesOverview}
                             />
                         </div>
@@ -439,6 +442,7 @@ function Dashboard() {
                                 dataKey="Purchases"
                                 icon={<ReceiptJapaneseYen />}
                                 isFetching={getStoreActivity.isFetching}
+                                isLoading={getStoreActivity.isLoading}
                                 data={getStoreActivity.data}
                             />
                             <StoreActivityCard
@@ -446,6 +450,7 @@ function Dashboard() {
                                 dataKey="ActivePromo"
                                 icon={<Tag />}
                                 isFetching={getStoreActivity.isFetching}
+                                isLoading={getStoreActivity.isLoading}
                                 data={getStoreActivity.data}
                             />
                             <StoreActivityCard
@@ -453,6 +458,7 @@ function Dashboard() {
                                 dataKey="CartIssue"
                                 icon={<ShoppingBasket />}
                                 isFetching={getStoreActivity.isFetching}
+                                isLoading={getStoreActivity.isLoading}
                                 data={getStoreActivity.data}
                             />
                             <StoreActivityCard
@@ -460,6 +466,7 @@ function Dashboard() {
                                 dataKey="Customer"
                                 icon={<UserRound />}
                                 isFetching={getStoreActivity.isFetching}
+                                isLoading={getStoreActivity.isLoading}
                                 data={getStoreActivity.data}
                             />
                         </div>
@@ -657,6 +664,7 @@ interface StoreActivityCardProps {
     dataKey: string;
     icon: JSX.Element;
     isFetching: boolean;
+    isLoading: boolean;
     data: { [key: string]: number };
 }
 const StoreActivityCard: FC<StoreActivityCardProps> = ({
@@ -664,6 +672,7 @@ const StoreActivityCard: FC<StoreActivityCardProps> = ({
     dataKey,
     icon,
     isFetching,
+    isLoading,
     data,
 }) => {
     console.log(title, data)
@@ -672,7 +681,7 @@ const StoreActivityCard: FC<StoreActivityCardProps> = ({
             <h1 className="text-start font-medium">{title}</h1>
             <div className="flex items-center gap-1">
                 {icon}
-                {isFetching ? (
+                {isLoading ? (
                     <Loader2 className="animate-spin" size={30} />
                 ) : (
                     <p className="text-3xl font-bold">
