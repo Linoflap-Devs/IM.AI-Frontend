@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Card } from "../ui/card";
 import { DataTable } from "../ui/data-table";
 import { Button } from "../ui/button";
-import { ArrowUpDown, Trash2, BookOpen } from "lucide-react";
+import { ArrowUpDown, Trash2, BookOpen, Pencil } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -37,6 +37,7 @@ import { toast } from "../ui/use-toast";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import MultipleSelector from "../ui/multi-select";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
+import { format } from "date-fns";
 
 function Promo() {
     const session = useSession();
@@ -85,8 +86,12 @@ function Promo() {
     const addPromoFormSchema = z.object({
         name: z.string().min(2).max(50),
         discount: z.string().min(1).max(90),
+        start: z.date(),
         expiry: z.date(),
         products: z.array(z.any()).min(1, { message: "Required at least one" }),
+    }).refine((data) => data.start < data.expiry, {
+        message: "Start date must be before the Expiry Date",
+        path: ["start"]
     });
     const addPromoForm = useForm<z.infer<typeof addPromoFormSchema>>({
         resolver: zodResolver(addPromoFormSchema),
@@ -95,6 +100,7 @@ function Promo() {
     const [openDial, setOpenDial] = useState<boolean>();
     const [indexToDel, setIndexToDel] = useState<number>(0);
     const [selectedPromo, setSelectedPromo] = useState<string>("");
+    const [isEditMode, setIsEditMode] = useState<boolean>(false);
     /* Queries */
     //Axios Configuration
     axios.defaults.headers.common[
@@ -139,6 +145,7 @@ function Promo() {
         queryKey: ["promo"],
         enabled: session.status === "authenticated",
         queryFn: async () => {
+            console.log(userData)
             if (session.data?.token !== undefined) {
                 const companyId =
                     globalCompanyState !== "all"
@@ -158,14 +165,20 @@ function Promo() {
     const promoMutation = useMutation({
         mutationKey: ["addPromo"],
         mutationFn: async (data: any) => {
+
+            const startDate = format(new Date(data.start), "yyyy-MM-dd HH:mm:ss")
+            const endDate = format(new Date(data.expiry), "yyyy-MM-dd HH:mm:ss")
+
+            console.log(startDate, endDate)
+
             await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/promo/addPromo`,
                 {
-                    expiry: data.expiry,
+                    startDate: startDate,
+                    endDate: endDate,
                     name: data.name,
                     category: data.category,
                     percentage: data.discount,
-                    promoCode: data.promoCode,
                     companyId: userData?.companyId,
                     branchId: userData?.branchId,
                     products: data.products.map(
@@ -256,15 +269,40 @@ function Promo() {
                 );
             },
             cell: ({ row }) => {
-                const status =
-                    new Date(row.getValue("Expiry")) < new Date()
-                        ? Expiredi18n[locale]
-                        : Activei18n[locale];
-                return <div className="text-center">{status}</div>;
+                const status = new Date(row.getValue("EndDate")) < new Date()
+                return <div className="text-center"><span className={`p-1 rounded ${status ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>{status ? Activei18n[locale]: Expiredi18n[locale]}</span></div>;
             },
         },
         {
-            accessorKey: "Expiry",
+            accessorKey: "StartDate",
+            header: ({ column }) => {
+                return (
+                    <div className="flex flex-col items-center">
+                        <Button
+                            variant="ghost"
+                            className="hover:bg-gray-300"
+                            onClick={() =>
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc"
+                                )
+                            }
+                        >
+                            {"Start Date"}
+                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">
+                        {format(new Date(row.getValue("StartDate")), "MM-dd-yyyy | HH:mm")}
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: "EndDate",
             header: ({ column }) => {
                 return (
                     <div className="flex flex-col items-center">
@@ -284,14 +322,9 @@ function Promo() {
                 );
             },
             cell: ({ row }) => {
-                const expiryDate: Date = new Date(row.getValue("Expiry"));
                 return (
                     <div className="text-center">
-                        {expiryDate.toLocaleDateString(locale, {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                        })}
+                        {format(new Date(row.getValue("EndDate")), "MM-dd-yyyy | HH:mm")}
                     </div>
                 );
             },
@@ -305,6 +338,26 @@ function Promo() {
                 return (
                     <div className="flex justify-center gap-3">
                         <Button
+                            onClick={() => {
+                                setOpen(true);
+                                setSelectedPromo(row.getValue("PromoId"));
+                            }}
+                            className="h-max px-1 py-1"
+                        >
+                            <BookOpen size={20} strokeWidth={1.25} />
+                        </Button>
+                        <Button
+                            className="h-max px-1 py-1"
+                            onClick={() => {
+                                setIsEditMode(true)
+                                setOpenDialAdd((prev) => {
+                                    return !prev!
+                                })
+                            }}
+                        >
+                            <Pencil size={20} strokeWidth={1.25}></Pencil>
+                        </Button>
+                        <Button
                             variant={"destructive"}
                             className="h-full px-1 py-1"
                             onClick={() => {
@@ -315,15 +368,6 @@ function Promo() {
                             }}
                         >
                             <Trash2 size={20} strokeWidth={1.25} />
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setOpen(true);
-                                setSelectedPromo(row.getValue("PromoId"));
-                            }}
-                            className="h-max px-1 py-1"
-                        >
-                            <BookOpen size={20} strokeWidth={1.25} />
                         </Button>
                     </div>
                 );
@@ -344,6 +388,7 @@ function Promo() {
     }, [selectedPromo]);
     return (
         <div className="mx-3 mb-3 flex flex-1 gap-3">
+            
             <Card className="flex flex-1 flex-col gap-3 p-3">
                 <div className="flex items-center justify-between pb-2">
                     <h1 className="text-2xl font-semibold">
@@ -364,7 +409,7 @@ function Promo() {
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
                                         <AlertDialogTitle>
-                                            {AddPromoi18n[locale]}
+                                            { isEditMode ? "Edit Promo" : AddPromoi18n[locale]}
                                         </AlertDialogTitle>
                                         <div>
                                             <Form {...addPromoForm}>
@@ -543,6 +588,85 @@ function Promo() {
                                                             </FormItem>
                                                         )}
                                                     />
+
+                                                    <FormField
+                                                        control={
+                                                            addPromoForm.control
+                                                        }
+                                                        name="start"
+                                                        render={({ field }) => (
+                                                            <FormItem className="flex flex-col gap-2 pt-2">
+                                                                <FormLabel>
+                                                                    {
+                                                                        "Start Date"
+                                                                    }
+                                                                </FormLabel>
+                                                                <div>
+                                                                    {/* <Popover>
+                                                                        <PopoverTrigger
+                                                                            asChild
+                                                                        >
+                                                                            <FormControl>
+                                                                                <Button
+                                                                                    variant={
+                                                                                        "outline"
+                                                                                    }
+                                                                                    className={cn(
+                                                                                        "w-[240px] pl-3 text-left font-normal",
+                                                                                        !field.value &&
+                                                                                            "text-muted-foreground"
+                                                                                    )}
+                                                                                >
+                                                                                    {field.value ? (
+                                                                                        format(
+                                                                                            field.value,
+                                                                                            "PPP"
+                                                                                        )
+                                                                                    ) : (
+                                                                                        <span>
+                                                                                            Pick
+                                                                                            a
+                                                                                            date
+                                                                                        </span>
+                                                                                    )}
+                                                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                                </Button>
+                                                                            </FormControl>
+                                                                        </PopoverTrigger>
+                                                                        <PopoverContent
+                                                                            className="w-auto p-0"
+                                                                            align="start"
+                                                                        >
+                                                                            <Calendar
+                                                                                mode="single"
+                                                                                selected={
+                                                                                    field.value
+                                                                                }
+                                                                                onSelect={
+                                                                                    field.onChange
+                                                                                }
+                                                                                initialFocus
+                                                                            />
+                                                                        </PopoverContent>
+                                                                    </Popover> */}
+                                                                    <DateTimePicker
+                                                                        granularity="minute"
+                                                                        hourCycle={
+                                                                            12
+                                                                        }
+                                                                        jsDate={
+                                                                            field.value
+                                                                        }
+                                                                        onJsDateChange={
+                                                                            field.onChange
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
                                                     <FormField
                                                         control={
                                                             addPromoForm.control
