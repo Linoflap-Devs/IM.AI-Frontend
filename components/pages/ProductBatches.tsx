@@ -50,7 +50,7 @@ export async function ProductBatches({batches, refetchMethod}: ProductBatchesPro
             console.log("Success", data)
             toast({
                 title: "Success!",
-                description: `${data.BatchNo} has been moved to Display.`,
+                description: `${data.batch.BatchNo} has been moved to Display.`,
             })
             refetchMethod();
         },
@@ -74,7 +74,7 @@ export async function ProductBatches({batches, refetchMethod}: ProductBatchesPro
             console.log("Success")
             toast({
                 title: "Success!",
-                description: `${data.BatchNo} has been moved to Storage.`,
+                description: `${data.batch.BatchNo} has been moved to Storage.`,
             })
             refetchMethod();
         },
