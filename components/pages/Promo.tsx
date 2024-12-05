@@ -48,6 +48,12 @@ function Promo() {
     >([]);
     const [open, setOpen] = useState(false);
     const { globalCompanyState, globalBranchState } = useGlobalStore();
+    const [openDialAdd, setOpenDialAdd] = useState<boolean>();
+    const [openDial, setOpenDial] = useState<boolean>();
+    const [indexToDel, setIndexToDel] = useState<number>(0);
+    const [selectedPromo, setSelectedPromo] = useState<string>("");
+    const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    const [selectedPromoDetail, setSelectedPromoDetail] = useState<any>({})
     const {
         locale,
         Namei18n,
@@ -95,12 +101,15 @@ function Promo() {
     });
     const addPromoForm = useForm<z.infer<typeof addPromoFormSchema>>({
         resolver: zodResolver(addPromoFormSchema),
+        defaultValues: {
+            name: "",
+            discount: "",
+            start: undefined,
+            expiry: undefined,
+            products: undefined
+        },
     });
-    const [openDialAdd, setOpenDialAdd] = useState<boolean>();
-    const [openDial, setOpenDial] = useState<boolean>();
-    const [indexToDel, setIndexToDel] = useState<number>(0);
-    const [selectedPromo, setSelectedPromo] = useState<string>("");
-    const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    
     /* Queries */
     //Axios Configuration
     axios.defaults.headers.common[
@@ -130,7 +139,7 @@ function Promo() {
         },
     });
     const promoDetailsQuery = useQuery({
-        queryKey: ["promoDetails"],
+        queryKey: ["promoDetails", selectedPromo],
         enabled: selectedPromo !== "",
         queryFn: async () => {
             if (session.data?.token !== undefined) {
@@ -206,6 +215,43 @@ function Promo() {
             });
         },
     });
+
+    const editPromoMutation = useMutation({
+        mutationKey: ['editPromo'],
+        mutationFn: async (data: any) => {
+            const editData = {
+                id: selectedPromo,
+                name: data.name,
+                startDate: data.start,
+                endDate: data.expiry,
+                percentage: data.discount,
+                products: data.products.map((product: any) => product.value)
+            }
+            console.log(editData)
+            await axios.patch(
+                `${process.env.NEXT_PUBLIC_API_URL}/promo/editPromo`,
+                editData
+            )
+        },
+        onSuccess: (data) => {
+            promoQuery.refetch();
+            toast({
+                title: Successi18n[locale],
+                description: SuccesfullyAddedNewPromoi18n[locale],
+            });
+            setTimeout(() => {
+                setOpenDialAdd(false);
+                addPromoForm.reset();
+            });
+        },
+        onError: (data) => {
+            console.log(data);
+            toast({
+                title: Failedi18n[locale],
+                description: PleaseUseADifferentPromoCodei18n[locale],
+            });
+        },
+    })
     const promoDeleteMutation = useMutation({
         mutationKey: ["deletePromo"],
         mutationFn: async (data: any) => {
@@ -221,6 +267,59 @@ function Promo() {
             });
         },
     });
+
+    const handleRowEdit = (row: any) => {
+        console.log(row.original)
+        setSelectedPromo(row.original.PromoId)
+        setIsEditMode(true)
+        const details = {
+            name: row.original.Name,
+            discount: row.original.Percentage,
+            start: new Date(row.original.StartDate),
+            expiry: new Date(row.original.EndDate),
+            // start: undefined,
+            // expiry: undefined,
+            products: row.getValue("products")
+        }   
+        setSelectedPromoDetail(details)
+        console.log(details)
+        addPromoForm.reset(details)
+        setOpenDialAdd((prev) => {
+            return !prev!
+        })
+    }
+
+    useEffect(() => {
+        console.log(selectedPromoDetail)
+    }, [selectedPromoDetail])
+
+    useEffect(() => {
+        promoQuery.refetch();
+    }, [globalCompanyState, globalBranchState]);
+
+    useEffect(() => {
+        console.log(selectedPromo)
+        promoDetailsQuery.refetch();
+    }, [selectedPromo]);
+
+    useEffect(() => {
+        if (promoDetailsQuery.data && isEditMode) {
+            // Set products in the form once data is fetched
+            const labelValue = promoDetailsQuery.data.map((item: any) => {
+                return {
+                    label: item.Name,
+                    value: item.ProductId.toString()
+                }
+            })
+            setSelectedPromoDetail((prev: any) => ({
+                ...prev,
+                products: labelValue, // Use the queried products
+            }));
+            
+            addPromoForm.setValue("products", labelValue); // Update form directly
+        }
+    }, [promoDetailsQuery.data, isEditMode]);
+
     /* Coloumn Definitions */
     const columnsPromoList: ColumnDef<PromoDataList>[] = [
         { accessorKey: "PromoId", header: IDi18n[locale] },
@@ -269,8 +368,10 @@ function Promo() {
                 );
             },
             cell: ({ row }) => {
-                const status = new Date(row.getValue("EndDate")) < new Date()
-                return <div className="text-center"><span className={`p-1 rounded ${status ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>{status ? Activei18n[locale]: Expiredi18n[locale]}</span></div>;
+                const hasStarted = new Date(row.getValue("StartDate")) < new Date()
+                const hasEnded = new Date(row.getValue("EndDate")) < new Date()
+                const isActive = hasStarted && !hasEnded
+                return <div className="text-center"><span className={`p-1 rounded ${hasEnded ? "bg-red-200 text-red-800" : hasStarted ? "bg-green-200 text-green-800" : "bg-orange-200 text-orange-800"}`}>{hasEnded ? "Expired" : hasStarted ? "Active" : "Inactive"}</span></div>;
             },
         },
         {
@@ -349,10 +450,7 @@ function Promo() {
                         <Button
                             className="h-max px-1 py-1"
                             onClick={() => {
-                                setIsEditMode(true)
-                                setOpenDialAdd((prev) => {
-                                    return !prev!
-                                })
+                                handleRowEdit(row)
                             }}
                         >
                             <Pencil size={20} strokeWidth={1.25}></Pencil>
@@ -378,14 +476,14 @@ function Promo() {
         { accessorKey: "Name", header: Namei18n[locale] },
     ];
     function onSubmit(values: z.infer<typeof addPromoFormSchema>) {
-        promoMutation.mutate(values);
+        if(isEditMode){
+            editPromoMutation.mutate(values)
+        }
+        else {
+            promoMutation.mutate(values);
+        }
     }
-    useEffect(() => {
-        promoQuery.refetch();
-    }, [globalCompanyState, globalBranchState]);
-    useEffect(() => {
-        promoDetailsQuery.refetch();
-    }, [selectedPromo]);
+    
     return (
         <div className="mx-3 mb-3 flex flex-1 gap-3">
             
@@ -401,7 +499,16 @@ function Promo() {
                                 onOpenChange={setOpenDialAdd}
                             >
                                 <AlertDialogTrigger
-                                    onClick={() => addPromoForm.reset()}
+                                    onClick={() => {
+                                        setIsEditMode(false) 
+                                        addPromoForm.reset({
+                                            name: "",
+                                            discount: "",
+                                            start: undefined,
+                                            expiry: undefined,
+                                            products: []
+                                        }) 
+                                    }}
                                     className="rounded-lg bg-primary px-2 py-2 font-medium text-white"
                                 >
                                     {AddPromoi18n[locale]}
@@ -447,6 +554,7 @@ function Promo() {
                                                             </FormItem>
                                                         )}
                                                     />
+                                                    <Button onClick={() => console.log("form values", addPromoForm.getValues())} type="button"></Button>
                                                     <FormField
                                                         control={
                                                             addPromoForm.control
