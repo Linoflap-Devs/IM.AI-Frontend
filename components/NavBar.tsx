@@ -98,15 +98,7 @@ function NavBar() {
             permission: [1, 2, 3, 4],
             state: currentPath.includes("inv&products"),
             subNav: [
-                {
-                    name: {
-                        en: "Category",
-                        ja: "カデゴリー",
-                    },
-                    icon: <LayoutGrid />,
-                    navigation: "category",
-                    permission: [1, 2],
-                },
+                
                 {
                     name: {
                         en: "Inventory",
@@ -133,6 +125,15 @@ function NavBar() {
                     icon: <Truck />,
                     navigation: "transferorder",
                     permission: [1, 2, 3],
+                },
+                {
+                    name: {
+                        en: "Category",
+                        ja: "カデゴリー",
+                    },
+                    icon: <LayoutGrid />,
+                    navigation: "category",
+                    permission: [1, 2],
                 },
             ],
         },

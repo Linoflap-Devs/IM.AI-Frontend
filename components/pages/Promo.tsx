@@ -279,7 +279,7 @@ function Promo() {
             expiry: new Date(row.original.EndDate),
             // start: undefined,
             // expiry: undefined,
-            products: row.getValue("products")
+            products: promoDetailsQuery.data.map((product: any) => {return { label: product.Name, value: product.ProductId}}) ?? []
         }   
         setSelectedPromoDetail(details)
         console.log(details)
@@ -554,7 +554,6 @@ function Promo() {
                                                             </FormItem>
                                                         )}
                                                     />
-                                                    <Button onClick={() => console.log("form values", addPromoForm.getValues())} type="button"></Button>
                                                     <FormField
                                                         control={
                                                             addPromoForm.control
@@ -860,7 +859,7 @@ function Promo() {
                                                             {Canceli18n[locale]}
                                                         </AlertDialogCancel>
                                                         <Button type="submit">
-                                                            {Submiti18n[locale]}
+                                                            { isEditMode ? "Update" : Submiti18n[locale]}
                                                         </Button>
                                                     </div>
                                                 </form>
