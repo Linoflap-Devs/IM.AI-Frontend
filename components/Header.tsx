@@ -95,7 +95,7 @@ function Header() {
                     )}
 
                 {session.status === "authenticated" &&
-                    userData.role <= 2 &&
+                    userData.role <= 3 &&
                     hideFilter(currentPath, [
                         "createacc",
                         "useractivity",
@@ -106,7 +106,7 @@ function Header() {
                             <label className="text-lg font-medium">
                                 {Branchi18n[locale]}
                             </label>
-                            <BranchDropDown />
+                            <BranchDropDown className="w-[20rem]" />
                         </div>
                     )}
             </div>
