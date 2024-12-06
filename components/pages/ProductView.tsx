@@ -36,6 +36,9 @@ function ProductView({product, batches}: ProductViewProps) {
         Categoryi18n,
         Expiryi18n,
         Contacti18n,
+        PurchasePrice,
+        RetailPrice,
+        CurrencyMarker
     } = useI18nStore();
     const productInfo = {
         productName: "Maggi",
@@ -165,14 +168,23 @@ function ProductView({product, batches}: ProductViewProps) {
                                 height="150"
                                 unoptimized={true}
                             />
-                            <div className="flex flex-col justify-between">
+                            <div className="flex flex-col justify-between w-full">
                                 <div className="flex flex-col">
                                     <h1 className="text-lg font-bold text-gray-600">
                                         {product.Name}
                                     </h1>
                                     <span className="p-2 bg-blue-100 text-blue-800 rounded text-sm w-max">{product.Category}</span>
                                 </div>
-                                <p className="text-3xl font-bold">PHP{parseInt(product.Price).toFixed(2)}</p>
+                                <div className="flex justify-between w-full gap-4">
+                                    <div className="flex flex-col w-1/2 border rounded p-2">
+                                        <p className="text-sm font-semibold text-black/[.70]">{PurchasePrice[locale]}</p>
+                                        <p className="text-3xl font-bold">{CurrencyMarker[locale]}{parseInt(product.PurchasePrice).toFixed(2)}</p>
+                                    </div>
+                                    <div className="flex flex-col w-1/2 border rounded p-2">
+                                        <p className="text-sm font-semibold text-black/[.70]">{RetailPrice[locale]}</p>
+                                        <p className="text-3xl font-bold">{CurrencyMarker[locale]}{parseInt(product.Price).toFixed(2)}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Card>
