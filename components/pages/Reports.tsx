@@ -31,10 +31,18 @@ import { addDays, format } from "date-fns";
 /* import { CalendarIcon, Calendar } from "lucide-react"; */
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
-import { ArrowUpDown, Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import { ArrowUpDown, ArrowUpRight, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import {
+    Tooltip as Tooltip1,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
+
 const labels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 ChartJS.register(
@@ -51,6 +59,9 @@ function Reports() {
     const session = useSession();
     const userData = session.data?.data;
     const currentPath = usePathname();
+    axios.defaults.headers.common[
+        "Authorization"
+    ] = `Bearer ${session.data?.token}`;
     
     const {
         locale,
@@ -70,13 +81,22 @@ function Reports() {
         Pricei18n,
         Itemsi18n,
         Datei18n,
-        PleaseSelectACompanyOrABranchi18n
+        PleaseSelectACompanyOrABranchi18n,
+        RetailPrice, 
+        PurchasePrice,
+        CurrencyMarker,
+        Quantityi18n
     } = useI18nStore();
     const { globalCompanyState, globalBranchState } = useGlobalStore();
     const [date, setDate] = useState<DateRange | undefined>({
         from: addDays(new Date(Date.now()), -7),
         to: new Date(Date.now()),
     });
+
+    const [open, setOpen] = useState<boolean>(false)
+    const [selectedTransaction, setSelectedTransaction] = useState<string>()
+    const [selectedTransactionParent, setSelectedTransactionParent] = useState<any>()
+
     const getSales = useQuery({
         queryKey: ["getSales"],
         enabled: session.data?.token !== undefined,
@@ -138,6 +158,19 @@ function Reports() {
         },
     });
 
+    const getTransactionQuery = useQuery({
+        queryKey: ["GetTransaction", selectedTransaction],
+        enabled: selectedTransaction !== "",
+        queryFn: async () => {
+            if (session.data?.token !== undefined) {
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_URL}/transaction/getTransaction/rNo/${selectedTransaction}`
+                );
+                return response.data;
+            }
+        }
+    }) 
+
     const options: ChartOptions<"line"> = {
         responsive: true as boolean,
         aspectRatio: 5 as number,
@@ -154,6 +187,20 @@ function Reports() {
                 },
             }, */
         },
+        scales: {
+            y: {
+                title: {
+                    display: true,
+                    text: "Amount"
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: "Month"
+                }
+            }
+        }
     };
     const column: ColumnDef<ProductPerformance>[] = [
         {
@@ -161,11 +208,29 @@ function Reports() {
             header: ReferenceNumberi18n[locale],
         },
         {
+            accessorKey: "PurchasePrice",
+            header: ({ table }) => {
+                return (
+                    <div className="flex justify-end">
+                        {PurchasePrice[locale]}
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-end">
+                        <span className="font-bold">¥</span>
+                        {parseInt(row.getValue("PurchasePrice") || "0").toFixed(2)}
+                    </div>
+                );
+            },
+        },
+        {
             accessorKey: "Price",
             header: ({ table }) => {
                 return (
                     <div className="flex justify-end">
-                        {Pricei18n[locale]}
+                        {RetailPrice[locale]}
                     </div>
                 );
             },
@@ -241,7 +306,89 @@ function Reports() {
                 }
             },
         },
+        {
+            id: "actions",
+            header: () => {
+                return <div className="text-center">{Itemsi18n[locale]}</div>;
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="w-full overflow-hidden truncate text-clip">
+                        <TooltipProvider>
+                            <Tooltip1>
+                                <TooltipTrigger asChild>
+                                <div className="text-center">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setSelectedTransaction(row.getValue("ReferenceNumber"))
+                                            setSelectedTransactionParent({
+                                                ReferenceNumber: row.getValue("ReferenceNumber"),
+                                                CreatedAt: row.getValue("CreatedAt"),
+                                                Price: row.getValue("Price")
+                                            })
+                                            setOpen(true)
+                                        }}
+                                    >
+                                        <ArrowUpRight />
+                                    </Button>
+                                </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    View Items
+                                </TooltipContent>
+                            </Tooltip1>
+                        </TooltipProvider>
+                    </div>
+                   
+                );
+            },
+        },
     ];
+
+
+    const transactionDetailColumns: ColumnDef<any>[] = [
+        {
+            accessorKey: "Name",
+            header: "Name"
+        },
+        {
+            accessorKey: "Price",
+            header: () => {
+                return (
+                    <div className="text-end">
+                       {RetailPrice[locale]} 
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-end">
+                        <span className="font-bold">{CurrencyMarker[locale]}</span>
+                        {parseInt(row.getValue("Price")).toFixed(2)}
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: "Quantity",
+            header: () => {
+                return (
+                    <div className="text-end">
+                       {Quantityi18n[locale]} 
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-end">
+                        {row.getValue("Quantity")}
+                    </div>
+                );
+            },
+        }
+    ]
+
     const data: ChartData<"line"> = {
         labels: labels,
         datasets: [
@@ -253,6 +400,14 @@ function Reports() {
                 borderColor: "rgb(53, 162, 235)",
                 backgroundColor: "rgba(53, 162, 235, 0.5)",
             },
+            {
+                label: "Profit",
+                data: Object.values(getMonthlySales.data || {}).map(
+                    (val: any) => val + 10000
+                ) as number[],
+                borderColor: "#ef4444",
+                backgroundColor: "#f87171",
+            }
         ],
     };
     useEffect(() => {
@@ -341,6 +496,45 @@ function Reports() {
                     columnsToSearch={["ReferenceNumber", "CreatedAt"]}
                 />
             </Card>
+            <Sheet open={open} onOpenChange={setOpen}>
+                <SheetContent className="w-[600px] sm:w-lg max-w-[600px]">
+                    <SheetHeader>
+                        <h1 className="text-2xl font-semibold">
+                            Transaction Details
+                        </h1>
+                    </SheetHeader>
+                    
+                    <div className="flex w-full flex-col gap-3 py-5">
+                        {
+                            selectedTransactionParent && (
+                                <div className="flex flex-col gap-4 border-b pb-4">
+                                    <div className="flex flex-row justify-between items-center border-b pb-2">
+                                        <p className="">Reference Number</p>
+                                        <p className="font-semibold text-right p-1">{selectedTransactionParent.ReferenceNumber || ""}</p>
+                                    </div>
+                                    <div className="flex flex-row justify-between items-center border-b pb-2">
+                                        <p className="">Transaction Date</p>
+                                        <p className="font-semibold text-right p-1">{format(new Date(selectedTransactionParent.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
+                                    </div>
+                                    <div className="flex flex-row justify-between items-center">
+                                        <p className="">Total Price</p>
+                                        <p className="font-semibold text-right p-1">{CurrencyMarker[locale]}{parseInt(selectedTransactionParent.Price || "0").toFixed(2)}</p>
+                                    </div>
+                                </div>
+                            )
+                        }
+                        <p className="font-semibold">Items</p>
+                        <DataTable
+                            columns={transactionDetailColumns}
+                            pagination={true}
+                            data={getTransactionQuery.data ?? []}
+                            pageSize={10}
+                            filtering={true}
+                            columnsToSearch={["Name"]}
+                        />
+                    </div>
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }
