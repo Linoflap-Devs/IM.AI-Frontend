@@ -43,6 +43,7 @@ import BranchDropDown from "../BranchDropDown";
 const formSchema = z.object({
     productName: z.string().min(2).max(50),
     price: z.string().min(2).max(50),
+    purchasePrice: z.string().min(2).max(50),
     barcode: z.string().min(2).max(50),
     actualWeight: z.string().min(2).max(50),
     netWeight: z.string().min(2).max(50),
@@ -113,6 +114,8 @@ export default function Product() {
         SuccessAddingProducti18n,
         SuccesfullyAddedProducti18n,
         Uniti18n,
+        RetailPrice,
+        PurchasePrice
     } = useI18nStore();
     const { globalBranchState, globalCompanyState } = useGlobalStore();
 
@@ -193,6 +196,7 @@ export default function Product() {
         console.log(values);
         addProductMutation.mutate({
             price: values.price,
+            purchasePrice: values.purchasePrice,
             companyId: userData?.companyId,
             branchId: selectedBranch,
             productName: values.productName,
@@ -216,14 +220,30 @@ export default function Product() {
             header: ({ column }) => {
                 return (
                     <div className="flex flex-col items-center">
-                        {Pricei18n[locale]}
+                        {RetailPrice[locale]}
                         <span className="font-bold">JP¥</span>
                     </div>
                 );
             },
             cell: ({ row }) => {
                 return (
-                    <div className="text-center">¥{row.getValue("Price")}</div>
+                    <div className="text-center">¥{parseInt(row.getValue("Price")).toFixed(2)}</div>
+                );
+            },
+        },
+        {
+            accessorKey: "PurchasePrice",
+            header: ({ column }) => {
+                return (
+                    <div className="flex flex-col items-center">
+                        {PurchasePrice[locale]}
+                        <span className="font-bold">JP¥</span>
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">¥{parseInt((row.getValue("PurchasePrice") || "0")).toFixed(2)}</div>
                 );
             },
         },
@@ -363,7 +383,7 @@ export default function Product() {
                                                         <div className="flex w-full items-center justify-between">
                                                             <FormLabel className="text-lg">
                                                                 {
-                                                                    Pricei18n[
+                                                                    RetailPrice[
                                                                         locale
                                                                     ]
                                                                 }
@@ -372,7 +392,36 @@ export default function Product() {
                                                                 <Input
                                                                     type="number"
                                                                     placeholder={
-                                                                        Pricei18n[
+                                                                        RetailPrice[
+                                                                            locale
+                                                                        ]
+                                                                    }
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                        </div>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="purchasePrice"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-col items-center">
+                                                        <div className="flex w-full items-center justify-between">
+                                                            <FormLabel className="text-lg">
+                                                                {
+                                                                    PurchasePrice[
+                                                                        locale
+                                                                    ]
+                                                                }
+                                                            </FormLabel>
+                                                            <FormControl className="w-[60%]">
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder={
+                                                                        PurchasePrice[
                                                                             locale
                                                                         ]
                                                                     }

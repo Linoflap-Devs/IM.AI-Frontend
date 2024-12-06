@@ -825,6 +825,16 @@ export const useI18nStore = create<I18nStore>((set) => ({
   InventoryI18n: {
     en: "Inventory",
     ja: "在庫"
+  },
+
+  PurchasePrice: {
+    en: "Purchase Price",
+    ja: "購入価格"
+  },
+
+  RetailPrice: {
+    en: "Retail Price",
+    ja: "小売価格"
   }
 }));
 export interface I18nStore {
@@ -1088,4 +1098,6 @@ export interface I18nStore {
   DeleteCategoryDeleteMsg: LocalizedString;
   BatchNo: LocalizedString;
   CurrencyMarker: LocalizedString;
+  PurchasePrice: LocalizedString;
+  RetailPrice: LocalizedString;
 }
