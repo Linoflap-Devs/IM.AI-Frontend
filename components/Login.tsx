@@ -147,19 +147,19 @@ function Login() {
                                                     }
                                                 />
                                             </FormControl>
-                                            <FormLabel className="m-0 text-xl hover:cursor-pointer">
+                                            <FormLabel className="m-0 text-md hover:cursor-pointer">
                                                 Remember for 30 days
                                             </FormLabel>
                                         </FormItem>
                                     )}
                                 />
                             </div>
-                            <Button variant="link" className="p-0 text-xl">
+                            <Button variant="link" className="p-0 text-md">
                                 Forgot Password
                             </Button>
                         </div>
-                        <Button className="mx-auto w-max px-5 py-3 text-xl" type="submit">
-                            Sign in
+                        <Button className="mx-auto w-full text-xl" type="submit" size={"lg"}>
+                            <span className="py-5">Sign in</span>
                         </Button>
                     </form>
                 </Form>
