@@ -877,7 +877,7 @@ function Promo() {
                     data={promoQuery.data ?? []}
                     isLoading={promoQuery.isPending}
                     filtering={true}
-                    columnsToSearch={["Name"]}
+                    columnsToSearch={["Name", "EndDate", "StartDate"]}
                     pageSize={10}
                     visibility={{ PromoId: false }}
                 />

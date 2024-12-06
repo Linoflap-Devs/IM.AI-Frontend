@@ -927,7 +927,7 @@ export default function TransferOrder() {
           {userData && (
             <DataTable
               filtering={true}
-              columnsToSearch={["TransferOrderId"]}
+              columnsToSearch={["TransferOrderId", "SourceBranch", "DestinationBranch"]}
               resetSortBtn={true}
               pageSize={userData.role === 1 ? 13 : 11}
               data={getTransferOrder?.data ? getTransferOrder.data : []}
