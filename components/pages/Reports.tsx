@@ -87,10 +87,10 @@ function Reports() {
         CurrencyMarker,
         Quantityi18n
     } = useI18nStore();
-    const { globalCompanyState, globalBranchState } = useGlobalStore();
+    const { globalCompanyState, globalBranchState, fromReportDate, toReportDate, setFromReportDate, setToReportDate } = useGlobalStore();
     const [date, setDate] = useState<DateRange | undefined>({
-        from: addDays(new Date(Date.now()), -7),
-        to: new Date(Date.now()),
+        from: fromReportDate,
+        to: toReportDate,
     });
 
     const [open, setOpen] = useState<boolean>(false)
@@ -134,6 +134,45 @@ function Reports() {
                         : userData?.branchId;
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_URL}/transaction/getMonthlySales/cId/${companyId}/bId/${branchId}`
+                );
+                console.log(response.data);
+                return response.data[0]
+                    ? response.data[0]
+                    : [
+                          {
+                              January: 0,
+                              February: 0,
+                              March: 0,
+                              April: 0,
+                              May: 0,
+                              June: 0,
+                              July: 0,
+                              August: 0,
+                              September: 0,
+                              October: 0,
+                              November: 0,
+                              December: 0,
+                          },
+                      ];
+            }
+        },
+    });
+
+    const getMonthlyPurhcasePrice = useQuery({
+        queryKey: ["getMonthlyPurchasePrice"],
+        enabled: session.data?.token !== undefined,
+        queryFn: async () => {
+            if (session.data?.token !== undefined) {
+                const companyId =
+                    globalCompanyState !== "all"
+                        ? globalCompanyState
+                        : userData?.companyId;
+                const branchId =
+                    globalBranchState !== "all"
+                        ? globalBranchState
+                        : userData?.branchId;
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_URL}/transaction/getMonthlyPurchasePrice/cId/${companyId}/bId/${branchId}`
                 );
                 console.log(response.data);
                 return response.data[0]
@@ -206,6 +245,37 @@ function Reports() {
         {
             accessorKey: "ReferenceNumber",
             header: ReferenceNumberi18n[locale],
+            cell: ({ row }) => {
+                return (
+                    <TooltipProvider>
+                        <Tooltip1>
+                            <TooltipTrigger asChild>
+                                <Button 
+                                    variant={"link"}
+                                    className=" decoration-black m-0 p-0"
+                                    onClick={() => {
+                                        setSelectedTransaction(row.getValue("ReferenceNumber"))
+                                        setSelectedTransactionParent({
+                                            ReferenceNumber: row.getValue("ReferenceNumber"),
+                                            CreatedAt: row.getValue("CreatedAt"),
+                                            Price: row.getValue("Price")
+                                        })
+                                        setOpen(true)
+                                    }}    
+                                >
+                                    <div className="flex justify-start items-center text-black">
+                                        <span className="">{row.getValue("ReferenceNumber")}</span>
+                                        <ArrowUpRight className="ml-2 h-4 w-4"></ArrowUpRight>
+                                    </div>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                View Transaction Details
+                            </TooltipContent>
+                        </Tooltip1>
+                    </TooltipProvider>
+                );
+            },
         },
         {
             accessorKey: "PurchasePrice",
@@ -306,44 +376,6 @@ function Reports() {
                 }
             },
         },
-        {
-            id: "actions",
-            header: () => {
-                return <div className="text-center">{Itemsi18n[locale]}</div>;
-            },
-            cell: ({ row }) => {
-                return (
-                    <div className="w-full overflow-hidden truncate text-clip">
-                        <TooltipProvider>
-                            <Tooltip1>
-                                <TooltipTrigger asChild>
-                                <div className="text-center">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => {
-                                            setSelectedTransaction(row.getValue("ReferenceNumber"))
-                                            setSelectedTransactionParent({
-                                                ReferenceNumber: row.getValue("ReferenceNumber"),
-                                                CreatedAt: row.getValue("CreatedAt"),
-                                                Price: row.getValue("Price")
-                                            })
-                                            setOpen(true)
-                                        }}
-                                    >
-                                        <ArrowUpRight />
-                                    </Button>
-                                </div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    View Items
-                                </TooltipContent>
-                            </Tooltip1>
-                        </TooltipProvider>
-                    </div>
-                   
-                );
-            },
-        },
     ];
 
 
@@ -402,8 +434,8 @@ function Reports() {
             },
             {
                 label: "Profit",
-                data: Object.values(getMonthlySales.data || {}).map(
-                    (val: any) => val + 10000
+                data: Object.values(getMonthlyPurhcasePrice.data || {}).map(
+                    (val: any) => val
                 ) as number[],
                 borderColor: "#ef4444",
                 backgroundColor: "#f87171",
@@ -414,6 +446,17 @@ function Reports() {
         getSales.refetch();
         getMonthlySales.refetch();
     }, [globalBranchState, globalCompanyState, date]);
+
+    useEffect(() => {
+        setDate({ from: fromReportDate, to: toReportDate });
+    }, [fromReportDate, toReportDate]);
+
+    const handleDateChange = (val: DateRange | undefined) => {
+        setDate(val);
+        setFromReportDate(val?.from || new Date());
+        setToReportDate(val?.to || new Date());    
+    }
+
     return (
         <div className="mx-3 mb-3 flex flex-1">
             <Card className="flex flex-1 flex-col gap-3 p-3">
@@ -471,7 +514,7 @@ function Reports() {
                                 mode="range"
                                 defaultMonth={date?.from}
                                 selected={date}
-                                onSelect={setDate}
+                                onSelect={handleDateChange}
                                 numberOfMonths={2}
                             />
                         </PopoverContent>
@@ -530,6 +573,7 @@ function Reports() {
                             data={getTransactionQuery.data ?? []}
                             pageSize={10}
                             filtering={true}
+                            isLoading={getTransactionQuery.isLoading}
                             columnsToSearch={["Name"]}
                         />
                     </div>

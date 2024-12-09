@@ -3,7 +3,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Card } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, ArrowUpRight } from "lucide-react";
 import { useI18nStore } from "@/store/usei18n";
 import { useSession } from "next-auth/react";
 import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
@@ -40,6 +40,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
+import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
+import { useStore } from "zustand";
 
 function TransactionHistory() {
     const session = useSession();
@@ -65,14 +67,29 @@ function TransactionHistory() {
         SuccesfullyPermittedCartContentTransferi18n,
         Continuei18n,
         DoYouWantToAllowThisCartToTransferItsTransactionsi18n,
-        Canceli18n
+        Canceli18n,
+        Itemsi18n,
+        Datei18n,
+        PleaseSelectACompanyOrABranchi18n,
+        RetailPrice, 
+        PurchasePrice,
+        CurrencyMarker,
+        Quantityi18n
     } = useI18nStore();
+
+    const {
+        fromReportDate, toReportDate, setFromReportDate, setToReportDate
+    } = useGlobalStore();
+
+    const [open, setOpen] = useState<boolean>(false)
     const [transferableId, setTransferableId] = useState<number>();
     const [transferModal, setTransferModal] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState<string>()
+    const [selectedTransactionParent, setSelectedTransactionParent] = useState<any>()
 
     const [date, setDate] = useState<DateRange | undefined>({
-        from: addDays(new Date(Date.now()), -7),
-        to: new Date(Date.now()),
+        from: fromReportDate,
+        to: toReportDate,
     });
     /* QUeries */
     axios.defaults.headers.common[
@@ -118,30 +135,54 @@ function TransactionHistory() {
             }
         },
     });
+
+    const getTransactionQuery = useQuery({
+        queryKey: ["GetTransaction", selectedTransaction],
+        enabled: selectedTransaction !== "",
+        queryFn: async () => {
+            if (session.data?.token !== undefined) {
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_API_URL}/transaction/getTransaction/rNo/${selectedTransaction}`
+                );
+                return response.data;
+            }
+        }
+    }) 
     const columns: ColumnDef<TransactionTableData>[] = [
         { 
             accessorKey: "ReferenceNumber", 
             header: ReferenceNumberi18n[locale],
-            cell: ({row}) => {
-                const id = row.getValue("TransactionId");
+            cell: ({ row }) => {
                 return (
                     <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Link
-                                            className="w-full text-nowrap p-0 font-medium hover:text-primary hover:underline"
-                                            href={`/home/reports/${id}`}
-                                        >
-                                            {row.getValue("ReferenceNumber")}
-                                        </Link>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        {row.getValue("ReferenceNumber")}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button 
+                                    variant={"link"}
+                                    className=" decoration-black m-0 p-0"
+                                    onClick={() => {
+                                        setSelectedTransaction(row.getValue("ReferenceNumber"))
+                                        setSelectedTransactionParent({
+                                            ReferenceNumber: row.getValue("ReferenceNumber"),
+                                            CreatedAt: row.getValue("CreatedAt"),
+                                            Price: row.getValue("Price")
+                                        })
+                                        setOpen(true)
+                                    }}    
+                                >
+                                    <div className="flex justify-start items-center text-black">
+                                        <span className="">{row.getValue("ReferenceNumber")}</span>
+                                        <ArrowUpRight className="ml-2 h-4 w-4"></ArrowUpRight>
+                                    </div>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                View Transaction Details
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 );
-            } 
+            },
         },
         {
             accessorKey: "CreatedAt",
@@ -263,10 +304,10 @@ function TransactionHistory() {
                                 row.getValue("TransferableTransaction") == true
                             }
                             onClick={() => {                               
-                                /* setTransferableId(
+                                setTransferableId(
                                     row.getValue("TransactionId")
                                 );
-                                setTransferModal(true); */
+                                setTransferModal(true);
                             }}
                         >
                             {AllowTransferi18n[locale]}
@@ -282,9 +323,64 @@ function TransactionHistory() {
             accessorKey: "TransferableTransaction",
         },
     ];
+
+
+    const transactionDetailColumns: ColumnDef<any>[] = [
+        {
+            accessorKey: "Name",
+            header: "Name"
+        },
+        {
+            accessorKey: "Price",
+            header: () => {
+                return (
+                    <div className="text-end">
+                       {RetailPrice[locale]} 
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-end">
+                        <span className="font-bold">{CurrencyMarker[locale]}</span>
+                        {parseInt(row.getValue("Price")).toFixed(2)}
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: "Quantity",
+            header: () => {
+                return (
+                    <div className="text-end">
+                       {Quantityi18n[locale]} 
+                    </div>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-end">
+                        {row.getValue("Quantity")}
+                    </div>
+                );
+            },
+        }
+    ]
+
     useEffect(() => {
         transactionQuery.refetch();
     }, [globalBranchState, globalCompanyState, date]);
+
+    useEffect(() => {
+        setDate({ from: fromReportDate, to: toReportDate });
+    }, [fromReportDate, toReportDate]);
+
+    const handleDateChange = (val: DateRange | undefined) => {
+        setDate(val);
+        setFromReportDate(val?.from || new Date());
+        setToReportDate(val?.to || new Date());    
+    }
+
     return (
         <div className="mx-3 flex flex-1">
             <AlertDialog open={transferModal} onOpenChange={setTransferModal}>
@@ -365,7 +461,7 @@ function TransactionHistory() {
                                     mode="range"
                                     defaultMonth={date?.from}
                                     selected={date}
-                                    onSelect={setDate}
+                                    onSelect={handleDateChange}
                                     numberOfMonths={2}
                                 />
                             </PopoverContent>
@@ -387,6 +483,46 @@ function TransactionHistory() {
                     isLoading={transactionQuery.isPending}
                 />
             </Card>
+            <Sheet open={open} onOpenChange={setOpen}>
+                <SheetContent className="w-[600px] sm:w-lg max-w-[600px]">
+                    <SheetHeader>
+                        <h1 className="text-2xl font-semibold">
+                            Transaction Details
+                        </h1>
+                    </SheetHeader>
+                    
+                    <div className="flex w-full flex-col gap-3 py-5">
+                        {
+                            selectedTransactionParent && (
+                                <div className="flex flex-col gap-4 border-b pb-4">
+                                    <div className="flex flex-row justify-between items-center border-b pb-2">
+                                        <p className="">Reference Number</p>
+                                        <p className="font-semibold text-right p-1">{selectedTransactionParent.ReferenceNumber || ""}</p>
+                                    </div>
+                                    <div className="flex flex-row justify-between items-center border-b pb-2">
+                                        <p className="">Transaction Date</p>
+                                        <p className="font-semibold text-right p-1">{format(new Date(selectedTransactionParent.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
+                                    </div>
+                                    <div className="flex flex-row justify-between items-center">
+                                        <p className="">Total Price</p>
+                                        <p className="font-semibold text-right p-1">{CurrencyMarker[locale]}{parseInt(selectedTransactionParent.Price || "0").toFixed(2)}</p>
+                                    </div>
+                                </div>
+                            )
+                        }
+                        <p className="font-semibold">Items</p>
+                        <DataTable
+                            columns={transactionDetailColumns}
+                            pagination={true}
+                            data={getTransactionQuery.data ?? []}
+                            pageSize={10}
+                            filtering={true}
+                            isLoading={getTransactionQuery.isLoading}
+                            columnsToSearch={["Name"]}
+                        />
+                    </div>
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }

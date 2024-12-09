@@ -280,14 +280,18 @@ function Dashboard() {
     ];
     const tspColoumns: ColumnDef<TopSellingProduct>[] = [
         {
+            accessorKey:"ProductId",
+            enableHiding: true
+        },
+        {
             accessorKey: "Name",
             header: () => Namei18n[locale],
             cell: ({ row }) => {
-                const id = row.getValue("Name");
+                const id = row.getValue("ProductId");
                 return userData?.role <= 2 ? (
                     <Link
                         className="h-fit p-0 font-medium hover:text-primary hover:underline"
-                        href={`/home/inventory/${id}`}
+                        href={`/home/inv&products/${id}`}
                     >
                         {row.getValue("Name")}
                     </Link>
@@ -489,6 +493,7 @@ function Dashboard() {
                             <DataTable
                                 isLoading={getDashboardData.isFetching}
                                 columns={tspColoumns}
+                                visibility={{ ProductId: false }}
                                 data={getDashboardData.data?.topSelling || []}
                                 pageSize={5}
                             />

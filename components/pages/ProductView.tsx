@@ -178,7 +178,7 @@ function ProductView({product, batches}: ProductViewProps) {
                                 <div className="flex justify-between w-full gap-4">
                                     <div className="flex flex-col w-1/2 border rounded p-2">
                                         <p className="text-sm font-semibold text-black/[.70]">{PurchasePrice[locale]}</p>
-                                        <p className="text-3xl font-bold">{CurrencyMarker[locale]}{parseInt(product.PurchasePrice).toFixed(2)}</p>
+                                        <p className="text-3xl font-bold">{CurrencyMarker[locale]}{parseInt(product.PurchasePrice || "0").toFixed(2)}</p>
                                     </div>
                                     <div className="flex flex-col w-1/2 border rounded p-2">
                                         <p className="text-sm font-semibold text-black/[.70]">{RetailPrice[locale]}</p>
