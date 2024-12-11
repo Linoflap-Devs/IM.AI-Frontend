@@ -189,7 +189,7 @@ function ProductView({product, batches}: ProductViewProps) {
                         </div>
                     </Card>
                     <div className="flex gap-3 h-full">
-                        <Card className="p-4 w-1/2">
+                        <Card className="p-4 w-1/3">
                             <CardHeader className="p-0  mb-3">
                                 <span className="font-bold text-lg">Product Information</span>
                             </CardHeader>
@@ -208,7 +208,7 @@ function ProductView({product, batches}: ProductViewProps) {
                                 </div>
                             </div>
                         </Card>
-                        <Card className="p-4 w-1/2">
+                        <Card className="p-4 w-1/3">
                             <CardHeader className="p-0  mb-3">
                                 <span className="font-bold text-lg">Stock Information</span>
                             </CardHeader>
@@ -223,12 +223,30 @@ function ProductView({product, batches}: ProductViewProps) {
                                 </div>
                                 <div className="flex flex-row justify-between items-center">
                                     <p className="">Stock In-Storage</p>
-                                    <p className="font-semibold text-right p-1">{totalInStorage}</p>
+                                    <p className="font-semibold text-right p-1">{totalInStorage} </p>
+                                </div>
+                            </div>
+                        </Card>
+                        <Card className="p-4 w-1/3">
+                            <CardHeader className="p-0  mb-3">
+                                <span className="font-bold text-lg">Miscellaneous</span>
+                            </CardHeader>
+                            <div className="flex flex-col gap-4 ">
+                                <div className="flex flex-row justify-between items-center border-b pb-2">
+                                    <p className="">Low Stock Level</p>
+                                    <p className={`font-semibold text-right p-1`}>{product.ReorderLevel || 0}</p>
+                                </div>
+                                <div className="flex flex-row justify-between items-center border-b pb-2">
+                                    <p className="">Critical Stock Level</p>
+                                    <p className="font-semibold text-right p-1">{product.CriticalLevel || 0} </p>
+                                </div>
+                                <div className="flex flex-row justify-between items-center">
+                                    <p className="">Unit</p>
+                                    <p className="font-semibold text-right p-1">{product.Unit || "N/A"} </p>
                                 </div>
                             </div>
                         
                         </Card>
-                        
                     </div>
                 </div>
                 <div className="w-1/3 h-full flex">
