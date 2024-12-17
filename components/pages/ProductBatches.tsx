@@ -10,7 +10,7 @@ import { useGlobalStore } from "@/store/useStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { ArrowsUpFromLine, Box, Ellipsis, Loader, Pencil, Trash } from "lucide-react";
+import { ArrowsUpFromLine, Box, Ellipsis, Loader, MessageSquareText, Pencil, Trash } from "lucide-react";
 import { addDays, format } from "date-fns";
 import { DataTable } from "../ui/data-table";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -149,6 +149,7 @@ export function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
                 description: "Remark added successfully"
             })
             setAddLoading(false)
+            form.reset()
         },
         onError: (error: any) => {
             console.log(error)
@@ -297,7 +298,7 @@ export function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
                             >
                                 <div className="flex justify-between w-full items-center">
                                     <p>View Remarks</p>
-                                    <ArrowsUpFromLine size={12} color="currentColor" />  
+                                    <MessageSquareText size={12} color="currentColor" />  
                                 </div>
                             </DropdownMenuItem>
                     <DropdownMenuItem
