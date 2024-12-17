@@ -83,7 +83,8 @@ function Dashboard() {
         Soldi18n,
         SeeAlli18n,
         PleaseSelectACompanyOrABranchi18n,
-        QuantitySoldi18n
+        QuantitySoldi18n,
+        RemainingStocksi18n
     } = useI18nStore();
 
 
@@ -145,7 +146,7 @@ function Dashboard() {
         },
     });
     const getDashboardData = useQuery({
-        queryKey: ["getDashboardData"],
+        queryKey: ["getDashboardData", date?.from?.toISOString(), date?.to?.toISOString()],
         enabled:
             (session.data?.token !== undefined &&
                 globalBranchState !== "all") ||
@@ -324,6 +325,19 @@ function Dashboard() {
                     <div className="text-center">
                         {row.getValue("TotalSale")}{" "}
                         <span className="font-bold">PCS</span>
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: "RemainingStock",
+            header: () => {
+                return <p className="text-center">{RemainingStocksi18n[locale]}</p>;
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="text-center">
+                        {row.getValue("RemainingStock")}
                     </div>
                 );
             },

@@ -24,16 +24,63 @@ import {
     DialogTitle,
  } from "../ui/dialog";
 import { useToast } from "../ui/use-toast";
+import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Textarea } from "../ui/textarea";
+import LoaderComponent from "../Loader";
+import { toast } from "../ui/use-toast";
 
 interface ProductBatchesProps {
     batches: any[];
     refetchMethod: () => void
 }
 
-export async function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
+export function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
 
     const [moveDialogOpen, setMoveDialogOpen] = useState(false);
+    const [sheetOpen, setSheetOpen] = useState(false);
+    const [selectedBatchId, setSelectedBatchId] = useState<string>();
+    const [addLoading, setAddLoading] = useState<boolean>(false);
     const { toast } = useToast();
+
+    const formSchema = z.object({
+        remarks: z.string()
+    })
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            remarks: ""
+        }
+    })
+
+    const remarksQuery = useQuery({
+        queryKey: ["batchRemarks", selectedBatchId],
+        enabled: selectedBatchId !== "",
+        queryFn: async () => {
+            console.log("Remarks Query", selectedBatchId)
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/batch/getBatchRemarks`,
+                {
+                    params: {
+                        id: selectedBatchId
+                    }
+                }
+            );
+            return response.data
+        }
+    })
+    
 
     const toDisplayMutation = useMutation({
         mutationFn: async (id: string) => {
@@ -83,7 +130,52 @@ export async function ProductBatches({batches, refetchMethod}: ProductBatchesPro
         }
     })
 
+    const addRemarkMutation = useMutation({
+        mutationFn: async (data: any) => {
+            setAddLoading(true)
+            return await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/batch/addBatchRemark`,
+                {
+                    batchId: selectedBatchId,
+                    remark: data.remarks,
+                    userId: 3
+                }
+            )
+        },
+        onSuccess: (data: any) => {
+            remarksQuery.refetch();
+            toast({
+                title: "Success",
+                description: "Remark added successfully"
+            })
+            setAddLoading(false)
+        },
+        onError: (error: any) => {
+            console.log(error)
+            toast({
+                title: "Oops!",
+                description: "Adding failed, try again later."
+            })
+            setAddLoading(false)
+        }
+    })
+
+    const handleRemarksClick = (id: string) => {
+        setSelectedBatchId(id);
+        setSheetOpen(true);
+        console.log(selectedBatchId)
+    }
+
+    function onSubmit(data: z.infer<typeof formSchema>) {
+        addRemarkMutation.mutate(data)
+    }
+
     const column: ColumnDef<any>[] = [
+        {
+            id: "batchId",
+            accessorKey: "Id",
+            enableHiding: true
+        },
         {
             accessorKey: "BatchNo",
             header: "Batch Name",
@@ -199,6 +291,16 @@ export async function ProductBatches({batches, refetchMethod}: ProductBatchesPro
                         )
                     }
                     <DropdownMenuItem
+                            onClick={() => {
+                                handleRemarksClick(row.getValue("batchId"))
+                            }}
+                            >
+                                <div className="flex justify-between w-full items-center">
+                                    <p>View Remarks</p>
+                                    <ArrowsUpFromLine size={12} color="currentColor" />  
+                                </div>
+                            </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => {
                        
                       }}
@@ -234,11 +336,70 @@ export async function ProductBatches({batches, refetchMethod}: ProductBatchesPro
                     filtering={true}
                     pagination={true}
                     columnsToSearch={["BatchNo", "BranchName", "Supplier"]}
+                    visibility={{
+                        batchId: false
+                    }}
                     pageSize={10}
                 />
 
 
             </div>
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                <SheetContent className="w-[600px] sm:w-lg max-w-[600px] flex flex-col">
+                    <SheetHeader className="border-b pb-2">
+                        <h1 className="text-2xl font-semibold">
+                            Batch Remarks
+                        </h1>
+                        <p className="text-muted-foreground">Batch Id: {selectedBatchId}</p>
+                    </SheetHeader>
+                    <div className="flex w-full flex-1 overflow-y-scroll flex-col gap-3 py-5 px-3">
+                        {
+                            remarksQuery.isLoading ? 
+                            <LoaderComponent></LoaderComponent> :
+                            remarksQuery.data?.length > 0 ? (
+                                remarksQuery.data?.map((remark: any, i: number) => {
+                                    return (
+                                        <div className={`flex flex-col gap-2 ${i == remarksQuery.data.length - 1 ? "" : "border-b pb-2"}`}>
+                                            <p className="text-sm font-semibold">{remark.UserId}</p>
+                                            <p className="text-sm">{remark.BatchRemarkText}</p>
+                                            <p className="text-end text-sm text-muted-foreground">{format(new Date(remark.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
+                                        </div>
+                                    )
+                                })
+                            ):(
+                                <div className="flex h-full w-full items-center justify-center">
+                                    <p>No remarks.</p>
+                                </div>
+                            )
+                        }
+                    </div>
+                    <div className="flex gap-3 py-5 pb-2 border-t w-full">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+                                <FormField
+                                    control={form.control}
+                                    name="remarks"
+                                    render={({ field }) => (
+                                        <FormItem className="w-full"> 
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Enter Remarks"
+                                                    className="resize-none w-full"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="flex justify-end mt-3">
+                                    <Button type="submit" className="" disabled={addLoading}>Submit</Button>
+                                </div>
+                            </form>
+                        </Form>
+                    </div>
+                </SheetContent>
+            </Sheet>
         </>
     )
 }
