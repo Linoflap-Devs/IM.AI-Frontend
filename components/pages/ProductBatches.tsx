@@ -39,13 +39,15 @@ import { useForm } from "react-hook-form";
 import { Textarea } from "../ui/textarea";
 import LoaderComponent from "../Loader";
 import { toast } from "../ui/use-toast";
+import { capitalFirst } from "@/app/util/Helpers";
 
 interface ProductBatchesProps {
     batches: any[];
-    refetchMethod: () => void
+    refetchMethod: () => void;
+    user: number
 }
 
-export function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
+export function ProductBatches({batches, refetchMethod, user}: ProductBatchesProps) {
 
     const [moveDialogOpen, setMoveDialogOpen] = useState(false);
     const [sheetOpen, setSheetOpen] = useState(false);
@@ -138,7 +140,7 @@ export function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
                 {
                     batchId: selectedBatchId,
                     remark: data.remarks,
-                    userId: 3
+                    userId: user
                 }
             )
         },
@@ -361,7 +363,7 @@ export function ProductBatches({batches, refetchMethod}: ProductBatchesProps) {
                                 remarksQuery.data?.map((remark: any, i: number) => {
                                     return (
                                         <div className={`flex flex-col gap-2 ${i == remarksQuery.data.length - 1 ? "" : "border-b pb-2"}`}>
-                                            <p className="text-sm font-semibold">{remark.UserId}</p>
+                                            <p className="text-sm font-semibold">{`${capitalFirst(remark.FirstName)} ${capitalFirst(remark.LastName)}`}</p>
                                             <p className="text-sm">{remark.BatchRemarkText}</p>
                                             <p className="text-end text-sm text-muted-foreground">{format(new Date(remark.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
                                         </div>

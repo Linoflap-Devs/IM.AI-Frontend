@@ -15,11 +15,14 @@ import { format } from "date-fns";
 import { Button } from "../ui/button";
 import { getMonthDifferenceArray, monthlyTotal } from "@/lib/dateoperators";
 import { toast } from "../ui/use-toast";
+import { capitalFirst } from "@/app/util/Helpers";
 
 function Products(productId: { productId: string}) {
     const session = useSession();
     const userData = session.data?.data;
     const status = session.status;
+    const userName = `${capitalFirst(userData?.firstName)} ${capitalFirst(userData?.lastName)}`;
+    const userId = userData?.id;
     const [tabState, setTabState] = useState<string>("overview");
     const { globalCompanyState, globalBranchState, globalBranchName, fromReportDate, toReportDate, productPurchaseDateRange } = useGlobalStore();
     const {
@@ -201,7 +204,7 @@ function Products(productId: { productId: string}) {
                 )}
                 {tabState== "batches" && (
                     !(lookupProductBatches.isLoading) && (
-                        <ProductBatches batches={lookupProductBatches.data} refetchMethod={lookupProductBatches.refetch}></ProductBatches>
+                        <ProductBatches batches={lookupProductBatches.data} refetchMethod={lookupProductBatches.refetch} user={userId}></ProductBatches>
                     )
                 )}
             </div>
