@@ -10,7 +10,7 @@ import { useGlobalStore } from "@/store/useStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { ArrowsUpFromLine, Box, Ellipsis, Loader, MessageSquareText, Pencil, Trash } from "lucide-react";
+import { ArrowsUpFromLine, Box, Clock, Ellipsis, Loader, Loader2, MessageSquareText, Pencil, SquarePen, Text, Trash } from "lucide-react";
 import { addDays, format } from "date-fns";
 import { DataTable } from "../ui/data-table";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -40,18 +40,36 @@ import { Textarea } from "../ui/textarea";
 import LoaderComponent from "../Loader";
 import { toast } from "../ui/use-toast";
 import { capitalFirst } from "@/app/util/Helpers";
+import { Input } from "../ui/input";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "../ui/select";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ProductBatchesProps {
     batches: any[];
     refetchMethod: () => void;
+    batchRefetchMethod: () => void;
     user: number
+    adjustmentTypeOptions?: {label: string, value: string}[]
 }
 
-export function ProductBatches({batches, refetchMethod, user}: ProductBatchesProps) {
+export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOptions = [], batchRefetchMethod}: ProductBatchesProps) {
 
-    const [moveDialogOpen, setMoveDialogOpen] = useState(false);
+    // Adjust Quantity States
+    const [adjustDialogOpen, setAdjustDialogOpen] = useState(false);
+    const [adjustmentLoading, setAdjustmentLoading] = useState(false);
+
+    // Adjust Sheet States
+    const [adjustSheetOpen, setAdjustSheetOpen] = useState(false);
+    const [adjustmentSheetLoading, setAdjustmentSheetLoading] = useState(false);
+
     const [sheetOpen, setSheetOpen] = useState(false);
     const [selectedBatchId, setSelectedBatchId] = useState<string>();
+    const [selectedBatchName, setSelectedBatchName] = useState<string>();
     const [addLoading, setAddLoading] = useState<boolean>(false);
     const { toast } = useToast();
 
@@ -63,6 +81,23 @@ export function ProductBatches({batches, refetchMethod, user}: ProductBatchesPro
         resolver: zodResolver(formSchema),
         defaultValues: {
             remarks: ""
+        }
+    })
+
+    const adjustQuantityFormSchema = z.object({
+        operation: z.string(),
+        quantity: z.coerce.number(),
+        adjustmentType: z.string(),
+        notes: z.string()
+    })
+
+    const adjustQuantityForm = useForm<z.infer<typeof adjustQuantityFormSchema>>({
+        resolver: zodResolver(adjustQuantityFormSchema),
+        defaultValues: {
+            operation: "",
+            quantity: undefined,
+            adjustmentType: "",
+            notes: ""
         }
     })
 
@@ -83,6 +118,22 @@ export function ProductBatches({batches, refetchMethod, user}: ProductBatchesPro
         }
     })
     
+    const adjustmentHistoryQuery = useQuery({
+        queryKey: ["batchAdjustmentHistory", selectedBatchId],
+        enabled: selectedBatchId !== "",
+        queryFn: async () => {
+            console.log("Adjustment History Query", selectedBatchId)
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/stocks/getStockAdjustments/bId/${selectedBatchId}`,
+                {
+                    params: {
+                        id: selectedBatchId
+                    }
+                }
+            );
+            return response.data
+        }
+    })
 
     const toDisplayMutation = useMutation({
         mutationFn: async (id: string) => {
@@ -163,6 +214,40 @@ export function ProductBatches({batches, refetchMethod, user}: ProductBatchesPro
         }
     })
 
+    const adjustmentMutation = useMutation({
+        mutationFn: async (data: any) => {
+            setAdjustmentLoading(true)
+            return await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/stocks/addStockAdjustments`,
+                {
+                    bId: selectedBatchId,
+                    quantity: data.operation == '+' ? data.quantity : -data.quantity,
+                    adjustmentType: data.adjustmentType,
+                    notes: data.notes,
+                    uId: user
+                }
+            )
+        },
+        onSuccess: (data: any) => {
+            setAdjustmentLoading(false)
+            setAdjustDialogOpen(false)
+            adjustQuantityForm.reset()
+            batchRefetchMethod();
+            adjustmentHistoryQuery.refetch();
+            toast({
+                title: "Success",
+                description: "Adjustment successful."
+            })
+        },
+        onError: (error: any) => {
+            setAdjustmentLoading(false)
+            toast({
+                title: "Oops!",
+                description: error.message
+            })
+        }
+    })
+
     const handleRemarksClick = (id: string) => {
         setSelectedBatchId(id);
         setSheetOpen(true);
@@ -171,6 +256,11 @@ export function ProductBatches({batches, refetchMethod, user}: ProductBatchesPro
 
     function onSubmit(data: z.infer<typeof formSchema>) {
         addRemarkMutation.mutate(data)
+    }
+
+    function onAdjustQuantitySubmit(data: z.infer<typeof adjustQuantityFormSchema>) {
+        console.log(data)
+        adjustmentMutation.mutate(data)
     }
 
     const column: ColumnDef<any>[] = [
@@ -294,15 +384,41 @@ export function ProductBatches({batches, refetchMethod, user}: ProductBatchesPro
                         )
                     }
                     <DropdownMenuItem
-                            onClick={() => {
-                                handleRemarksClick(row.getValue("batchId"))
-                            }}
-                            >
-                                <div className="flex justify-between w-full items-center">
-                                    <p>View Remarks</p>
-                                    <MessageSquareText size={12} color="currentColor" />  
-                                </div>
-                            </DropdownMenuItem>
+                        onClick={() => {
+                            handleRemarksClick(row.getValue("batchId"))
+                        }}
+                    >
+                        <div className="flex justify-between w-full items-center">
+                            <p>View Remarks</p>
+                            <MessageSquareText size={12} color="currentColor" />  
+                        </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setSelectedBatchId(row.getValue("batchId"))
+                            setSelectedBatchName(row.getValue("BatchNo"))
+                            setAdjustDialogOpen(true)
+                        }}
+                    >
+                        <div className="flex justify-between w-full items-center">
+                            <p>Adjust Quantity</p>
+                            <SquarePen size={12} color="currentColor" />  
+                        </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setSelectedBatchId(row.getValue("batchId"))
+                            setSelectedBatchName(row.getValue("BatchNo"))
+                            setAdjustSheetOpen(true)
+                        }}
+                    >
+                        <div className="flex justify-between w-full items-center">
+                            <p>Adjustment History</p>
+                            <Clock size={12} color="currentColor" />  
+                        </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator /> 
                     <DropdownMenuItem
                       onClick={() => {
                        
@@ -321,17 +437,212 @@ export function ProductBatches({batches, refetchMethod, user}: ProductBatchesPro
         }
     ];
 
+    const adjustmentColumns: ColumnDef<any>[] = [
+        {
+            accessorKey: "StockAdjustmentType",
+            header: "Reason",
+
+        },
+        {
+            accessorKey: "Quantity",
+            header: "Quantity",
+            cell: ({ row }) => {
+                const isPositive = parseInt(row.getValue("Quantity")) > 0 ? true : false;
+
+                return (
+                    <span className={`py-1 px-2 rounded ${isPositive ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+                        {isPositive ? `+` : `-`} {Math.abs(row.getValue("Quantity"))}
+                    </span>
+                )
+            }
+        },
+        {
+            accessorKey: "FirstName",
+            enableHiding: true
+        },
+        {
+            accessorKey: "LastName",
+            enableHiding: true
+        },
+        {
+            id: "User",
+            header: "User",
+            cell: ({ row }) => {
+                return `${capitalFirst(row.getValue("FirstName"))} ${capitalFirst(row.getValue("LastName"))}`;
+            }
+        },
+        {
+            accessorKey: "CreatedAt",
+            header: "Date",
+            cell: ({ row }) => {
+                return format(new Date(row.getValue("CreatedAt")), "MMM dd, yyyy | hh:mm a");
+            }
+        },
+        {
+            accessorKey: "Notes",
+            header: "Remarks",
+            cell: ({row}) => {
+                return (
+                    <TooltipProvider delayDuration={0}>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button variant="outline">
+                                    <div className="flex items-center gap-2">
+                                        <Text size={16} />
+                                        <span>Hover</span>
+                                    </div>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" align="end">
+                            <p className="max-w-[200px]">{row.getValue("Notes")}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )
+            }
+        }
+    ]
     return (
         <>
             
-            {/* <Dialog
-                open={moveDialogOpen}
-                onOpenChange={setMoveDialogOpen}
+            <Dialog
+                open={adjustDialogOpen}
+                onOpenChange={() => {
+                    setAdjustDialogOpen(false)
+                    adjustQuantityForm.reset()
+                }}
             >  
                 <DialogContent>
-                    Hello
+                    <DialogHeader>
+                        <DialogTitle>Adjust Quantity</DialogTitle>
+                        <p className="text-black/[.7]">Batch {selectedBatchName}</p>
+                    </DialogHeader>
+                    <Form {...adjustQuantityForm}>
+                        <form
+                            onSubmit={adjustQuantityForm.handleSubmit(onAdjustQuantitySubmit)}
+                            className="space-y-3"
+                        >
+                            <FormField
+                                control={adjustQuantityForm.control}
+                                name="operation"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col items-center">
+                                         <div className="flex w-full items-center justify-between">
+                                            <FormLabel className="">
+                                                Adjustment Type
+                                            </FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                                
+                                            >
+                                                <FormControl className="w-[60%]">
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            placeholder="Select type of adjustment"
+                                                        />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="+">Add Quantity</SelectItem>
+                                                    <SelectItem value="-">Remove Quantity</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                         </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={adjustQuantityForm.control}
+                                name="adjustmentType"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col items-center">
+                                        <div className="flex w-full items-center justify-between">
+                                            <FormLabel className="">
+                                                Reason
+                                            </FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <FormControl className="w-[60%]">
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            placeholder="Select reason for adjustment"
+                                                        >
+                                                            {adjustmentTypeOptions.find(option => option.value == field.value)?.label}
+                                                        </SelectValue>
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {adjustmentTypeOptions.map((option, index) => (
+                                                        <SelectItem key={index} value={option.value}>
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={adjustQuantityForm.control}
+                                name="quantity"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col items-center">
+                                        <div className="flex w-full items-center justify-between">
+                                            <FormLabel className="">
+                                                Amount
+                                            </FormLabel>
+                                            <FormControl className="w-[60%]">
+                                                <Input
+                                                    type="number"
+                                                    placeholder={
+                                                        "Amount to add/remove"
+                                                    }
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                        </div>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={adjustQuantityForm.control}
+                                name="notes"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col items-center pt-3 border-t">
+                                        <div className="flex w-full items-center justify-between pb-3">
+                                            <FormLabel className="">
+                                                Adjustment Remarks
+                                            </FormLabel>
+                                           
+                                        </div>
+                                        <FormControl className="w-full">
+                                            <Textarea
+                                                placeholder="Enter remarks..."
+                                                className="resize-none w-full"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            
+                            <div className="flex justify-end">
+                                <Button type="submit" disabled={adjustmentLoading}>
+                                    {adjustmentLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirm"}
+                                </Button>
+                            </div>
+                        </form>
+                    </Form>
                 </DialogContent>
-            </Dialog> */}
+            </Dialog>
             <div className="w-full mt-4">
                 <DataTable
                     data={batches}
@@ -400,6 +711,42 @@ export function ProductBatches({batches, refetchMethod, user}: ProductBatchesPro
                                 </div>
                             </form>
                         </Form>
+                    </div>
+                </SheetContent>
+            </Sheet>
+            <Sheet open={adjustSheetOpen} onOpenChange={setAdjustSheetOpen}>
+                <SheetContent className="w-[800px] sm:w-lg max-w-[800px] flex flex-col">
+                    <SheetHeader className="border-b pb-2">
+                        <h1 className="text-2xl font-semibold">
+                            Adjustment History
+                        </h1>
+                        <p className="text-muted-foreground">Batch: {selectedBatchName}</p>
+                    </SheetHeader>
+                    <div className="flex w-full flex-1 overflow-y-scroll flex-col gap-3 py-5 px-1">
+                        {
+                            adjustmentHistoryQuery.isLoading ? 
+                            <LoaderComponent></LoaderComponent> :
+                            adjustmentHistoryQuery.data?.length > 0 ? (
+                                <DataTable
+                                    columns={adjustmentColumns}
+                                    pagination={true}
+                                    data={adjustmentHistoryQuery.data ?? []}
+                                    pageSize={10}
+                                    filtering={true}
+                                    columnsToSearch={[]}
+                                    visibility={
+                                        {
+                                            FirstName: false,
+                                            LastName: false
+                                        }
+                                    }
+                                />
+                            ):(
+                                <div className="flex h-full w-full items-center justify-center">
+                                    <p>No adjustments.</p>
+                                </div>
+                            )
+                        }
                     </div>
                 </SheetContent>
             </Sheet>

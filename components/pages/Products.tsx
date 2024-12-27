@@ -126,6 +126,22 @@ function Products(productId: { productId: string}) {
         }
     })
 
+    const getAdjustmentTypes = useQuery({
+        queryKey: ["getAdjustmentTypes"],
+        enabled: session.status === 'authenticated',
+        queryFn: async () => {
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/stocks/getStockAdjustmentTypes`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${session.data?.token}`,
+                    },
+                }
+            );
+            return response.data.map((item: any) => { return {value: item.StockAdjustmentTypeId, label: item.StockAdjustmentType}});
+        },
+    })
+
     useEffect(() => {
         lookupProductBatches.refetch();
         lookupProductTransactions.refetch();
@@ -203,8 +219,16 @@ function Products(productId: { productId: string}) {
                     )
                 )}
                 {tabState== "batches" && (
-                    !(lookupProductBatches.isLoading) && (
-                        <ProductBatches batches={lookupProductBatches.data} refetchMethod={lookupProductBatches.refetch} user={userId}></ProductBatches>
+                    !(lookupProductBatches.isLoading) && !(getAdjustmentTypes.isLoading) && (
+                        <ProductBatches 
+                            batches={lookupProductBatches.data} 
+                            refetchMethod={lookupProductBatches.refetch} 
+                            batchRefetchMethod={lookupProductBatches.refetch}
+                            user={userId} 
+                            adjustmentTypeOptions={getAdjustmentTypes.data}
+                        >
+
+                        </ProductBatches>
                     )
                 )}
             </div>
