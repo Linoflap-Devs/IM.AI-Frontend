@@ -599,9 +599,9 @@ function Dashboard() {
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <h1 className="w-40 truncate font-semibold hover:cursor-pointer">
+                                                        <p className="w-40 truncate font-semibold hover:cursor-pointer">
                                                             {item.Name}
-                                                        </h1>
+                                                        </p>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
                                                         <p>{item.Name}</p>
@@ -700,12 +700,12 @@ const StoreActivityCard: FC<StoreActivityCardProps> = ({
             <h1 className="text-start font-medium">{title}</h1>
             <div className="flex items-center gap-1">
                 {icon}
-                {isLoading ? (
-                    <Loader2 className="animate-spin" size={30} />
-                ) : (
+                {(!isLoading && data) ? (
                     <p className="text-3xl font-bold">
                         {data[dataKey] || 0}
                     </p>
+                ) : (
+                    <Loader2 className="animate-spin" size={30} />
                 )}
             </div>
         </Card>
