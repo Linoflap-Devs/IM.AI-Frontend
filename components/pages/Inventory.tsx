@@ -77,6 +77,7 @@ const formSchema = z.object({
 function Inventory() {
     const session = useSession();
     const userData = session.data?.data;
+    const userId = userData?.id;
     const { toast } = useToast();
     const [inventoryDataOverview, setInventoryDataOverview] =
         useState<InventoryDataOverview>({
@@ -231,6 +232,7 @@ function Inventory() {
 
     const addBatchMutation = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
+            console.log(data, discrepancies);
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/batch/addBatch`,
                 {
@@ -251,7 +253,9 @@ function Inventory() {
                     expiryDate: data.expiry,
                     quantity: data.quantity,
                     branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId,
-                    batchId: response.data.Id
+                    batchId: response.data.Id,
+                    discrepancies: discrepancies || [],
+                    uId: userId
                 }
             )
             console.log({
