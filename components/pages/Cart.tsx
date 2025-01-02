@@ -20,6 +20,8 @@ import {
 import { useSession } from "next-auth/react";
 import { Textarea } from "../ui/textarea";
 import { toast } from "../ui/use-toast";
+import { parse } from "path";
+import { format } from "date-fns";
 
 function Cart() {
     const session = useSession();
@@ -329,33 +331,41 @@ function Cart() {
     return (
         <div className="mx-3 mb-3 flex w-full flex-1">
             <AlertDialog open={open} onOpenChange={setOpen}>
-                <AlertDialogContent>
+                <AlertDialogContent className="w-[50rem]">
                     <AlertDialogHeader>
                         <div className="flex items-center justify-between">
                             <AlertDialogTitle className="flex gap-2 font-semibold">
                                 {CartIDi18n[locale]}
-                                <h1 className="font-medium italic">
+                                <h1 className="font-medium">
                                     {cartReportId}
                                 </h1>
                                 {Reporti18n[locale]}
                             </AlertDialogTitle>
                             <AlertDialogCancel>{Closei18n[locale]}</AlertDialogCancel>
                         </div>
-                        <div className="z-0 h-40 overflow-auto">
+                        <div className="z-0 h-80 overflow-auto">
                             {cartReports.length > 0 ? (
                                 <div className="flex flex-col items-center">
                                     {cartReports.map(
                                         (item: any, index: number) => {
                                             return (
-                                                <div
-                                                    key={index}
-                                                    className="mb-5 w-full rounded border px-2 py-3 text-center"
-                                                >
-                                                    <h1 className="font-semibold">
-                                                        {Reporti18n[locale]} #:
-                                                        {item.RowOrder}
-                                                    </h1>
-                                                    <p>{item.ReportMessage}</p>
+                                                <div className="flex justify-between mb-5 w-full rounded border px-2 py-3 ">
+                                                    <div
+                                                        key={index}
+                                                    >
+                                                        <h1 className="font-semibold">
+                                                            {Reporti18n[locale]} #
+                                                            {item.PushCartReportId}
+                                                        </h1>
+                                                        <p>{item.ReportMessage}</p>
+                                                    </div>
+                                                    {
+                                                        item.CreatedAt && (
+                                                            <div>
+                                                                <p className="text-black/[.70] text-xs">{format(new Date(item.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
+                                                            </div>    
+                                                        )
+                                                    }
                                                 </div>
                                             );
                                         }
