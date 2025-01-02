@@ -83,6 +83,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
   SetDateRangei18n: { en: "Set Date Range", ja: "日付範囲を設定" },
   DateTimei18n: { en: "Date & Time", ja: "日付と時刻" },
   Customeri18n: { en: "Customer", ja: "顧客" },
+  Customersi18n: { en: "Customers", ja: "顧客" },
   Notesi18n: { en: "Notes", ja: "備考" },
   Transactioni18n: { en: "Transaction", ja: "取引" },
   Useri18n: { en: "User", ja: "ユーザー" },
@@ -898,6 +899,7 @@ export interface I18nStore {
   SetDateRangei18n: LocalizedString;
   DateTimei18n: LocalizedString;
   Customeri18n: LocalizedString;
+  Customersi18n: LocalizedString;
   Notesi18n: LocalizedString;
   Transactioni18n: LocalizedString;
   Useri18n: LocalizedString;

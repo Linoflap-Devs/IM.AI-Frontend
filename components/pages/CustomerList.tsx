@@ -52,6 +52,7 @@ function CustomerList() {
         ContactNumberi18n,
         CreatedSincei18n,
         CustomerListi18n,
+        Customersi18n,
         Downloadi18n,
         AddGuesti18n,
         CreateGuestAccounti18n,
@@ -250,7 +251,7 @@ function CustomerList() {
             </AlertDialog>
             <Card className="mb-3 flex flex-grow flex-col gap-3 p-3">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">{CustomerListi18n[locale]}</h1>
+                    <h1 className="text-2xl font-semibold">{Customersi18n[locale]}</h1>
                     <div className="flex flex-grow-0 gap-4">
                         <Button className="bg-green-500">{Downloadi18n[locale]}</Button>
                         <Button onClick={() => setOpenAddGuest(true)}>

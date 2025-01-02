@@ -3,7 +3,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Card } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, User } from "lucide-react";
 
 import { useI18nStore } from "@/store/usei18n";
 import { UseQueryResult, useQuery } from "@tanstack/react-query";
@@ -37,6 +37,7 @@ function UserActivity() {
         localeExtended,
         Viewi18n,
         Downloadi18n,
+        Useri18n
     } = useI18nStore();
 
     const [date, setDate] = useState<DateRange | undefined>({
@@ -108,7 +109,7 @@ function UserActivity() {
         {
             accessorKey: "Costumer",
             header: () => (
-                <div className="text-center">{Customeri18n[locale]}</div>
+                <div className="text-center">{Useri18n[locale]}</div>
             ),
             cell: ({ row }) => {
                 return (

@@ -52,6 +52,7 @@ function TransactionHistory() {
         locale,
         DateTimei18n,
         cartsi18n,
+        Carti18n,
         Customeri18n,
         TransactionStatusi18n,
         TransactionHistoryi18n,
@@ -227,7 +228,7 @@ function TransactionHistory() {
         {
             accessorKey: "PushCartId",
             header: () => (
-                <div className="text-center">{`${cartsi18n[locale]} ${IDi18n[locale]}`}</div>
+                <div className="text-center">{`${Carti18n[locale]} ${IDi18n[locale]}`}</div>
             ),
             cell: ({ row }) => {
                 return (
