@@ -38,7 +38,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowUpDown, CalendarIcon, CheckIcon, ChevronsUpDown } from "lucide-react";
+import { ArrowUpDown, CalendarIcon, CheckIcon, ChevronsUpDown, CircleHelp } from "lucide-react";
 import Link from "next/link";
 import { useGlobalStore } from "@/store/useStore";
 import { useToast } from "@/components/ui/use-toast";
@@ -51,8 +51,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 import { DateTimePicker } from "../ui/datetime-picker";
 import { Calendar } from "../ui/calendar";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { DatePicker } from "../ui/datepicker";
+import { Collapsible } from "@radix-ui/react-collapsible";
+import { CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 /* Msc */
 const formSchema = z.object({
     productName: z
@@ -88,7 +91,13 @@ function Inventory() {
     const { globalCompanyState, globalBranchState } = useGlobalStore();
     const [activeFilter, setActiveFilter] = useState<{column: string, value: string} | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
-    
+
+    const [discrepancies, setDiscrepancies] = useState<{id: number, reason: string, amount: number}[] | null>(null);
+    const [discrepancyCount, setDiscrepancyCount] = useState(0);
+
+    const [discrepancyReason, setDiscrepancyReason] = useState("");
+    const [discrepancyAmount, setDiscrepancyAmount] = useState(0);
+
     axios.defaults.headers.common[
         "Authorization"
     ] = `Bearer ${session.data?.token}`;
@@ -125,6 +134,23 @@ function Inventory() {
             expiry: undefined
         }
     });
+
+    const getAdjustmentTypes = useQuery({
+        queryKey: ["getAdjustmentTypes"],
+        enabled: session.status === 'authenticated',
+        queryFn: async () => {
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/stocks/getStockAdjustmentTypes`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${session.data?.token}`,
+                    },
+                }
+            );
+            return response.data.map((item: any) => { return {value: item.StockAdjustmentTypeId, label: item.StockAdjustmentType}});
+        },
+    })
+
     const getStocksquery = useQuery({
         queryKey: ["getStocks", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId],
         enabled: session.data?.token !== undefined,
@@ -420,6 +446,35 @@ function Inventory() {
         },
     ];
 
+    const discrepancyColumns: ColumnDef<any>[] = [
+        {
+            accessorKey: "id",
+            header: "Id",
+            enableHiding: true
+        },
+        {
+            accessorKey: "reason",
+            header: "Reason"
+        },
+        {
+            accessorKey: "amount",
+            header: "Amount"
+        },
+        {   
+            id: "actions",
+            cell: ({ row }) => {
+                return (
+                    <Button variant="outline" size="sm" type="button" onClick={() => setDiscrepancies((prev) => {
+                        return (prev || []).filter((discrepancy) => discrepancy.id !== row.getValue("id"))
+                    })}>
+                        X
+                    </Button>
+                )
+            }
+        }
+
+    ]
+
     // filters = [
 
     // ]
@@ -434,6 +489,15 @@ function Inventory() {
             </Card>
         );
     }
+
+    const handleCloseDialog = () => {
+        setOpenDialog(!openDialog);
+        form.reset();
+        setDiscrepancies(null);
+        setDiscrepancyCount(0);
+        setDiscrepancyReason("");
+    }
+
     return (
         <div className="mx-3 mb-3 flex flex-1 flex-col gap-3">
             {userData && userData.role <= 3 && (
@@ -486,7 +550,7 @@ function Inventory() {
                     })}
                 </Card>
             )}
-            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+            <Dialog open={openDialog} onOpenChange={handleCloseDialog}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle className="text-2xl m-0">{AddStocksi18n[locale]}</DialogTitle>
@@ -726,11 +790,92 @@ function Inventory() {
                                             </Command>
                                             </PopoverContent>
                                         </Popover>
-                                        <FormMessage className="text-xs" />
                                     </div>
+                                    <FormMessage className="text-xs text-right w-full" />
                                     </FormItem>
                                 )}
                             />
+                            <div className="pb-2 border-b"></div>
+                            <div className="w-full">
+                                <Collapsible>
+                                    <CollapsibleTrigger className="w-full">
+                                        <div className="flex justify-between items-center w-full">
+                                            <div className="flex gap-2 items-center">
+                                                <h1 className="text-lg">Discrepancies {discrepancies?.length ? `(${discrepancies?.length})` : ""}</h1>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            <span className="text-black/[.70]"><CircleHelp size={16} color="currentColor"></CircleHelp></span>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>Use this to account for missing items, expired or damaged products in the batch.</p>
+                                                        </TooltipContent>
+
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </div>
+                                            <ChevronsUpDown className="h-4 w-4" />
+                                        </div>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent className="px-2">
+                                        {
+                                            discrepancies?.length ? (
+                                                <>
+                                                    <DataTable
+                                                        columns={discrepancyColumns}
+                                                        data={discrepancies}
+                                                        visibility={{id: false}}
+                                                    ></DataTable>
+                                                </>
+                                                
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center py-4 mt-2 gap-2 border rounded">
+                                                    <p className="text-black/[.70]">No discrepancies.</p>
+                                                </div>
+                                            )
+                                        }
+                                        <div className="flex gap-2 mt-4">
+                                            <div className="flex flex-col gap-2 w-2/5">
+                                                <p className="text-sm">Reason</p>
+                                                <Select
+                                                    value={discrepancyReason}
+                                                    onValueChange={(value) => setDiscrepancyReason(value)}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            placeholder="Discrepancy"
+                                                        >
+                                                            {getAdjustmentTypes.data?.find((option: any) => option.value == discrepancyReason)?.label}
+                                                        </SelectValue>
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {getAdjustmentTypes.data?.map((option: any, index: number) => (
+                                                            <SelectItem key={index} value={option.value}>
+                                                                {option.label}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                           <div className="flex flex-col gap-2 w-2/5">
+                                                <p className="text-sm">Amount</p>
+                                                <Input type="number" value={discrepancyAmount} onChange={(e) => setDiscrepancyAmount(parseInt(e.target.value))}></Input>
+                                           </div>
+                                           <div className="flex flex-col gap-2 w-1/5">
+                                                <p>&nbsp;</p>
+                                                <Button
+                                                    onClick={() => setDiscrepancies((prev) => [...(prev || []), {id: discrepancyCount, reason: getAdjustmentTypes.data?.find((option: any) => option.value == discrepancyReason)?.label, amount: discrepancyAmount}])}
+                                                    variant="outline"
+                                                    size="sm"
+                                                    type="button"
+                                                >
+                                                    +
+                                                </Button>
+                                           </div>
+                                        </div>
+                                    </CollapsibleContent>
+                                </Collapsible>
+                            </div>
                             <DialogFooter>
                                 <div className="flex justify-end mt-4">
                                     <Button type="submit" onClick={() => console.log(form.formState)}>
