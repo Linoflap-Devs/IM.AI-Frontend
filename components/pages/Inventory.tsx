@@ -93,11 +93,11 @@ function Inventory() {
     const [activeFilter, setActiveFilter] = useState<{column: string, value: string} | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
 
-    const [discrepancies, setDiscrepancies] = useState<{id: number, reason: string, amount: number}[] | null>(null);
+    const [discrepancies, setDiscrepancies] = useState<{id: number, reason: string, quantity: number}[] | null>(null);
     const [discrepancyCount, setDiscrepancyCount] = useState(0);
 
     const [discrepancyReason, setDiscrepancyReason] = useState("");
-    const [discrepancyAmount, setDiscrepancyAmount] = useState(0);
+    const [discrepancyAmount, setDiscrepancyAmount] = useState("");
 
     axios.defaults.headers.common[
         "Authorization"
@@ -242,27 +242,25 @@ function Inventory() {
                     quantity: data.quantity,
                     supplierId: data.supplier ,
                     companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId,
-                    branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId
+                    branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId,
+                    discrepancies: JSON.stringify(discrepancies || []),
+                    uId: userId
                 },
             )
 
-            const stockResponse = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/stocks/addStocks`,
-                {
-                    productId: data.productName,
-                    expiryDate: data.expiry,
-                    quantity: data.quantity,
-                    branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId,
-                    batchId: response.data.Id,
-                    discrepancies: discrepancies || [],
-                    uId: userId
-                }
-            )
-            console.log({
-                batch: response.data,
-                stock: stockResponse.data
-            })
-            return {batch: response.data, stock: stockResponse.data}
+            // const stockResponse = await axios.post(
+            //     `${process.env.NEXT_PUBLIC_API_URL}/stocks/addStocks`,
+            //     {
+            //         productId: data.productName,
+            //         expiryDate: data.expiry,
+            //         quantity: data.quantity,
+            //         branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId,
+            //         batchId: response.data.Id,
+            //         discrepancies: discrepancies || [],
+            //         uId: userId
+            //     }
+            // )
+            return {batch: response.data}
         },
         onSuccess: () => {
             setOpenDialog(false);
@@ -458,11 +456,16 @@ function Inventory() {
         },
         {
             accessorKey: "reason",
-            header: "Reason"
+            header: "Reason",
+            cell: ({ row }) => {
+                return (
+                    getAdjustmentTypes.data?.find((option: any) => option.value == row.getValue("reason"))?.label
+                )
+            }
         },
         {
-            accessorKey: "amount",
-            header: "Amount"
+            accessorKey: "quantity",
+            header: "Quantity"
         },
         {   
             id: "actions",
@@ -863,12 +866,12 @@ function Inventory() {
                                             </div>
                                            <div className="flex flex-col gap-2 w-2/5">
                                                 <p className="text-sm">Amount</p>
-                                                <Input type="number" value={discrepancyAmount} onChange={(e) => setDiscrepancyAmount(parseInt(e.target.value))}></Input>
+                                                <Input type="number" value={discrepancyAmount} onChange={(e) => setDiscrepancyAmount(e.target.value)}></Input>
                                            </div>
                                            <div className="flex flex-col gap-2 w-1/5">
                                                 <p>&nbsp;</p>
                                                 <Button
-                                                    onClick={() => setDiscrepancies((prev) => [...(prev || []), {id: discrepancyCount, reason: getAdjustmentTypes.data?.find((option: any) => option.value == discrepancyReason)?.label, amount: discrepancyAmount}])}
+                                                    onClick={() => setDiscrepancies((prev) => [...(prev || []), {id: discrepancyCount, reason: getAdjustmentTypes.data?.find((option: any) => option.value == discrepancyReason)?.value, quantity: parseInt(discrepancyAmount)}])}
                                                     variant="outline"
                                                     size="sm"
                                                     type="button"
