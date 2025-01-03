@@ -74,6 +74,11 @@ const formSchema = z.object({
     expiry: z.date().optional(),    
 });
 
+const discrepancySchema = z.object({
+    reason: z.string().min(1, { message: "Select a reason." }),
+    quantity: z.coerce.number().min(1, { message: "Enter a quantity." })
+});
+
 function Inventory() {
     const session = useSession();
     const userData = session.data?.data;
@@ -133,6 +138,14 @@ function Inventory() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             expiry: undefined
+        }
+    });
+
+    const discrepancyForm = useForm<z.infer<typeof discrepancySchema>>({
+        resolver: zodResolver(discrepancySchema),
+        defaultValues: {
+            reason: "",
+            quantity: 0
         }
     });
 
@@ -280,6 +293,29 @@ function Inventory() {
             })
         }
     })
+
+    function addDiscrepancy(values: z.infer<typeof discrepancySchema>) {
+        console.log(values);
+        setDiscrepancyCount(discrepancyCount + 1);
+        discrepancyForm.trigger();
+        const validate = discrepancySchema.safeParse(values);
+
+        if(!validate.success) {
+            console.log(validate.error.issues);
+            return;
+        }
+
+        setDiscrepancies((prev) => [
+            ...(prev || []), 
+            {
+                id: discrepancyCount, 
+                reason: getAdjustmentTypes.data?.find((option: any) => option.value == values.reason)?.value, 
+                quantity: values.quantity
+            }
+        ]);
+
+        discrepancyForm.reset();
+    }
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values, globalCompanyState !== "all" ? globalCompanyState : userData?.companyId, globalBranchState !== "all" ? globalBranchState : userData?.branchId);
@@ -500,6 +536,7 @@ function Inventory() {
     const handleCloseDialog = () => {
         setOpenDialog(!openDialog);
         form.reset();
+        discrepancyForm.reset();
         setDiscrepancies(null);
         setDiscrepancyCount(0);
         setDiscrepancyReason("");
@@ -569,34 +606,6 @@ function Inventory() {
                             )}
                             className="space-y-3"
                         >
-                            {/* <FormField
-                                control={form.control}
-                                name="productName"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col items-center">
-                                        <div className="flex w-full items-center justify-between">
-                                            <FormLabel className="text-lg">
-                                                {
-                                                    ProdNamei18n[
-                                                    locale
-                                                    ]
-                                                }
-                                            </FormLabel>
-                                            <FormControl className="w-[60%]">
-                                                <Input
-                                                    placeholder={
-                                                        ProdNamei18n[
-                                                        locale
-                                                        ]
-                                                    }
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                        </div>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
                             <FormField
                                 control={form.control}
                                 name="batchNo"
@@ -841,44 +850,78 @@ function Inventory() {
                                                 </div>
                                             )
                                         }
-                                        <div className="flex gap-2 mt-4">
-                                            <div className="flex flex-col gap-2 w-2/5">
-                                                <p className="text-sm">Reason</p>
-                                                <Select
-                                                    value={discrepancyReason}
-                                                    onValueChange={(value) => setDiscrepancyReason(value)}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue
-                                                            placeholder="Discrepancy"
-                                                        >
-                                                            {getAdjustmentTypes.data?.find((option: any) => option.value == discrepancyReason)?.label}
-                                                        </SelectValue>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {getAdjustmentTypes.data?.map((option: any, index: number) => (
-                                                            <SelectItem key={index} value={option.value}>
-                                                                {option.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                           <div className="flex flex-col gap-2 w-2/5">
-                                                <p className="text-sm">Amount</p>
-                                                <Input type="number" value={discrepancyAmount} onChange={(e) => setDiscrepancyAmount(e.target.value)}></Input>
-                                           </div>
-                                           <div className="flex flex-col gap-2 w-1/5">
-                                                <p>&nbsp;</p>
-                                                <Button
-                                                    onClick={() => setDiscrepancies((prev) => [...(prev || []), {id: discrepancyCount, reason: getAdjustmentTypes.data?.find((option: any) => option.value == discrepancyReason)?.value, quantity: parseInt(discrepancyAmount)}])}
-                                                    variant="outline"
-                                                    size="sm"
-                                                    type="button"
-                                                >
-                                                    +
-                                                </Button>
-                                           </div>
+                                        <div className="mt-4 w-full">
+                                            <Form {...discrepancyForm}>
+                                                <form onSubmit={discrepancyForm.handleSubmit(addDiscrepancy)}>
+                                                    <div className="flex gap-4 items-end w-full">
+                                                        <FormField
+                                                            control={discrepancyForm.control}
+                                                            name="reason"
+                                                            render={({ field }) => (
+                                                                <FormItem className="w-2/5">
+                                                                    <FormLabel>Reason</FormLabel>
+                                                                    <Select
+                                                                            value={field.value?.toString()}
+                                                                            onValueChange={field.onChange}
+                                                                        >
+                                                                            <FormControl>
+                                                                                <SelectTrigger>
+                                                                                    <SelectValue
+                                                                                        placeholder="Discrepancy"
+                                                                                    >
+                                                                                        {getAdjustmentTypes.data?.find((option: any) => option.value == field.value)?.label}
+                                                                                    </SelectValue>
+                                                                                </SelectTrigger>
+                                                                            </FormControl>
+                                                                            <SelectContent>
+                                                                                {getAdjustmentTypes.data?.map((option: any, index: number) => (
+                                                                                    <SelectItem key={index} value={option.value.toString()}>
+                                                                                        {option.label}
+                                                                                    </SelectItem>
+                                                                                ))}
+                                                                            </SelectContent>    
+                                                                        </Select>
+                                                                        <div className="h-[1.5rem]">
+                                                                            <FormMessage className="" />
+                                                                        </div>
+                                                                        
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                        <FormField
+                                                            control={discrepancyForm.control}
+                                                            name="quantity"
+                                                            render={({ field }) => (
+                                                                <FormItem className="w-2/5">
+                                                                    <FormLabel>Quantity</FormLabel>
+                                                                    <Input
+                                                                        type="number"
+                                                                        value={field.value || ""}
+                                                                        onChange={field.onChange}
+                                                                    />
+                                                                    <div className="h-[1.5rem]">
+                                                                        <FormMessage className="" />
+                                                                    </div>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                        <div className="w-1/5 flex flex-col items-end">
+                                                            <Button
+                                                                type="button"
+                                                                onClick={() => addDiscrepancy(discrepancyForm.getValues())}
+                                                                variant="secondary"
+                                                                size="sm"
+                                                                className="w-full"
+                                                            >
+                                                                +
+                                                            </Button>
+                                                            <div className="h-[1.5rem]">
+                                                               
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </Form>
                                         </div>
                                     </CollapsibleContent>
                                 </Collapsible>
