@@ -76,7 +76,7 @@ const formSchema = z.object({
 
 const discrepancySchema = z.object({
     reason: z.string().min(1, { message: "Select a reason." }),
-    quantity: z.coerce.number().min(1, { message: "Enter a quantity." })
+    quantity: z.coerce.number().refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." })
 });
 
 function Inventory() {
@@ -246,6 +246,7 @@ function Inventory() {
     const addBatchMutation = useMutation({
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log(data, discrepancies);
+            console.log(JSON.stringify(discrepancies || []));
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/batch/addBatch`,
                 {
