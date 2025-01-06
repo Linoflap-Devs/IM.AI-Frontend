@@ -279,14 +279,12 @@ function Promo() {
             expiry: new Date(row.original.EndDate),
             // start: undefined,
             // expiry: undefined,
-            products: promoDetailsQuery.data.map((product: any) => {return { label: product.Name, value: product.ProductId}}) ?? []
+            products: promoDetailsQuery.data?.map((product: any) => {return { label: product.Name, value: product.ProductId}}) ?? []
         }   
         setSelectedPromoDetail(details)
         console.log(details)
         addPromoForm.reset(details)
-        setOpenDialAdd((prev) => {
-            return !prev!
-        })
+        setOpenDialAdd(true)
     }
 
     useEffect(() => {
@@ -447,14 +445,18 @@ function Promo() {
                         >
                             <BookOpen size={20} strokeWidth={1.25} />
                         </Button>
-                        <Button
-                            className="h-max px-1 py-1"
-                            onClick={() => {
-                                handleRowEdit(row)
-                            }}
-                        >
-                            <Pencil size={20} strokeWidth={1.25}></Pencil>
-                        </Button>
+                        {
+                            userData.role == "3" && (
+                                <Button
+                                    className="h-max px-1 py-1"
+                                    onClick={() => {
+                                        handleRowEdit(row)
+                                    }}
+                                >
+                                    <Pencil size={20} strokeWidth={1.25}></Pencil>
+                                </Button>
+                            )
+                        }
                         <Button
                             variant={"destructive"}
                             className="h-full px-1 py-1"
