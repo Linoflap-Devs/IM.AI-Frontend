@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "../ui/data-table";
 import { format } from "date-fns";
+import { Truck } from "lucide-react";
 
 export default function Deliveries() {
      const session = useSession();
@@ -103,20 +104,29 @@ export default function Deliveries() {
     ]
 
     return (
+        
         <Card className="mx-3 mb-3 flex w-full flex-col gap-2 p-3">
             <p className="text-2xl font-semibold">{Deliveries[locale]}</p>
 
-            <DataTable
-                isLoading={batchQuery.isLoading}
-                columns={columns}
-                data={batchQuery.data || []}
-                pagination={true}
-                columnsToSearch={["ProductName", "SupplierName", "LocationStatusName", "BatchNo"]}
-                filtering={true}
-                
-            >
+            {
+                (globalBranchState === "all") ? ( 
+                    <div className="w-full h-full flex flex-col justify-center items-center text-muted-foreground">
+                        <Truck size={50} strokeWidth={1} />
+                        <p className="text-xl ">Select a branch to show its deliveries.</p>
+                    </div>
+                ) : (
+                    <DataTable
+                        isLoading={batchQuery.isLoading}
+                        columns={columns}
+                        data={batchQuery.data || []}
+                        pagination={true}
+                        columnsToSearch={["ProductName", "SupplierName", "LocationStatusName", "BatchNo"]}
+                        filtering={true}
+                    >
 
-            </DataTable>
+                    </DataTable>
+                 )
+            }
         </Card>
     )
 }
