@@ -76,7 +76,8 @@ const formSchema = z.object({
 
 const discrepancySchema = z.object({
     reason: z.string().min(1, { message: "Select a reason." }),
-    quantity: z.coerce.number().refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." })
+    quantity: z.coerce.number().refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." }),
+    operation: z.string().min(1, { message: "Select an operation." })
 });
 
 function Inventory() {
@@ -98,7 +99,7 @@ function Inventory() {
     const [activeFilter, setActiveFilter] = useState<{column: string, value: string} | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
 
-    const [discrepancies, setDiscrepancies] = useState<{id: number, reason: string, quantity: number}[] | null>(null);
+    const [discrepancies, setDiscrepancies] = useState<{id: number, reason: string, quantity: number, operation: string}[] | null>(null);
     const [discrepancyCount, setDiscrepancyCount] = useState(0);
 
     const [discrepancyReason, setDiscrepancyReason] = useState("");
@@ -145,7 +146,8 @@ function Inventory() {
         resolver: zodResolver(discrepancySchema),
         defaultValues: {
             reason: "",
-            quantity: 0
+            quantity: 0,
+            operation: ""
         }
     });
 
@@ -247,6 +249,12 @@ function Inventory() {
         mutationFn: async (data: z.infer<typeof formSchema>) => {
             console.log(data, discrepancies);
             console.log(JSON.stringify(discrepancies || []));
+            const discrepancyAltered = discrepancies?.map((discrepancy) => {
+                return {
+                    reason: discrepancy.reason,
+                    quantity: discrepancy.operation === "add" ? discrepancy.quantity : -discrepancy.quantity,
+                }
+            })
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/batch/addBatch`,
                 {
@@ -257,7 +265,7 @@ function Inventory() {
                     supplierId: data.supplier ,
                     companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId,
                     branchId: globalBranchState !== "all" ? globalBranchState : userData?.branchId,
-                    discrepancies: JSON.stringify(discrepancies || []),
+                    discrepancies: JSON.stringify(discrepancyAltered || []),
                     uId: userId
                 },
             )
@@ -311,7 +319,8 @@ function Inventory() {
             {
                 id: discrepancyCount, 
                 reason: getAdjustmentTypes.data?.find((option: any) => option.value == values.reason)?.value, 
-                quantity: values.quantity
+                quantity: values.quantity,
+                operation: values.operation
             }
         ]);
 
@@ -492,6 +501,10 @@ function Inventory() {
             enableHiding: true
         },
         {
+            accessorKey: "operation",
+            header: "Operation"
+        },
+        {
             accessorKey: "reason",
             header: "Reason",
             cell: ({ row }) => {
@@ -596,7 +609,7 @@ function Inventory() {
                 </Card>
             )}
             <Dialog open={openDialog} onOpenChange={handleCloseDialog}>
-                <DialogContent>
+                <DialogContent className="w-[600px] max-w-full">
                     <DialogHeader>
                         <DialogTitle className="text-2xl m-0">{AddStocksi18n[locale]}</DialogTitle>
                     </DialogHeader>
@@ -857,9 +870,44 @@ function Inventory() {
                                                     <div className="flex gap-4 items-end w-full">
                                                         <FormField
                                                             control={discrepancyForm.control}
+                                                            name="operation"
+                                                            render={({ field }) => (
+                                                                <FormItem className="w-1/4">
+                                                                    <FormLabel>Operation</FormLabel>
+                                                                    <Select
+                                                                            value={field.value?.toString()}
+                                                                            onValueChange={field.onChange}
+                                                                        >
+                                                                            <FormControl>
+                                                                                <SelectTrigger>
+                                                                                    <SelectValue
+                                                                                        placeholder="Operation"
+                                                                                    >
+                                                                                        {field.value == "add" ? "Add" : field.value == "subtract" ? "Subtract" : ""}
+                                                                                    </SelectValue>
+                                                                                </SelectTrigger>
+                                                                            </FormControl>
+                                                                            <SelectContent>
+                                                                                <SelectItem key={0} value={"add"}>
+                                                                                    Add
+                                                                                </SelectItem>
+                                                                                <SelectItem key={1} value={"subtract"}>
+                                                                                    Subtract
+                                                                                </SelectItem>
+                                                                            </SelectContent>    
+                                                                        </Select>
+                                                                        <div className="h-[1.5rem]">
+                                                                            <FormMessage className="" />
+                                                                        </div>
+                                                                        
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                        <FormField
+                                                            control={discrepancyForm.control}
                                                             name="reason"
                                                             render={({ field }) => (
-                                                                <FormItem className="w-2/5">
+                                                                <FormItem className="w-1/4">
                                                                     <FormLabel>Reason</FormLabel>
                                                                     <Select
                                                                             value={field.value?.toString()}
@@ -893,7 +941,7 @@ function Inventory() {
                                                             control={discrepancyForm.control}
                                                             name="quantity"
                                                             render={({ field }) => (
-                                                                <FormItem className="w-2/5">
+                                                                <FormItem className="w-1/4">
                                                                     <FormLabel>Quantity</FormLabel>
                                                                     <Input
                                                                         type="number"
@@ -906,7 +954,7 @@ function Inventory() {
                                                                 </FormItem>
                                                             )}
                                                         />
-                                                        <div className="w-1/5 flex flex-col items-end">
+                                                        <div className="w-1/4 flex flex-col items-end">
                                                             <Button
                                                                 type="button"
                                                                 onClick={() => addDiscrepancy(discrepancyForm.getValues())}
