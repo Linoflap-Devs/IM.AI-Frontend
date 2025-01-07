@@ -10,7 +10,7 @@ import { useGlobalStore } from "@/store/useStore";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { ArrowsUpFromLine, Box, Clock, Ellipsis, Loader, Loader2, MessageSquareText, Pencil, SquarePen, Text, Trash } from "lucide-react";
+import { ArrowsUpFromLine, ArrowUpDown, Box, Clock, Ellipsis, Loader, Loader2, MessageSquareText, Pencil, SquarePen, Text, Trash } from "lucide-react";
 import { addDays, format } from "date-fns";
 import { DataTable } from "../ui/data-table";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -289,9 +289,24 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
         },
         {
             accessorKey: "ExpirationDate",
-            header: "Expiration Date",
+            header: ({table}) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className="flex items-center gap-1 justify-center mx-0 px-0"
+                        onClick={ () => {
+                            table.getColumn("ExpirationDate")?.toggleSorting(
+                                table.getColumn("ExpirationDate")?.getIsSorted() === 'asc'
+                            )
+                        }}
+                    >
+                        <span>Expiration Date</span>
+                        <ArrowUpDown size={16} />                            
+                    </Button>
+                )
+            },
             cell: ({ row, cell }) => {
-                return format(new Date(row.getValue("ExpirationDate")), "MMM dd, yyyy");
+                return <span className={`${new Date(row.getValue("ExpirationDate")) < new Date() ? "text-red-500" : new Date(row.getValue("ExpirationDate")) <= addDays(new Date(), 30) ? "text-yellow-500" : "text-green-500"}`}>{format(new Date(row.getValue("ExpirationDate")), "MMM dd, yyyy")}</span>;
             }
         },
         {
