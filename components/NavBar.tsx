@@ -21,6 +21,7 @@ import {
     AlignJustify,
     Package,
     LayoutGrid,
+    ArrowLeftRight,
 } from "lucide-react";
 import { Toaster } from "./ui/toaster";
 import AnimateHeight from "react-animate-height";
@@ -122,8 +123,17 @@ function NavBar() {
                         en: "Transfer Stock",
                         ja: "転送",
                     },
-                    icon: <Truck />,
+                    icon: <ArrowLeftRight />,
                     navigation: "transferorder",
+                    permission: [1, 2, 3],
+                },
+                {
+                    name: {
+                        en: "Deliveries",
+                        ja: "出荷",
+                    },
+                    icon: <Truck />,
+                    navigation: "deliveries",
                     permission: [1, 2, 3],
                 },
                 {

@@ -56,6 +56,7 @@ function Header() {
             report: { en: "Report", ja: "レポート" },
             transactionhistory: { en: "Transaction History", ja: "取引履歴" },
             unusualtransaction: { en: "Unusual Transaction", ja: "異常取引" },
+            deliveries: {en: "Deliveries", ja: "配達"},
             /* Children */
             
         };
