@@ -322,13 +322,14 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
             header: "Status",
             cell: ({ row }) => {
                 const expiry: string = row.getValue("ExpirationDate");
-                const status: string = new Date(expiry) < new Date() 
+                const status: string =  row.getValue("Quantity") == 0 ? "Completed"
+                                        : new Date(expiry) < new Date() 
                                         ? "Expired" 
                                         : new Date(expiry) <= addDays(new Date(), 30) 
                                         ? "Near-Expiry" 
                                         : "In-Stock";
                 return (
-                    <span className={`p-1 font-semibold rounded text-sm ${status == "In-Stock" ? "bg-green-100 text-green-800" : status== "Near-Expiry" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
+                    <span className={`p-1 font-semibold rounded text-sm ${status == "Completed" ? "bg-blue-100 text-blue-800" : status == "In-Stock" ? "bg-green-100 text-green-800" : status== "Near-Expiry" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
                        {status}
                     </span>
                 );
