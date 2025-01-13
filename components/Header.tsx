@@ -39,7 +39,7 @@ function Header() {
         },
     ];
     function headerType() {
-        console.log("header type: ", currentPath);
+        
         const pathMap = {
             dashboard: { en: "Dashboard", ja: "ダッシュボード" },
             inventory: { en: "Inventory", ja: "在庫" },
@@ -64,7 +64,7 @@ function Header() {
             pathMap[
                 Object.keys(pathMap).find((key) => {
                     let slug = currentPath.slice(currentPath.lastIndexOf("/") + 1);
-                    console.log(slug)
+                    
                     return slug.includes(key)
                 }
                 ) as keyof typeof pathMap

@@ -164,7 +164,7 @@ function NavBar() {
                     },
                     icon: <AlignJustify />,
                     navigation: "cart",
-                    permission: [3, 4],
+                    permission: [2, 3, 4],
                 },
                 {
                     name: {
