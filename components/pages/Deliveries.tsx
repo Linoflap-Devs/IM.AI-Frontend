@@ -24,7 +24,8 @@ export default function Deliveries() {
 
     const {
         locale,
-        Deliveries
+        Deliveries,
+        
     } = useI18nStore()
     
 
@@ -106,7 +107,7 @@ export default function Deliveries() {
     return (
         
         <Card className="mx-3 mb-3 flex w-full flex-col gap-2 p-3">
-            <p className="text-2xl font-semibold">{Deliveries[locale]}</p>
+            <p className="text-2xl font-semibold">Batches</p>
 
             {
                 (globalBranchState === "all") ? ( 
