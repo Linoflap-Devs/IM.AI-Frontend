@@ -387,6 +387,13 @@ function Inventory() {
             },
         },
         {
+            accessorKey: "CategoryName",
+            header: "Category",
+            cell: ({ row }) => {
+                return row.getValue("CategoryName") || "N/A"
+            }
+        },
+        {
             accessorKey: "BranchName",
             header: "Branch"
         },
