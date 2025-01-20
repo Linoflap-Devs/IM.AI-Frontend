@@ -214,7 +214,13 @@ export default function Product() {
             accessorKey: "Name",
             header: ProdNamei18n[locale],
         },
-
+        {
+            accessorKey: "Unit",
+            header: Uniti18n[locale],
+            cell: ({ row }) => {
+                return row.getValue("Unit") || "N/A";
+            }
+        },
         {
             accessorKey: "Price",
             header: ({ column }) => {

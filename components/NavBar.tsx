@@ -23,6 +23,7 @@ import {
     LayoutGrid,
     ArrowLeftRight,
     Package2,
+    Barcode,
 } from "lucide-react";
 import { Toaster } from "./ui/toaster";
 import AnimateHeight from "react-animate-height";
@@ -133,8 +134,8 @@ function NavBar() {
                         en: "Batches",
                         ja: "出荷",
                     },
-                    icon: <Package2 />,
-                    navigation: "deliveries",
+                    icon: <Barcode />,
+                    navigation: "batches",
                     permission: [1, 2, 3],
                 },
                 {
