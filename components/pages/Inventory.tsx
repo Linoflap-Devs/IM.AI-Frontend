@@ -132,7 +132,8 @@ function Inventory() {
         SuccessfullyAddedTheProducti18n,
         Successi18n,
         BatchNo,
-        InventoryI18n
+        InventoryI18n,
+        Availability
     } = useI18nStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -464,7 +465,7 @@ function Inventory() {
                                     );
                             }}
                         >
-                            {Availi18n[locale]}
+                            {Availability[locale]}
                             <ArrowUpDown className="ml-2 h-4 w-4" />
                         </Button>
                     </div>
@@ -838,7 +839,7 @@ function Inventory() {
                                     <CollapsibleTrigger className="w-full">
                                         <div className="flex justify-between items-center w-full">
                                             <div className="flex gap-2 items-center">
-                                                <h1 className="text-lg">Discrepancies {discrepancies?.length ? `(${discrepancies?.length})` : ""}</h1>
+                                                <h1 className="text-lg">Stock Discrepancies {discrepancies?.length ? `(${discrepancies?.length})` : ""}</h1>
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger>

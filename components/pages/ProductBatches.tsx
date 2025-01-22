@@ -62,6 +62,8 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
     // Adjust Quantity States
     const [adjustDialogOpen, setAdjustDialogOpen] = useState(false);
     const [adjustmentLoading, setAdjustmentLoading] = useState(false);
+    const [currentQuantity, setCurrentQuantity] = useState<number>(0);
+    const [currentLocation, setCurrentLocation] = useState<string>("");
 
     // Adjust Sheet States
     const [adjustSheetOpen, setAdjustSheetOpen] = useState(false);
@@ -221,10 +223,12 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                 `${process.env.NEXT_PUBLIC_API_URL}/stocks/addStockAdjustments`,
                 {
                     bId: selectedBatchId,
+                    initial: currentQuantity,
                     quantity: data.operation == '+' ? data.quantity : -data.quantity,
                     adjustmentType: data.adjustmentType,
                     notes: data.notes,
-                    uId: user
+                    uId: user,
+                    location: currentLocation
                 }
             )
         },
@@ -414,6 +418,8 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                         onClick={() => {
                             setSelectedBatchId(row.getValue("batchId"))
                             setSelectedBatchName(row.getValue("BatchNo"))
+                            setCurrentQuantity(row.getValue("Quantity"))
+                            setCurrentLocation(row.getValue("LocationStatus"))
                             setAdjustDialogOpen(true)
                         }}
                     >
@@ -437,7 +443,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                     <DropdownMenuSeparator /> 
                     <DropdownMenuItem
                       onClick={() => {
-                       
+                        // wala pang delete function maam 
                       }}
                       className="font-medium text-red-500"
                     >
@@ -455,21 +461,46 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
 
     const adjustmentColumns: ColumnDef<any>[] = [
         {
-            accessorKey: "StockAdjustmentType",
+            accessorKey: "AdjustmentType",
             header: "Reason",
 
         },
         {
-            accessorKey: "Quantity",
+            accessorKey: "Initial",
             header: "Quantity",
+            cell: ({ row }) => {
+                return (
+                    <p className="text-end">
+                        {row.getValue("Initial")}
+                    </p>
+                );
+            }
+        },
+        {
+            accessorKey: "Quantity",
+            header: "Adjustment",
             cell: ({ row }) => {
                 const isPositive = parseInt(row.getValue("Quantity")) > 0 ? true : false;
 
                 return (
-                    <span className={`py-1 px-2 rounded ${isPositive ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
-                        {isPositive ? `+` : `-`} {Math.abs(row.getValue("Quantity"))}
-                    </span>
+                    <p className="text-end">
+                        <span className={`py-1 px-2 rounded ${isPositive ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+                            {isPositive ? `+` : `-`} {Math.abs(row.getValue("Quantity"))}
+                        </span>
+                        
+                    </p>
                 )
+            }
+        },
+        {
+            accessorKey: "Total",
+            header: "Total",
+            cell: ({ row }) => {
+                return (
+                    <p className="text-end">
+                        {row.getValue("Total")}
+                    </p>
+                );
             }
         },
         {
@@ -485,6 +516,22 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
             header: "User",
             cell: ({ row }) => {
                 return `${capitalFirst(row.getValue("FirstName"))} ${capitalFirst(row.getValue("LastName"))}`;
+            }
+        },
+        {
+            accessorKey: "Location",
+            header: "Location",
+            cell: ({ row }) => {
+                const classes = (status: string) => {
+                    if (status == "On Display") return "bg-green-100 text-green-800";
+                    if (status == "In Storage") return "bg-orange-100 text-orange-800";
+                    return "bg-gray-100 text-gray-800"
+                }
+                return (
+                    <span className={`p-1 font-semibold rounded text-sm ${classes(row.getValue("Location"))}`}>
+                       {row.getValue("Location") || "Unknown"}
+                    </span>
+                );
             }
         },
         {
@@ -731,7 +778,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                 </SheetContent>
             </Sheet>
             <Sheet open={adjustSheetOpen} onOpenChange={setAdjustSheetOpen}>
-                <SheetContent className="w-[800px] sm:w-lg max-w-[800px] flex flex-col">
+                <SheetContent className="w-[1000px] sm:w-lg max-w-[1000px] flex flex-col">
                     <SheetHeader className="border-b pb-2">
                         <h1 className="text-2xl font-semibold">
                             Adjustment History
@@ -749,7 +796,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                     data={adjustmentHistoryQuery.data ?? []}
                                     pageSize={10}
                                     filtering={true}
-                                    columnsToSearch={[]}
+                                    columnsToSearch={["StockAdjustmentType", "FirstName", "LastName"]}
                                     visibility={
                                         {
                                             FirstName: false,
