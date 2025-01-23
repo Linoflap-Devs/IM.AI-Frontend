@@ -286,7 +286,7 @@ function Dashboard() {
         },
         {
             accessorKey: "Name",
-            header: () => Namei18n[locale],
+            header: () => "Product Name",
             cell: ({ row }) => {
                 const id = row.getValue("ProductId");
                 return userData?.role <= 2 ? (

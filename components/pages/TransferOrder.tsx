@@ -119,6 +119,8 @@ export default function TransferOrder() {
   const [open, setOpen] = useState<boolean>(false);
   const [openLoadingModal, setOpenLoadingModal] = useState<boolean>(false);
 
+  console.log(userData);
+
   const getTransferOrder = useQuery({
     queryKey: ["GetTransferOrder"],
     enabled: session.data?.token !== undefined,
@@ -159,6 +161,7 @@ export default function TransferOrder() {
   const requestTransferStock = useMutation({
     mutationKey: ["requestTransferOrder"],
     mutationFn: async (data: any) => {
+      console.log(data, userData?.branchId);
       return await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/product/transportStock`,
         { products: data, branchId: userData?.branchId }

@@ -145,7 +145,7 @@ function NavBar() {
                     },
                     icon: <LayoutGrid />,
                     navigation: "category",
-                    permission: [1, 2],
+                    permission: [1, 2, 3],
                 },
             ],
         },
@@ -225,7 +225,7 @@ function NavBar() {
             },
             icon: <CircleUser />,
             navigation: "suppliers",
-            permission: [1, 2],
+            permission: [1, 2, 3],
         },
         {
             name: {
@@ -238,7 +238,7 @@ function NavBar() {
         },
         {
             name: {
-                en: "Manage Customer",
+                en: "Manage Customers",
                 ja: "クライアントリスト",
             },
             icon: <Contact2 />,
@@ -247,7 +247,7 @@ function NavBar() {
         },
         {
             name: {
-                en: "Promo",
+                en: "Promos",
                 ja: "プロモ",
             },
             icon: <Tag />,

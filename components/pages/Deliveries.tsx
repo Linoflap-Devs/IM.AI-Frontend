@@ -61,10 +61,18 @@ export default function Deliveries() {
         },
         {
             accessorKey: "ProductName",
-            header: "Product",
+            header: "Product Name",
+            // cell: ({row}) => {
+            //     return (
+            //         <span className="p-1 rounded bg-blue-200 text-blue-800 font-semibold">{row.getValue("ProductName")}</span>)
+            // }
+        },
+        {
+            accessorKey: "CategoryName",
+            header: "Category",
             cell: ({row}) => {
                 return (
-                    <span className="p-1 rounded bg-blue-200 text-blue-800 font-semibold">{row.getValue("ProductName")}</span>)
+                    <span className="p-1 rounded bg-blue-200 text-blue-800 font-semibold">{row.getValue("CategoryName")}</span>)
             }
         },
         {
