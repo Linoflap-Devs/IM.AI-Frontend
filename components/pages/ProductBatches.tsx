@@ -440,10 +440,9 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                             <Clock size={12} color="currentColor" />  
                         </div>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator /> 
+                    {/* <DropdownMenuSeparator /> 
                     <DropdownMenuItem
                       onClick={() => {
-                        // wala pang delete function maam 
                       }}
                       className="font-medium text-red-500"
                     >
@@ -451,7 +450,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                           <p>Delete</p>
                           <Trash size={12} color="currentColor" />  
                         </div>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                   </DropdownMenuContent>
                 </DropdownMenu>
               );
