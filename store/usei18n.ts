@@ -43,11 +43,11 @@ export const useI18nStore = create<I18nStore>((set) => ({
   salesOverviewi18n: { en: "Sales Overview", ja: "売上概要" },
   storeActivityi18n: { en: "Store Activity", ja: "店舗活動" },
   topSellingProducti18n: {
-    en: "Top Selling Product",
+    en: "Top Selling Products",
     ja: "トップ売れた商品",
   },
   leastSellingProducti18n: {
-    en: "Least Selling Product",
+    en: "Least Selling Products",
     ja: "最も売れない商品",
   },
   cartsi18n: {

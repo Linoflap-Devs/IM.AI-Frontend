@@ -795,7 +795,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                     data={adjustmentHistoryQuery.data ?? []}
                                     pageSize={10}
                                     filtering={true}
-                                    columnsToSearch={["StockAdjustmentType", "FirstName", "LastName"]}
+                                    columnsToSearch={["StockAdjustmentType", "FirstName", "LastName", "AdjustmentType"]}
                                     visibility={
                                         {
                                             FirstName: false,
