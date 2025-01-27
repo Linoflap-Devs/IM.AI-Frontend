@@ -7,7 +7,7 @@ async function page() {
     const userData = session?.data;
     /* Role + 1 to restrict acces*/
     if (userData) {
-        if (userData.role >= 3) {
+        if (userData.role >= 4) {
             notFound();
         }
     }

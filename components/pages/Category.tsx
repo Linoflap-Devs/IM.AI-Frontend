@@ -79,7 +79,7 @@ export default function Category() {
 
     const getCategoriesQuery = useQuery({
         queryKey: ["getCategories", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId],
-        enabled: session.status === "authenticated" && userData.role <= 2,
+        enabled: session.status === "authenticated" && userData.role <= 3,
         queryFn: async () => {
             const isAdmin = userData.role === 1;
             const adminQuery = await axios.get(
