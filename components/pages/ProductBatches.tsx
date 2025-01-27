@@ -762,6 +762,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                                 <Textarea
                                                     placeholder="Enter Remarks"
                                                     className="resize-none w-full"
+                                                    required={true}
                                                     {...field}
                                                 />
                                             </FormControl>
