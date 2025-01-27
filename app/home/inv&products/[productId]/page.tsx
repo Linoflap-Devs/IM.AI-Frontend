@@ -6,8 +6,9 @@ async function page({ params }: { params: { productId: string } }) {
 
     const session = await getServerSession(NextAuthOpt);
     const userData = session?.data;
+    console.log(userData?.role);
     if (userData) {
-        if (userData.role >= 3) {
+        if (userData.role >= 4) {
             notFound();
         }
     }

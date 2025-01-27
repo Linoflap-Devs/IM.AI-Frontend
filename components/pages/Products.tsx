@@ -174,7 +174,7 @@ function Products(productId: { productId: string}) {
                     >
                         {Overviewi18n[locale]}
                     </span>
-                    {userData?.role <= 2 && (
+                    {userData?.role <= 3 && (
                         <span
                             className={`   border-b p-2 py-3 hover:cursor-pointer hover:bg-slate-300 ${
                                 tabState == "batches" &&
@@ -187,7 +187,7 @@ function Products(productId: { productId: string}) {
                             {"Batches"}
                         </span>
                     )}
-                    {userData?.role <= 2 && (
+                    {userData?.role <= 3 && (
                         <span
                             className={`   border-b p-2 py-3 hover:cursor-pointer hover:bg-slate-300 ${
                                 tabState == "purchase" &&

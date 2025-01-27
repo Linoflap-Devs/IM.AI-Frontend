@@ -62,10 +62,10 @@ const formSchema = z.object({
         .number()
         .min(1, { message: "Select a product." }
     ),
-    quantity: z.coerce.number().min(1, {
+    quantity: z.coerce.number({invalid_type_error: "Quantity is required."}).min(1, {
         message: "Quantity cannot be less than 1",
     }),   
-    supplier: z.coerce.number().min(1, {
+    supplier: z.coerce.number({ invalid_type_error: "Supplier is required."}).min(1, {
         message: "Supplier cannot be empty",
     }),
     batchNo: z.coerce.string().min(1, {
@@ -351,7 +351,7 @@ function Inventory() {
 
                 return (
                     <div className="scroll-animation flex w-[250px] justify-center overflow-hidden">
-                        {userData?.role <= 2 ? (
+                        {userData?.role < 4 ? (
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -566,7 +566,7 @@ function Inventory() {
 
     return (
         <div className="mx-3 mb-3 flex flex-1 flex-col gap-3">
-            {userData && userData.role <= 3 && (
+            {userData && userData.role < 4 && (
                 <Card className="flex justify-between p-4 gap-4">
                     {Object.keys(inventoryDataOverview).map((key, index) => {
                         const bgColor = (value: string) => {
@@ -802,7 +802,7 @@ function Inventory() {
                                                 className="h-9"
                                                 />
                                                 <CommandList>
-                                                <CommandEmpty>No framework found.</CommandEmpty>
+                                                <CommandEmpty>No supplier found.</CommandEmpty>
                                                 <CommandGroup>
                                                     {getSuppliersQuery?.data?.map((stock: any) => (
                                                     <CommandItem
@@ -930,7 +930,7 @@ function Inventory() {
                                                                                     </SelectValue>
                                                                                 </SelectTrigger>
                                                                             </FormControl>
-                                                                            <SelectContent>
+                                                                            <SelectContent className="overflow-y-scroll max-h-50">
                                                                                 {getAdjustmentTypes.data?.map((option: any, index: number) => (
                                                                                     <SelectItem key={index} value={option.value.toString()}>
                                                                                         {option.label}
@@ -995,7 +995,7 @@ function Inventory() {
                 </DialogContent>
             </Dialog>
             <Card className={`flex flex-1 flex-col gap-3 p-3`}>
-                {userData && userData.role <= 3 && (
+                {userData && userData.role < 4 && (
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-semibold">
                             {InventoryI18n[locale]}

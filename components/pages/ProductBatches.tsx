@@ -406,6 +406,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                     <DropdownMenuItem
                         onClick={() => {
                             handleRemarksClick(row.getValue("batchId"))
+                            setSelectedBatchName(row.getValue("BatchNo"))
                         }}
                     >
                         <div className="flex justify-between w-full items-center">
@@ -726,7 +727,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                         <h1 className="text-2xl font-semibold">
                             Batch Remarks
                         </h1>
-                        <p className="text-muted-foreground">Batch Id: {selectedBatchId}</p>
+                        <p className="text-muted-foreground">Batch: {selectedBatchName}</p>
                     </SheetHeader>
                     <div className="flex w-full flex-1 overflow-y-scroll flex-col gap-3 py-5 px-3">
                         {

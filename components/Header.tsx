@@ -106,7 +106,7 @@ function Header() {
                     )}
 
                 {session.status === "authenticated" &&
-                    userData.role <= 3 &&
+                    userData.role <= 4 &&
                     hideFilter(currentPath, [
                         "createacc",
                         "useractivity",
