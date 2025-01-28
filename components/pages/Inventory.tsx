@@ -652,8 +652,8 @@ function Inventory() {
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormMessage />
                                         </div>
+                                            <FormMessage className="text-xs text-right w-full"/>
                                     </FormItem>
                                 )}
                             />

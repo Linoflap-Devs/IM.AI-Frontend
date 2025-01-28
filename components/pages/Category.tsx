@@ -224,6 +224,12 @@ export default function Category() {
         },
     })
 
+    function handleOpen() {
+        setOpen(!open);
+        form.reset();
+        setSelectedRecord({} as {id: number, categoryName: string, companyId: number});
+    }
+
     function onSubmit(data: z.infer<typeof formSchema>) {
         isEditMode ? editCategoryMutation.mutate(data) : addCategoryMutation.mutate(data);
     }
@@ -267,6 +273,7 @@ export default function Category() {
                             onClick={() => {
                                 console.log(row)
                                 setSelectedRecord({id: row.original.CategoryId, categoryName: row.original.Name, companyId: row.original.CompanyId});
+                                
                                 setIsEditMode(true);
                                 setOpen(true);
                             }}
@@ -293,7 +300,7 @@ export default function Category() {
 
     return (
         <>
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={open} onOpenChange={handleOpen}>
                 <DialogContent className="">
                     <DialogHeader>
                         <DialogTitle>

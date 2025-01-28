@@ -377,7 +377,7 @@ export default function Product() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -406,7 +406,7 @@ export default function Product() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -435,7 +435,7 @@ export default function Product() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full"/>
                                                     </FormItem>
                                                 )}
                                             />
@@ -494,7 +494,7 @@ export default function Product() {
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -523,7 +523,7 @@ export default function Product() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -560,7 +560,7 @@ export default function Product() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -597,7 +597,7 @@ export default function Product() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -658,7 +658,7 @@ export default function Product() {
                                                                 </SelectContent>
                                                             </Select>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs text-right w-full" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -688,7 +688,7 @@ export default function Product() {
                                                                     />
                                                                 </FormControl>
                                                             </div>
-                                                            <FormMessage />
+                                                            <FormMessage className="" />
                                                         </FormItem>
                                                     )}
                                                 />
@@ -717,7 +717,7 @@ export default function Product() {
                                                                     />
                                                                 </FormControl>
                                                             </div>
-                                                            <FormMessage />
+                                                            <FormMessage className="" />
                                                         </FormItem>
                                                     )}
                                                 />
