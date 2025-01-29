@@ -846,6 +846,11 @@ export const useI18nStore = create<I18nStore>((set) => ({
   Availability: {
     en: "Availability",
     ja: "利用可能性"
+  },
+
+  SupplierContactInfo: {
+    en: "Supplier Contact Information",
+    ja: "仕入先連絡先情報"
   }
 }));
 export interface I18nStore {
@@ -1114,4 +1119,5 @@ export interface I18nStore {
   RetailPrice: LocalizedString;
   Deliveries: LocalizedString;
   Availability: LocalizedString;
+  SupplierContactInfo: LocalizedString;
 }

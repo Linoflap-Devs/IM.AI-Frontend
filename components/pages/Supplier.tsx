@@ -64,22 +64,22 @@ interface Supplier {
     email: string;
 }
 const formSchema = z.object({
-    companyId: z.number().gte(0, { message: "Company is required" }),
-    supplier: z.string().min(2, { message: "Supplier Name required" }).max(50),
-    contact: z.string().min(2, { message: "Contact required" }).max(50),
+    companyId: z.number({invalid_type_error: "Company is required"}).gte(0, { message: "Company is required" }),
+    supplier: z.string().min(2, { message: "Supplier name is required" }).max(50),
+    contact: z.string().min(2, { message: "Contact number is required" }).max(50),
     contactPerson: z
         .string()
-        .min(2, { message: "Contact Person Required" })
+        .min(2, { message: "Contact person is required" })
         .max(50),
-    address: z.string().min(10, { message: "Address Required" }).max(70),
+    address: z.string().min(10, { message: "Address is required" }).max(70),
     email: z
         .string()
-        .email({ message: "Invalid Email" })
-        .min(2, { message: "Email Required" })
+        .email({ message: "Invalid email" })
+        .min(2, { message: "Email is required" })
         .max(50),
     products: z
         .array(z.object({ value: z.number(), label: z.string() }))
-        .min(1, { message: "Please Select atleast 1 or more Product" }),
+        .min(1, { message: "Please select at least 1 or more product" }),
 });
 export default function Supplier() {
     const session = useSession();
@@ -106,12 +106,14 @@ export default function Supplier() {
         ProductSuppliedi18n,
         SelectProducti18n,
         Canceli18n,
+        Addi18n,
         AreYouAbsolutelySurei18n,
         ThisActionCannotBeUndoneThisWillPermanentlyDeleteYourAccountAndRemoveYourDataFromOurServersi18n,
         EditSupplieri18n,
         Hoveri18n,
         PleaseCompleteTheFormToEditTheSupplieri18n,
         PleaseCompleteTheFormToAddASupplieri18n,
+        SupplierContactInfo
     } = useI18nStore();
     const { globalCompanyState, setGlobalCompanyState, globalBranchState } =
         useGlobalStore();
@@ -447,20 +449,14 @@ export default function Supplier() {
             <Dialog open={modalFormState} onOpenChange={setModalFormState}>
                 <DialogContent className="">
                     <DialogHeader>
-                        <DialogTitle>
+                        <DialogTitle className="text-xl">
                             {isEditMode
                                 ? EditSupplieri18n[locale]
                                 : AddSupplieri18n[locale]}
                         </DialogTitle>
-                        <DialogDescription>
-                            {isEditMode
-                                ? PleaseCompleteTheFormToEditTheSupplieri18n[
-                                      locale
-                                  ]
-                                : PleaseCompleteTheFormToAddASupplieri18n[
-                                      locale
-                                  ]}
-                        </DialogDescription>
+                        {/* <DialogDescription>
+                            {SupplierContactInfo[locale]}
+                        </DialogDescription> */}
                     </DialogHeader>
                     <Form {...form}>
                         <form
@@ -473,7 +469,7 @@ export default function Supplier() {
                                     name="companyId"
                                     render={({ field }) => (
                                         <FormItem className="flex items-center justify-between">
-                                            <FormLabel className="text-lg font-semibold">
+                                            <FormLabel className="text-md">
                                                 {Companyi18n[locale]}
                                             </FormLabel>
                                             <div>
@@ -586,19 +582,20 @@ export default function Supplier() {
                                                         </Command>
                                                     </PopoverContent>
                                                 </Popover>
-                                                <FormMessage />
+                                                <FormMessage className="text-xs text-right w-full" />
                                             </div>
                                         </FormItem>
                                     )}
                                 />
                             )}
+                            
                             <FormField
                                 control={form.control}
                                 name="supplier"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <div className="flex items-center justify-between">
-                                            <FormLabel className="text-lg font-semibold">
+                                            <FormLabel className="text-md">
                                                 {SupplierNamei18n[locale]}
                                             </FormLabel>
                                             <FormControl>
@@ -611,7 +608,7 @@ export default function Supplier() {
                                                 />
                                             </FormControl>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs text-right w-full"/>
                                     </FormItem>
                                 )}
                             />
@@ -621,7 +618,7 @@ export default function Supplier() {
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <div className="flex items-center justify-between">
-                                            <FormLabel className="text-lg font-semibold">
+                                            <FormLabel className="text-md">
                                                 {ContactNumberi18n[locale]}
                                             </FormLabel>
                                             <FormControl>
@@ -637,7 +634,7 @@ export default function Supplier() {
                                                 />
                                             </FormControl>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs text-right w-full"/>
                                     </FormItem>
                                 )}
                             />
@@ -645,9 +642,9 @@ export default function Supplier() {
                                 control={form.control}
                                 name="products"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-col">
+                                    <FormItem className="flex flex-col border-b pb-2">
                                         <div className="flex items-center justify-between">
-                                            <FormLabel className="text-lg font-semibold text-nowrap">
+                                            <FormLabel className="text-md text-nowrap">
                                                 {ProductSuppliedi18n[locale]}
                                             </FormLabel>
                                             <div>
@@ -685,17 +682,21 @@ export default function Supplier() {
                                                 </FormControl>
                                             </div>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs text-right w-full" />
                                     </FormItem>
                                 )}
                             />
+
+                            <p className="text-lg font-bold">
+                                {SupplierContactInfo[locale]}
+                            </p>
                             <FormField
                                 control={form.control}
                                 name="contactPerson"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <div className="flex items-center justify-between">
-                                            <FormLabel className="text-lg font-semibold">
+                                            <FormLabel className="text-md">
                                                 {ContactPersoni18n[locale]}
                                             </FormLabel>
                                             <FormControl>
@@ -710,7 +711,7 @@ export default function Supplier() {
                                                 />
                                             </FormControl>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs text-right w-full" />
                                     </FormItem>
                                 )}
                             />
@@ -720,7 +721,7 @@ export default function Supplier() {
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <div className="flex items-center justify-between">
-                                            <FormLabel className="text-lg font-semibold">
+                                            <FormLabel className="text-md">
                                                 {Addressi8n[locale]}
                                             </FormLabel>
                                             <FormControl>
@@ -733,7 +734,7 @@ export default function Supplier() {
                                                 />
                                             </FormControl>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs text-right w-full"/>
                                     </FormItem>
                                 )}
                             />
@@ -743,7 +744,7 @@ export default function Supplier() {
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <div className="flex items-center justify-between">
-                                            <FormLabel className="text-lg font-semibold">
+                                            <FormLabel className="text-md">
                                                 {Emaili18n[locale]}
                                             </FormLabel>
                                             <FormControl>
@@ -756,12 +757,12 @@ export default function Supplier() {
                                                 />
                                             </FormControl>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs text-right w-full" />
                                     </FormItem>
                                 )}
                             />
                             <div className="flex justify-end gap-2">
-                                <Button
+                                {/* <Button
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setModalFormState(false);
@@ -769,9 +770,9 @@ export default function Supplier() {
                                     variant={"destructive"}
                                 >
                                     {Canceli18n[locale]}
-                                </Button>
+                                </Button> */}
                                 <Button type="submit">
-                                    {Submiti18n[locale]}
+                                    {Addi18n[locale]}
                                 </Button>
                             </div>
                         </form>
