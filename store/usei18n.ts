@@ -851,6 +851,16 @@ export const useI18nStore = create<I18nStore>((set) => ({
   SupplierContactInfo: {
     en: "Supplier Contact Information",
     ja: "仕入先連絡先情報"
+  },
+
+  ConfirmDeletion: {
+    en: "Confirm Deletion",
+    ja: "削除を確認"
+  },
+
+  ConfirmDeleteMessage: {
+    en: "This action cannot be undone and will permanently delete this record from our servers.",
+    ja: "このアクションは元に戻せません。このレコードをサーバーから削除します。"
   }
 }));
 export interface I18nStore {
@@ -1120,4 +1130,6 @@ export interface I18nStore {
   Deliveries: LocalizedString;
   Availability: LocalizedString;
   SupplierContactInfo: LocalizedString;
+  ConfirmDeletion: LocalizedString;
+  ConfirmDeleteMessage: LocalizedString;
 }

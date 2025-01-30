@@ -113,7 +113,9 @@ export default function Supplier() {
         Hoveri18n,
         PleaseCompleteTheFormToEditTheSupplieri18n,
         PleaseCompleteTheFormToAddASupplieri18n,
-        SupplierContactInfo
+        SupplierContactInfo,
+        ConfirmDeletion,
+        ConfirmDeleteMessage,
     } = useI18nStore();
     const { globalCompanyState, setGlobalCompanyState, globalBranchState } =
         useGlobalStore();
@@ -169,7 +171,7 @@ export default function Supplier() {
             getSuppliersQuery.refetch();
             toast({
                 title: "Success",
-                description: `Succesfully Added New Supplier`,
+                description: `Succesfully added a new supplier.`,
             });
             setModalFormState(false);
         },
@@ -783,13 +785,11 @@ export default function Supplier() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {AreYouAbsolutelySurei18n[locale]}
+                            {ConfirmDeletion[locale]}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                             {
-                                ThisActionCannotBeUndoneThisWillPermanentlyDeleteYourAccountAndRemoveYourDataFromOurServersi18n[
-                                    locale
-                                ]
+                                ConfirmDeleteMessage[locale]
                             }
                         </AlertDialogDescription>
                     </AlertDialogHeader>

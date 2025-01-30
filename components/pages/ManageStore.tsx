@@ -90,7 +90,9 @@ function ManageStore() {
         Savei18n,
         TINNumber,
         Deletei18n,
-        Addi18n
+        Addi18n,
+        ConfirmDeletion,
+        ConfirmDeleteMessage
     } = useI18nStore();
     const [isOpenDial, setIsOpenDial] = useState<boolean>(false);
     const [isOpenDelDial, setIsOpenDelDial] = useState<boolean>(false);
@@ -543,10 +545,10 @@ function ManageStore() {
                         <AlertDialogContent>
                             <AlertDialogHeader>
                                 <AlertDialogTitle>
-                                    {AreYouAbsolutelySurei18n[locale]}
+                                    {ConfirmDeletion[locale]}
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    {AlertDialogue1i18n[locale]}
+                                    {ConfirmDeleteMessage[locale]}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
