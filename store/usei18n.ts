@@ -658,7 +658,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "カードレポートを送信しました！",
   },
   SuccessfullyAddedTheProducti18n: {
-    en: "Successfully added the product!",
+    en: "Successfully added a product!",
     ja: "製品を正常に追加しました！",
   },
   Successi18n: {

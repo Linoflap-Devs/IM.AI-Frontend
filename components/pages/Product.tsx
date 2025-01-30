@@ -116,7 +116,9 @@ export default function Product() {
         SuccesfullyAddedProducti18n,
         Uniti18n,
         RetailPrice,
-        PurchasePrice
+        PurchasePrice,
+        Successi18n,
+        SuccessfullyAddedTheProducti18n
     } = useI18nStore();
     const { globalBranchState, globalCompanyState } = useGlobalStore();
 
@@ -183,8 +185,8 @@ export default function Product() {
         },
         onSuccess: (data) => {
             toast({
-                title: SuccessAddingProducti18n[locale],
-                description: SuccesfullyAddedProducti18n[locale],
+                title: Successi18n[locale],
+                description: SuccessfullyAddedTheProducti18n[locale],
             });
         },
         onSettled: async () => {
