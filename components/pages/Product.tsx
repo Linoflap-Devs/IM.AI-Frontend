@@ -30,6 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogHeader } from "../ui/dialog";
 
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
@@ -41,15 +42,15 @@ import { useEffect, useState } from "react";
 import BranchDropDown from "../BranchDropDown";
 
 const formSchema = z.object({
-    productName: z.string().min(2).max(50),
-    price: z.string().min(2).max(50),
-    purchasePrice: z.string().min(2).max(50),
-    barcode: z.string().min(2).max(50),
-    actualWeight: z.string().min(2).max(50),
-    netWeight: z.string().min(2).max(50),
-    category: z.string().min(1),
+    productName: z.string({required_error: "Product name is required"}).min(2).max(50),
+    price: z.string({required_error: "Price is required"}).min(2).max(50),
+    purchasePrice: z.string({required_error: "Purchase price is required"}).min(2).max(50),
+    barcode: z.string({required_error: "Barcode is required"}).min(2).max(50),
+    actualWeight: z.string({required_error: "Actual weight is required"}).min(2).max(50),
+    netWeight: z.string({required_error: "Net weight is required"}).min(2).max(50),
+    category: z.string({required_error: "Category is required"}).min(1),
     imgFile: z
-        .instanceof(File, { message: "Please select add an image" })
+        .instanceof(File, { message: "Please add an image" })
         .refine(
             (file) => {
                 if (file.type.startsWith("image")) {
@@ -59,9 +60,9 @@ const formSchema = z.object({
             },
             { message: "Please select a valid file format" }
         ),
-    lowStocklvl: z.string().min(1, { message: "Required" }),
-    criticalStocklvl: z.string().min(1, { message: "Required" }),
-    unit: z.string().min(1, { message: "Required" }),
+    lowStocklvl: z.string({required_error: "Low stock level is required"}).min(1, { message: "Required" }),
+    criticalStocklvl: z.string({required_error: "Critical stock level is required"}).min(1, { message: "Required" }),
+    unit: z.string({required_error: "Unit is required"}).min(1, { message: "Required" }),
 });
 
 export default function Product() {
@@ -308,8 +309,8 @@ export default function Product() {
                         <Button className="bg-green-400">
                             {`${Downloadi18n[locale]}`}
                         </Button>
-                        <AlertDialog open={open} onOpenChange={setOpen}>
-                            <AlertDialogTrigger asChild>
+                        <Dialog open={open} onOpenChange={setOpen}>
+                            <DialogTrigger asChild>
                                 <Button
                                     onClick={() => {
                                         form.reset();
@@ -318,448 +319,451 @@ export default function Product() {
                                 >
                                     {`${Addi18n[locale]} ${Producti18n[locale]}`}
                                 </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle className="flex items-center justify-between text-2xl">
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle className="flex items-center justify-between text-2xl">
                                         {`${Addi18n[locale]} ${Producti18n[locale]}`}
-                                        <AlertDialogCancel>X</AlertDialogCancel>
-                                    </AlertDialogTitle>
+                                        
+                                    </DialogTitle>
+                                    
                                     <Form {...form}>
                                         <form
                                             onSubmit={form.handleSubmit(
                                                 onSubmit
                                             )}
-                                            className="space-y-3"
                                         >
-                                            {userData?.role == 2 && (
-                                                <div className="flex items-center justify-between">
-                                                    <label className="text-lg font-medium">
-                                                        {Branchi18n[locale]}
-                                                    </label>
-                                                    <BranchDropDown
-                                                        className="w-[277.19px]"
-                                                        defaultValue={
-                                                            AllBranchi18n[
-                                                                locale
-                                                            ]
-                                                        }
-                                                        externalState={
-                                                            selectedBranch
-                                                        }
-                                                        setExternalState={
-                                                            setSelectedBranch
-                                                        }
-                                                    />
-                                                </div>
-                                            )}
-                                            <FormField
-                                                control={form.control}
-                                                name="productName"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    ProdNamei18n[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                            </FormLabel>
-                                                            <FormControl className="w-[60%]">
-                                                                <Input
-                                                                    placeholder={
+                                            <div className="space-y-2 overflow y-scroll">
+                                                {userData?.role == 2 && (
+                                                    <div className="flex items-center justify-between">
+                                                        <label className="text-lg font-medium">
+                                                            {Branchi18n[locale]}
+                                                        </label>
+                                                        <BranchDropDown
+                                                            className="w-[277.19px]"
+                                                            defaultValue={
+                                                                AllBranchi18n[
+                                                                    locale
+                                                                ]
+                                                            }
+                                                            externalState={
+                                                                selectedBranch
+                                                            }
+                                                            setExternalState={
+                                                                setSelectedBranch
+                                                            }
+                                                        />
+                                                    </div>
+                                                )}
+                                                <FormField
+                                                    control={form.control}
+                                                    name="productName"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col items-center">
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <FormLabel className="text-lg">
+                                                                    {
                                                                         ProdNamei18n[
                                                                             locale
                                                                         ]
                                                                     }
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="price"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    RetailPrice[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                            </FormLabel>
-                                                            <FormControl className="w-[60%]">
-                                                                <Input
-                                                                    type="number"
-                                                                    placeholder={
+                                                                </FormLabel>
+                                                                <FormControl className="w-[60%]">
+                                                                    <Input
+                                                                        placeholder={
+                                                                            ProdNamei18n[
+                                                                                locale
+                                                                            ]
+                                                                        }
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full" />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="price"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col items-center">
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <FormLabel className="text-lg">
+                                                                    {
                                                                         RetailPrice[
                                                                             locale
                                                                         ]
                                                                     }
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="purchasePrice"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    PurchasePrice[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                            </FormLabel>
-                                                            <FormControl className="w-[60%]">
-                                                                <Input
-                                                                    type="number"
-                                                                    placeholder={
+                                                                </FormLabel>
+                                                                <FormControl className="w-[60%]">
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder={
+                                                                            RetailPrice[
+                                                                                locale
+                                                                            ]
+                                                                        }
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full" />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="purchasePrice"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col items-center">
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <FormLabel className="text-lg">
+                                                                    {
                                                                         PurchasePrice[
                                                                             locale
                                                                         ]
                                                                     }
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full"/>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="category"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    Categoryi18n[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                            </FormLabel>
-                                                            <Select
-                                                                onValueChange={
-                                                                    field.onChange
-                                                                }
-                                                                defaultValue={
-                                                                    field.value
-                                                                }
-                                                            >
+                                                                </FormLabel>
                                                                 <FormControl className="w-[60%]">
-                                                                    <SelectTrigger>
-                                                                        <SelectValue
-                                                                            placeholder={
-                                                                                Categoryi18n[
-                                                                                    locale
-                                                                                ]
-                                                                            }
-                                                                        />
-                                                                    </SelectTrigger>
-                                                                </FormControl>
-                                                                <SelectContent>
-                                                                    {getCategoriesQuery.data.map(
-                                                                        (
-                                                                            item: any,
-                                                                            index: number
-                                                                        ) => {
-                                                                            return (
-                                                                                <SelectItem
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    value={item.id.toString()}
-                                                                                >
-                                                                                    {selectedCategory
-                                                                                        ? selectedCategory
-                                                                                        : item.name}
-                                                                                </SelectItem>
-                                                                            );
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder={
+                                                                            PurchasePrice[
+                                                                                locale
+                                                                            ]
                                                                         }
-                                                                    )}
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="barcode"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    Barcodei18n[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                            </FormLabel>
-                                                            <FormControl className="w-[60%]">
-                                                                <Input
-                                                                    type="number"
-                                                                    placeholder={
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full"/>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="category"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col items-center">
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <FormLabel className="text-lg">
+                                                                    {
+                                                                        Categoryi18n[
+                                                                            locale
+                                                                        ]
+                                                                    }
+                                                                </FormLabel>
+                                                                <Select
+                                                                    onValueChange={
+                                                                        field.onChange
+                                                                    }
+                                                                    defaultValue={
+                                                                        field.value
+                                                                    }
+                                                                >
+                                                                    <FormControl className="w-[60%]">
+                                                                        <SelectTrigger>
+                                                                            <SelectValue
+                                                                                placeholder={
+                                                                                    Categoryi18n[
+                                                                                        locale
+                                                                                    ]
+                                                                                }
+                                                                            />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {getCategoriesQuery.data.map(
+                                                                            (
+                                                                                item: any,
+                                                                                index: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <SelectItem
+                                                                                        key={
+                                                                                            index
+                                                                                        }
+                                                                                        value={item.id.toString()}
+                                                                                    >
+                                                                                        {selectedCategory
+                                                                                            ? selectedCategory
+                                                                                            : item.name}
+                                                                                    </SelectItem>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full" />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="barcode"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col items-center">
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <FormLabel className="text-lg">
+                                                                    {
                                                                         Barcodei18n[
                                                                             locale
                                                                         ]
                                                                     }
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="actualWeight"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    ActualWeighti18n[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                                <span className="text-sm">
-                                                                    (
+                                                                </FormLabel>
+                                                                <FormControl className="w-[60%]">
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder={
+                                                                            Barcodei18n[
+                                                                                locale
+                                                                            ]
+                                                                        }
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full" />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="actualWeight"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col items-center">
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <FormLabel className="text-lg">
                                                                     {
-                                                                        Gramsi18n[
-                                                                            locale
-                                                                        ]
-                                                                    }
-                                                                    )
-                                                                </span>
-                                                            </FormLabel>
-                                                            <FormControl className="w-[60%]">
-                                                                <Input
-                                                                    placeholder={
                                                                         ActualWeighti18n[
                                                                             locale
                                                                         ]
                                                                     }
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="netWeight"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    NetWeighti18n[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                                <span className="text-sm">
-                                                                    (
+                                                                    <span className="text-sm">
+                                                                        (
+                                                                        {
+                                                                            Gramsi18n[
+                                                                                locale
+                                                                            ]
+                                                                        }
+                                                                        )
+                                                                    </span>
+                                                                </FormLabel>
+                                                                <FormControl className="w-[60%]">
+                                                                    <Input
+                                                                        placeholder={
+                                                                            ActualWeighti18n[
+                                                                                locale
+                                                                            ]
+                                                                        }
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full" />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="netWeight"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-col items-center">
+                                                            <div className="flex w-full items-center justify-between">
+                                                                <FormLabel className="text-lg">
                                                                     {
-                                                                        Gramsi18n[
-                                                                            locale
-                                                                        ]
-                                                                    }
-                                                                    )
-                                                                </span>
-                                                            </FormLabel>
-                                                            <FormControl className="w-[60%]">
-                                                                <Input
-                                                                    placeholder={
                                                                         NetWeighti18n[
                                                                             locale
                                                                         ]
                                                                     }
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="unit"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col items-center">
-                                                        <div className="flex w-full items-center justify-between">
-                                                            <FormLabel className="text-lg">
-                                                                {
-                                                                    Uniti18n[
-                                                                        locale
-                                                                    ]
-                                                                }
-                                                            </FormLabel>
-                                                            <Select
-                                                                onValueChange={
-                                                                    field.onChange
-                                                                }
-                                                                defaultValue={
-                                                                    field.value
-                                                                }
-                                                            >
-                                                                <FormControl className="w-[60%]">
-                                                                    <SelectTrigger>
-                                                                        <SelectValue
-                                                                            placeholder={
-                                                                                SelectAUniti18n[
-                                                                                    locale
-                                                                                ]
-                                                                            }
-                                                                        />
-                                                                    </SelectTrigger>
-                                                                </FormControl>
-                                                                <SelectContent>
-                                                                    {productUnits.map(
+                                                                    <span className="text-sm">
                                                                         (
-                                                                            item,
-                                                                            index
-                                                                        ) => {
-                                                                            return (
-                                                                                <SelectItem
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    value={
-                                                                                        item.value
-                                                                                    }
-                                                                                >
-                                                                                    {
-                                                                                        item.label
-                                                                                    }
-                                                                                </SelectItem>
-                                                                            );
+                                                                        {
+                                                                            Gramsi18n[
+                                                                                locale
+                                                                            ]
                                                                         }
-                                                                    )}
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                        <FormMessage className="text-xs text-right w-full" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <div className="flex items-center justify-center">
+                                                                        )
+                                                                    </span>
+                                                                </FormLabel>
+                                                                <FormControl className="w-[60%]">
+                                                                    <Input
+                                                                        placeholder={
+                                                                            NetWeighti18n[
+                                                                                locale
+                                                                            ]
+                                                                        }
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full" />
+                                                        </FormItem>
+                                                    )}
+                                                />
                                                 <FormField
                                                     control={form.control}
-                                                    name="lowStocklvl"
+                                                    name="unit"
                                                     render={({ field }) => (
                                                         <FormItem className="flex flex-col items-center">
-                                                            <div className="flex w-full flex-col items-center justify-between">
+                                                            <div className="flex w-full items-center justify-between">
                                                                 <FormLabel className="text-lg">
                                                                     {
-                                                                        LowStockLvli18n[
+                                                                        Uniti18n[
                                                                             locale
                                                                         ]
                                                                     }
                                                                 </FormLabel>
-                                                                <FormControl className="w-[80%]">
-                                                                    <Input
-                                                                        type="number"
-                                                                        placeholder={
+                                                                <Select
+                                                                    onValueChange={
+                                                                        field.onChange
+                                                                    }
+                                                                    defaultValue={
+                                                                        field.value
+                                                                    }
+                                                                >
+                                                                    <FormControl className="w-[60%]">
+                                                                        <SelectTrigger>
+                                                                            <SelectValue
+                                                                                placeholder={
+                                                                                    SelectAUniti18n[
+                                                                                        locale
+                                                                                    ]
+                                                                                }
+                                                                            />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {productUnits.map(
+                                                                            (
+                                                                                item,
+                                                                                index
+                                                                            ) => {
+                                                                                return (
+                                                                                    <SelectItem
+                                                                                        key={
+                                                                                            index
+                                                                                        }
+                                                                                        value={
+                                                                                            item.value
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            item.label
+                                                                                        }
+                                                                                    </SelectItem>
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <FormMessage className="text-xs text-right w-full" />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <div className="flex items-center justify-center">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="lowStocklvl"
+                                                        render={({ field }) => (
+                                                            <FormItem className="flex flex-col items-center">
+                                                                <div className="flex w-full flex-col items-center justify-between">
+                                                                    <FormLabel className="text-lg">
+                                                                        {
                                                                             LowStockLvli18n[
                                                                                 locale
                                                                             ]
                                                                         }
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                            </div>
-                                                            <FormMessage className="" />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                                <FormField
-                                                    control={form.control}
-                                                    name="criticalStocklvl"
-                                                    render={({ field }) => (
-                                                        <FormItem className="flex flex-col items-center">
-                                                            <div className="flex w-full flex-col items-center justify-between">
-                                                                <FormLabel className="text-lg">
-                                                                    {
-                                                                        CriticalStockLvli18n[
-                                                                            locale
-                                                                        ]
-                                                                    }
-                                                                </FormLabel>
-                                                                <FormControl className="w-[80%]">
-                                                                    <Input
-                                                                        type="number"
-                                                                        placeholder={
+                                                                    </FormLabel>
+                                                                    <FormControl className="w-[80%]">
+                                                                        <Input
+                                                                            type="number"
+                                                                            placeholder={
+                                                                                LowStockLvli18n[
+                                                                                    locale
+                                                                                ]
+                                                                            }
+                                                                            {...field}
+                                                                        />
+                                                                    </FormControl>
+                                                                </div>
+                                                                <FormMessage className="" />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="criticalStocklvl"
+                                                        render={({ field }) => (
+                                                            <FormItem className="flex flex-col items-center">
+                                                                <div className="flex w-full flex-col items-center justify-between">
+                                                                    <FormLabel className="text-lg">
+                                                                        {
                                                                             CriticalStockLvli18n[
                                                                                 locale
                                                                             ]
                                                                         }
-                                                                        {...field}
+                                                                    </FormLabel>
+                                                                    <FormControl className="w-[80%]">
+                                                                        <Input
+                                                                            type="number"
+                                                                            placeholder={
+                                                                                CriticalStockLvli18n[
+                                                                                    locale
+                                                                                ]
+                                                                            }
+                                                                            {...field}
+                                                                        />
+                                                                    </FormControl>
+                                                                </div>
+                                                                <FormMessage className="" />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="imgFile"
+                                                    render={({ field }) => (
+                                                        <FormItem className="">
+                                                            <div className="mx-auto flex w-3/4 flex-col items-center justify-between rounded border py-5">
+                                                                <FormLabel className="text-lg">
+                                                                    {`${Uploadi18n[locale]} ${Imagei18n[locale]}`}
+                                                                </FormLabel>
+                                                                <FormControl className="w-[60%]">
+                                                                    <Input
+                                                                        className="transition-all hover:scale-[1.05] hover:cursor-pointer hover:bg-primary active:scale-100"
+                                                                        accept="image/*"
+                                                                        type="file"
+                                                                        multiple={
+                                                                            false
+                                                                        }
+                                                                        // required
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            field.onChange(
+                                                                                e
+                                                                                    .target
+                                                                                    .files
+                                                                                    ? e
+                                                                                        .target
+                                                                                        .files[0]
+                                                                                    : null
+                                                                            );
+                                                                        }}
                                                                     />
                                                                 </FormControl>
                                                             </div>
-                                                            <FormMessage className="" />
+                                                            <FormMessage className="text-center" />
                                                         </FormItem>
                                                     )}
                                                 />
+                                        
                                             </div>
-                                            <FormField
-                                                control={form.control}
-                                                name="imgFile"
-                                                render={({ field }) => (
-                                                    <FormItem className="">
-                                                        <div className="mx-auto flex w-3/4 flex-col items-center justify-between rounded border py-5">
-                                                            <FormLabel className="text-lg">
-                                                                {`${Uploadi18n[locale]} ${Imagei18n[locale]}`}
-                                                            </FormLabel>
-                                                            <FormControl className="w-[60%]">
-                                                                <Input
-                                                                    className="transition-all hover:scale-[1.05] hover:cursor-pointer hover:bg-primary active:scale-100"
-                                                                    accept="image/*"
-                                                                    type="file"
-                                                                    multiple={
-                                                                        false
-                                                                    }
-                                                                    // required
-                                                                    onChange={(
-                                                                        e
-                                                                    ) => {
-                                                                        field.onChange(
-                                                                            e
-                                                                                .target
-                                                                                .files
-                                                                                ? e
-                                                                                      .target
-                                                                                      .files[0]
-                                                                                : null
-                                                                        );
-                                                                    }}
-                                                                />
-                                                            </FormControl>
-                                                        </div>
-                                                        <FormMessage className="text-center" />
-                                                    </FormItem>
-                                                )}
-                                            />
                                             <div className="flex justify-end">
                                                 <Button type="submit">
                                                     {`${Addi18n[locale]}`}
@@ -767,9 +771,9 @@ export default function Product() {
                                             </div>
                                         </form>
                                     </Form>
-                                </AlertDialogHeader>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             )}
