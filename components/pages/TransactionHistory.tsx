@@ -110,9 +110,9 @@ function TransactionHistory() {
                 description: SuccesfullyPermittedCartContentTransferi18n[locale],
             });
         },
-    });
+    }); 
     const transactionQuery: UseQueryResult<TransactionTableData[]> = useQuery({
-        queryKey: [`transaction`],
+        queryKey: [`transaction`, format(new Date(date?.from!), 'yyyy-MM-dd'), format(new Date(date?.to!), 'yyyy-MM-dd')],
         enabled: session.data?.token !== undefined,
         retryOnMount: true,
         /* refetchInterval: 10000, */
@@ -126,8 +126,8 @@ function TransactionHistory() {
                     globalBranchState !== "all"
                         ? globalBranchState
                         : userData?.branchId;
-                const from = date?.from?.toISOString();
-                const to = date?.to?.toISOString();
+                const from = format(new Date(date?.from!), 'yyyy-MM-dd');
+                const to = format(addDays(new Date(date?.to!), 1), 'yyyy-MM-dd');
 
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_URL}/transaction/getTransactions/cId/${companyId}/bId/${branchId}/from/${from}/to/${to}`
@@ -139,7 +139,7 @@ function TransactionHistory() {
 
     const getTransactionQuery = useQuery({
         queryKey: ["GetTransaction", selectedTransaction],
-        enabled: selectedTransaction !== "",
+        enabled: selectedTransaction !== undefined,
         queryFn: async () => {
             if (session.data?.token !== undefined) {
                 const response = await axios.get(
