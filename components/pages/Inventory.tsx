@@ -56,6 +56,7 @@ import { DatePicker } from "../ui/datepicker";
 import { Collapsible } from "@radix-ui/react-collapsible";
 import { CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { randomBytes } from "crypto";
 /* Msc */
 const formSchema = z.object({
     productName: z
@@ -79,6 +80,11 @@ const discrepancySchema = z.object({
     quantity: z.coerce.number().refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." }),
     operation: z.string().min(1, { message: "Select an operation." })
 });
+
+const transactionSchema = z.object({
+    productName: z.number().min(1, { message: "Select a product." }),
+    quantity: z.coerce.number().refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." }),
+})
 
 function Inventory() {
     const session = useSession();
@@ -104,6 +110,8 @@ function Inventory() {
 
     const [discrepancyReason, setDiscrepancyReason] = useState("");
     const [discrepancyAmount, setDiscrepancyAmount] = useState("");
+
+    const [testTransactionOpen, setTestTransactionOpen] = useState(false);
 
     axios.defaults.headers.common[
         "Authorization"
@@ -151,6 +159,14 @@ function Inventory() {
             operation: ""
         }
     });
+
+    const transactionForm = useForm<z.infer<typeof transactionSchema>>({
+        resolver: zodResolver(transactionSchema),
+        defaultValues: {
+            productName: undefined,
+            quantity: 0
+        }
+    })
 
     const getAdjustmentTypes = useQuery({
         queryKey: ["getAdjustmentTypes"],
@@ -303,6 +319,46 @@ function Inventory() {
             })
         }
     })
+
+    const addTransaction = useMutation({
+        mutationFn: async (data: z.infer<typeof transactionSchema>) => {
+            console.log(data);
+            const random = randomBytes(4).toString("hex");
+            const price = getStocksquery.data.find((stock: any) => stock.ProductId == data.productName)?.Price
+            const refNo = "REF" + random
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/transaction/testTransaction`,
+                {
+                    bId: globalBranchState !== "all" ? globalBranchState : userData?.branchId,
+                    ucId: 35,
+                    transactionStatus: "On-Going",
+                    referenceNumber: refNo,
+                    pId: data.productName,
+                    quantity: data.quantity,
+                    price: price,
+                    identifier: refNo + "-1"
+                }
+            )
+            return response.data;
+        },
+        onSuccess: (data: any) => {
+            toast({
+                title: "Success",
+                description: "Transaction added successfully."
+            })
+
+            getStocksquery.refetch();
+
+            setTestTransactionOpen(false);
+        },
+        onError:  (err: any) => {
+            toast({
+                variant: "destructive",
+                title: "Oops!",
+                description: err.response.data.message,
+            })
+        }
+    });
 
     function addDiscrepancy(values: z.infer<typeof discrepancySchema>) {
         console.log(values);
@@ -562,6 +618,10 @@ function Inventory() {
         setDiscrepancies(null);
         setDiscrepancyCount(0);
         setDiscrepancyReason("");
+    }
+
+    const testTransactionSubmit = (values: z.infer<typeof transactionSchema>) => {
+        addTransaction.mutate(values);
     }
 
     return (
@@ -994,6 +1054,110 @@ function Inventory() {
                     </Form>
                 </DialogContent>
             </Dialog>
+            <Dialog open={testTransactionOpen} onOpenChange={setTestTransactionOpen}>
+                <DialogContent>
+                    <DialogTitle>
+                        Test Transaction
+                    </DialogTitle>
+                    <div className="pb-2 border-b"></div>
+                    <Form {...transactionForm}>
+                        <form onSubmit={transactionForm.handleSubmit(testTransactionSubmit)}>
+                            <FormField 
+                                control={transactionForm.control}
+                                name="productName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Product Name</FormLabel>
+                                        <div className="">
+                                            <Popover modal={true}>
+                                                <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    type="button"
+                                                    className={
+                                                        `w-full justify-between px-3
+                                                        ${!field.value && "text-muted-foreground"}`
+                                                    }
+                                                    >
+                                                    {field.value
+                                                        ? getStocksquery?.data?.find(
+                                                            (stock: any) => stock.ProductId === field.value
+                                                        )?.Name
+                                                        : "Select Product"}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-full p-0">
+                                                <Command>
+                                                    <CommandInput
+                                                    placeholder="Search product..."
+                                                    className="h-9"
+                                                    />
+                                                    <CommandList>
+                                                    <CommandEmpty>No products found.</CommandEmpty>
+                                                    <CommandGroup>
+                                                        {getStocksquery?.data?.map((stock: any) => (
+                                                        <CommandItem
+                                                            value={stock.Name}
+                                                            key={stock.ProductId}
+                                                            onSelect={() => {
+                                                            transactionForm.setValue("productName", stock.ProductId)
+                                                            }}
+                                                        >
+                                                            {stock.Name}
+                                                            <CheckIcon
+                                                            className={
+                                                                `ml-auto h-4 w-4 
+                                                                ${stock.ProductId === field.value
+                                                                ? "opacity-100"
+                                                                : "opacity-0"}`
+                                                            }
+                                                            />
+                                                        </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                                </PopoverContent>
+                                            </Popover>
+
+                                        </div>
+
+                                        <div className="h-[1.5rem]">
+                                            <FormMessage />
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField 
+                                control={transactionForm.control}
+                                name="quantity"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Quantity</FormLabel>
+                                        <Input
+                                            type="number"
+                                            value={field.value || ""}
+                                            onChange={field.onChange}
+                                        />
+                                        <div className="h-[1.5rem]">
+                                            <FormMessage />
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <div className="flex justify-end gap-2">
+                                <Button type="submit">Submit</Button>
+                            </div>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
             <Card className={`flex flex-1 flex-col gap-3 p-3`}>
                 {userData && userData.role < 4 && (
                     <div className="flex items-center justify-between">
@@ -1011,6 +1175,18 @@ function Inventory() {
                                 type="button"
                             >
                                 {AddStocksi18n[locale]}
+                            </Button>
+                            <Button 
+                                onClick={() => {
+                                    console.log(globalBranchState)
+                                    globalBranchState == "all" ? 
+                                    toast({title: "Please select a branch", variant: "destructive"}) :
+                                    setTestTransactionOpen(true)  
+                                }}
+                                type="button"
+                                variant="outline"
+                            >
+                                Test Transaction
                             </Button>
                         </div>
                     </div>
