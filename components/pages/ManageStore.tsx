@@ -35,18 +35,19 @@ import { useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useGlobalStore } from "@/store/useStore";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const fileSchema = z.object({
     name: z.string(),
     size: z.number(),
 });
 const formSchema = z.object({
-    companyId: z.string().min(1).max(50),
-    branchName: z.string().min(2).max(50),
-    fullAddress: z.string().min(2).max(100),
-    contact: z.coerce.string().min(1),
-    contactPerson: z.string().min(2).max(50),
-    tinNumber: z.coerce.string().min(9).max(12),
+    companyId: z.coerce.number().min(1).max(50),
+    branchName: z.string({required_error: "Branch name is required"}).min(1, {message: "Store name is required"}).max(50),
+    fullAddress: z.string({required_error: "Address is required"}).min(1, {message: "Address is required"}).max(100),
+    contact: z.coerce.string({required_error: "Contact is required"}).min(1, {message: "Contact is required"}).max(50),
+    contactPerson: z.string({required_error: "Contact person is required"}).min(1, {message: "Contact person is required"}).max(50),
+    tinNumber: z.coerce.string({required_error: "TIN Number is required"}).min(9, {message: "TIN Number is required"}).max(12),
     imgFile: fileSchema.required(),
     /* imgFile: z.instanceof(File), */
 });
@@ -88,7 +89,8 @@ function ManageStore() {
         AreYouAbsolutelySurei18n,
         Savei18n,
         TINNumber,
-        Deletei18n
+        Deletei18n,
+        Addi18n
     } = useI18nStore();
     const [isOpenDial, setIsOpenDial] = useState<boolean>(false);
     const [isOpenDelDial, setIsOpenDelDial] = useState<boolean>(false);
@@ -229,7 +231,7 @@ function ManageStore() {
         if (editStoreIndex !== null) {
             const companyID = filteredStoreBranches[editStoreIndex].CompanyId;
             setTimeout(() => {
-                form.setValue("companyId", `${companyID}`);
+                form.setValue("companyId", companyID);
                 form.setValue(
                     "contact",
                     `${filteredStoreBranches[editStoreIndex].Contact}`
@@ -283,28 +285,28 @@ function ManageStore() {
                                 Searchi18n[locale] + " " + Namei18n[locale]
                             }
                         />
-                        <AlertDialog
+                        <Dialog
                             open={isOpenDial}
                             onOpenChange={setIsOpenDial}
                         >
-                            <AlertDialogTrigger
+                            <DialogTrigger
                                 onClick={() => {
                                     setIsOpenDial(true);
                                 }}
                                 className="rounded border-0 bg-primary px-4 py-2 text-white"
                             >
                                 {AddBranchi18n[locale]}
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
                                         {editStoreIndex !== null
                                             ? `${Editi18n[locale]}: ${filteredStoreBranches[editStoreIndex].Name}`
                                             : AddBranchi18n[locale]}
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
+                                    </DialogTitle>
+                                    {/* <DialogDescription>
                                         {AddStoreMsgi8n[locale]}
-                                    </AlertDialogDescription>
+                                    </DialogDescription> */}
                                     <Form {...form}>
                                         <form
                                             onSubmit={form.handleSubmit(
@@ -344,7 +346,7 @@ function ManageStore() {
                                                                         />
                                                                     </FormControl>
                                                                 </div>
-                                                                <FormMessage />
+                                                                <FormMessage className="text-xs w-full text-end"  />
                                                             </FormItem>
                                                         )}
                                                     />
@@ -373,7 +375,7 @@ function ManageStore() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs w-full text-end"  />
                                                     </FormItem>
                                                 )}
                                             />
@@ -401,7 +403,7 @@ function ManageStore() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs w-full text-end"  />
                                                     </FormItem>
                                                 )}
                                             />
@@ -430,7 +432,7 @@ function ManageStore() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs w-full text-end"  />
                                                     </FormItem>
                                                 )}
                                             />
@@ -458,7 +460,7 @@ function ManageStore() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs w-full text-end"  />
                                                     </FormItem>
                                                 )}
                                             />
@@ -482,7 +484,7 @@ function ManageStore() {
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs w-full text-end" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -522,20 +524,17 @@ function ManageStore() {
                                                 )}
                                             />
                                             <div className="flex justify-end gap-5">
-                                                <AlertDialogCancel>
-                                                    {Canceli18n[locale]}
-                                                </AlertDialogCancel>
                                                 <Button type="submit">
                                                     {editStoreIndex === null
-                                                        ? AddStorei18n[locale]
+                                                        ? Addi18n[locale]
                                                         : Savei18n[locale]}
                                                 </Button>
                                             </div>
                                         </form>
                                     </Form>
-                                </AlertDialogHeader>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                     <AlertDialog
                         open={isOpenDelDial}
