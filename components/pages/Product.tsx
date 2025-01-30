@@ -333,7 +333,7 @@ export default function Product() {
                                                 onSubmit
                                             )}
                                         >
-                                            <div className="space-y-2 overflow y-scroll">
+                                            <div className="space-y-2 max-h-[700px] overflow-auto pe-2">
                                                 {userData?.role == 2 && (
                                                     <div className="flex items-center justify-between">
                                                         <label className="text-lg font-medium">
@@ -764,7 +764,7 @@ export default function Product() {
                                                 />
                                         
                                             </div>
-                                            <div className="flex justify-end">
+                                            <div className="flex justify-end mt-3">
                                                 <Button type="submit">
                                                     {`${Addi18n[locale]}`}
                                                 </Button>
