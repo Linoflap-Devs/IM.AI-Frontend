@@ -243,7 +243,7 @@ function NavBar() {
             },
             icon: <Contact2 />,
             navigation: "customerlist",
-            permission: [1, 2, 3],
+            permission: [1, 2, 3, 4],
         },
         {
             name: {
