@@ -742,7 +742,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "転送在庫リクエストを拒否",
   },
   AreYouAbsolutelySureToDenyTransferStockRequesti18n: {
-    en: "Are you absolutely sure to deny transfer stock request?",
+    en: "Are you sure you want to deny this stock transfer request?",
     ja: "転送在庫リクエストを拒否しますか？",
   },
   ReProcessStockTransferi18n: {

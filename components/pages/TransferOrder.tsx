@@ -186,7 +186,8 @@ export default function TransferOrder() {
     },
     onSuccess: async () => {
       toast({
-        description: `Succesfully Requested Transfer Stock`,
+        title: "Success",
+        description: `Succesfully requested stock transfer`,
       });
       setOpen(false);
     },
@@ -211,7 +212,7 @@ export default function TransferOrder() {
     onSuccess: () => {
       toast({
         title: "Success",
-        description: `Succesfully confirmed transfer of stock.`,
+        description: `Succesfully confirmed the transfer of stock.`,
       })
       getTransferOrder.refetch();
     },
@@ -699,6 +700,7 @@ export default function TransferOrder() {
             <DialogClose>{Canceli18n[locale]}</DialogClose>
             <Button
               type="button"
+              variant={"destructive"}
               onClick={() => {
                 confirmationMutationByStoreSender.mutate({
                   transferStockId,
@@ -856,7 +858,7 @@ export default function TransferOrder() {
             <Button type="button" variant="secondary">{Canceli18n[locale]}</Button>
             <Button
               type="button"
-              
+              variant={"destructive"}
               onClick={() => {
                 confirmationMutationByCompany.mutate({
                   transferStockId,
