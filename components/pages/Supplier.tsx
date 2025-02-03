@@ -217,6 +217,7 @@ export default function Supplier() {
     const deleteSupplierMutation = useMutation({
         mutationKey: ["deleteSupplier"],
         mutationFn: async (data: any) => {
+            console.log(data);
             return await axios.delete(
                 `${process.env.NEXT_PUBLIC_API_URL}/supplier/deleteSupplier/sId/${data}`
             );
@@ -225,14 +226,14 @@ export default function Supplier() {
             getSuppliersQuery.refetch();
             toast({
                 title: "Success",
-                description: `Succesfully Deleted ${"supplierName"}`,
+                description: `Succesfully deleted ${"supplierName"}`,
             });
         },
         onError: (e: any) => {
             toast({
                 variant: "destructive",
                 title: "Uh oh! Something went wrong.",
-                description: `Failed to Delete ${"supplierName"}`,
+                description: `Failed to delete ${"supplierName"}`,
                 action: <ToastClose>Remove</ToastClose>,
             });
         },

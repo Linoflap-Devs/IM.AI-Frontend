@@ -88,9 +88,11 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
 
     const adjustQuantityFormSchema = z.object({
         operation: z.string(),
-        quantity: z.coerce.number(),
+        quantity: z.coerce.number({invalid_type_error: "Quantity is required."}).refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." }),
         adjustmentType: z.string(),
-        notes: z.string()
+        notes: z.string(),
+        
+
     })
 
     const adjustQuantityForm = useForm<z.infer<typeof adjustQuantityFormSchema>>({
@@ -670,7 +672,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                                 />
                                             </FormControl>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs w-full text-end"/>
                                     </FormItem>
                                 )}
                             />

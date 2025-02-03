@@ -229,7 +229,7 @@ function NavBar() {
         },
         {
             name: {
-                en: "Manage Branch",
+                en: "Manage Branches",
                 ja: "ストアの管理",
             },
             icon: <ListChecks />,

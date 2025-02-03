@@ -861,7 +861,8 @@ export const useI18nStore = create<I18nStore>((set) => ({
   ConfirmDeleteMessage: {
     en: "This action cannot be undone and will permanently delete this record from our servers.",
     ja: "このアクションは元に戻せません。このレコードをサーバーから削除します。"
-  }
+  },
+  
 }));
 export interface I18nStore {
   locale: locale;

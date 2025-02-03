@@ -66,7 +66,8 @@ export default function Category() {
         DeleteCategory,
         DeleteCategoryDeleteMsg,
         Canceli18n,
-        CompanyIdi8n
+        CompanyIdi8n,
+        ConfirmDeleteMessage
     } = useI18nStore();
 
     const { globalCompanyState } = useGlobalStore();
@@ -361,11 +362,7 @@ export default function Category() {
                             {DeleteCategory[locale] }
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {
-                               DeleteCategoryDeleteMsg[
-                                    locale
-                                ]
-                            } {`[${selectedRecord.categoryName}]`}
+                            {ConfirmDeleteMessage[locale]}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

@@ -36,6 +36,7 @@ import { Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useGlobalStore } from "@/store/useStore";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { set } from "date-fns";
 
 const fileSchema = z.object({
     name: z.string(),
@@ -92,7 +93,8 @@ function ManageStore() {
         Deletei18n,
         Addi18n,
         ConfirmDeletion,
-        ConfirmDeleteMessage
+        ConfirmDeleteMessage,
+        Update
     } = useI18nStore();
     const [isOpenDial, setIsOpenDial] = useState<boolean>(false);
     const [isOpenDelDial, setIsOpenDelDial] = useState<boolean>(false);
@@ -289,11 +291,12 @@ function ManageStore() {
                         />
                         <Dialog
                             open={isOpenDial}
-                            onOpenChange={setIsOpenDial}
+                            onOpenChange={(open) => {setIsOpenDial(open), form.reset(), setEditStoreIndex(null)} }
                         >
                             <DialogTrigger
                                 onClick={() => {
                                     setIsOpenDial(true);
+                                    form.reset();
                                 }}
                                 className="rounded border-0 bg-primary px-4 py-2 text-white"
                             >
@@ -521,7 +524,7 @@ function ManageStore() {
                                                             </FormControl>
                                                         </div>
 
-                                                        <FormMessage />
+                                                        <FormMessage className="text-xs w-full text-center" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -529,7 +532,7 @@ function ManageStore() {
                                                 <Button type="submit">
                                                     {editStoreIndex === null
                                                         ? Addi18n[locale]
-                                                        : Savei18n[locale]}
+                                                        : Update[locale]}
                                                 </Button>
                                             </div>
                                         </form>
