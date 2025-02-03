@@ -730,8 +730,8 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "この転送在庫を受け取り済みにしますか？この操作は取り消せません。",
   },
   PickASourceBranchi18n: {
-    en: "Pick a source branch",
-    ja: "取引元の店舗を選択してください",
+    en: "Select a source branch",
+    ja: "転送元の店舗を選択",
   },
   PickABranchToTransferFromAndModifyQuantityIfNeededi18n: {
     en: "Pick a branch to transfer from and modify quantity if needed",
@@ -862,6 +862,11 @@ export const useI18nStore = create<I18nStore>((set) => ({
     en: "This action cannot be undone and will permanently delete this record from our servers.",
     ja: "このアクションは元に戻せません。このレコードをサーバーから削除します。"
   },
+
+  Request: {
+    en: "Request",
+    ja: "リクエスト"
+  }
   
 }));
 export interface I18nStore {
@@ -1133,4 +1138,5 @@ export interface I18nStore {
   SupplierContactInfo: LocalizedString;
   ConfirmDeletion: LocalizedString;
   ConfirmDeleteMessage: LocalizedString;
+  Request: LocalizedString;
 }

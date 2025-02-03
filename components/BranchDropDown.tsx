@@ -97,7 +97,7 @@ export default function BranchDropDown({
                     </div>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className={"w-[200px] p-0"}>
+            <PopoverContent className={"w-full p-0"}>
                 <Command>
                     <CommandInput
                         placeholder="Search Branch..."

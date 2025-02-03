@@ -116,6 +116,8 @@ export default function ProductDropDown({
                                                     return [...prev, product];
                                                 });
                                             }
+                                            setOpenBranch(false);
+                                            setOpen(false);
                                         }
                                     }}
                                 >
