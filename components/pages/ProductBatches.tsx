@@ -87,9 +87,9 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
     })
 
     const adjustQuantityFormSchema = z.object({
-        operation: z.string(),
+        operation: z.string().min(1, { message: "Select an operation." }),
         quantity: z.coerce.number({invalid_type_error: "Quantity is required."}).refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." }),
-        adjustmentType: z.string(),
+        adjustmentType: z.string().min(1, { message: "Select an adjustment type." }),
         notes: z.string(),
         
 
@@ -614,7 +614,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                                 </SelectContent>
                                             </Select>
                                          </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs w-full text-end" />
                                     </FormItem>
                                 )}
                             />
@@ -649,7 +649,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <FormMessage />
+                                        <FormMessage className="text-xs w-full text-end" />
                                     </FormItem>
                                 )}
                             />

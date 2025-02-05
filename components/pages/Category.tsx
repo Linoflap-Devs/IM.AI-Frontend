@@ -67,7 +67,8 @@ export default function Category() {
         DeleteCategoryDeleteMsg,
         Canceli18n,
         CompanyIdi8n,
-        ConfirmDeleteMessage
+        ConfirmDeleteMessage,
+        ConfirmDeletion
     } = useI18nStore();
 
     const { globalCompanyState } = useGlobalStore();
@@ -82,7 +83,9 @@ export default function Category() {
         queryKey: ["getCategories", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId],
         enabled: session.status === "authenticated" && userData.role <= 3,
         queryFn: async () => {
+
             const isAdmin = userData.role === 1;
+            
             const adminQuery = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_URL}/product/getCategoriesAll`,
                 {
@@ -94,7 +97,7 @@ export default function Category() {
             const companyQuery = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_URL}/product/getCategories`,
                 {
-                    data: {
+                    params: {
                         companyId: globalCompanyState !== "all" ? globalCompanyState : userData?.companyId
                     },
                     headers: {
@@ -105,9 +108,10 @@ export default function Category() {
             
             const response = isAdmin ? adminQuery : companyQuery;
 
+            console.log(`${process.env.NEXT_PUBLIC_API_URL}/product/getCategories`, globalCompanyState !== "all" ? globalCompanyState : userData?.companyId)
+
             return response.data;
         },
-        refetchOnWindowFocus: false,
     });    
 
     const formSchema = z.object({
@@ -359,7 +363,7 @@ export default function Category() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {DeleteCategory[locale] }
+                            {ConfirmDeletion[locale] }
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                             {ConfirmDeleteMessage[locale]}

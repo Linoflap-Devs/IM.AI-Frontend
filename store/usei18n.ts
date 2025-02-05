@@ -406,7 +406,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "すぐに補充する",
   },
   RequestTransferi18n: {
-    en: "Request Transfer",
+    en: "Request Stock Transfer",
     ja: "転送依頼",
   },
   DateIssuedi18n: {
@@ -658,7 +658,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "カードレポートを送信しました！",
   },
   SuccessfullyAddedTheProducti18n: {
-    en: "Successfully added a product!",
+    en: "Successfully added a product",
     ja: "製品を正常に追加しました！",
   },
   Successi18n: {
@@ -718,8 +718,8 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "転送在庫を拒否",
   },
   AreYouAbsolutelySureToDenyTransferingStocki18n: {
-    en: "Are you absolutely sure to deny transfering stock?",
-    ja: "転送在庫を拒否しますか？",
+    en: "Are you sure you want to deny this stock transfer request? This action cannot be undone",
+    ja: "転送在庫を拒否しますか？この操作は取り消せません。",
   },
   MarkTransferStockAsReceivedi18n: {
     en: "Mark Transfer Stock As Received",
@@ -742,8 +742,8 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "転送在庫リクエストを拒否",
   },
   AreYouAbsolutelySureToDenyTransferStockRequesti18n: {
-    en: "Are you sure you want to deny this stock transfer request?",
-    ja: "転送在庫リクエストを拒否しますか？",
+    en: "Are you sure you want to deny this stock transfer request? This action cannot be undone.",
+    ja: "転送在庫を拒否しますか？この操作は取り消せません。",
   },
   ReProcessStockTransferi18n: {
     en: "Re-Process Stock Transfer",

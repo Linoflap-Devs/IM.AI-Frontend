@@ -222,18 +222,18 @@ export default function Supplier() {
                 `${process.env.NEXT_PUBLIC_API_URL}/supplier/deleteSupplier/sId/${data}`
             );
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             getSuppliersQuery.refetch();
             toast({
                 title: "Success",
-                description: `Succesfully deleted ${"supplierName"}`,
+                description: `Succesfully deleted supplier.`,
             });
         },
         onError: (e: any) => {
             toast({
                 variant: "destructive",
                 title: "Uh oh! Something went wrong.",
-                description: `Failed to delete ${"supplierName"}`,
+                description: `Failed to delete supplier.`,
                 action: <ToastClose>Remove</ToastClose>,
             });
         },

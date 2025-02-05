@@ -949,30 +949,33 @@ export default function TransferOrder() {
                         <div className="flex flex-col gap-2 py-2">
                           {
                             listOfSelectedProducts.length > 0 &&
-                            <div className="flex items-center justify-between font-bold">
+                            <div className="flex items-center justify-between font-bold pr-3">
                               <div className="">{Producti18n[locale]}</div>
                               <div className="w-[30%]">{Quantityi18n[locale]}</div>
                             </div>
                           }
-                          {listOfSelectedProducts.length > 0 &&
-                            listOfSelectedProducts.map((item, index) => {
-                              return (
-                                <div
-                                  key={index}
-                                  className={`flex items-center justify-between ${index !== 0 ? "border-t pt-2" : ""}`}
-                                >
-                                  <label>{item.label}</label>
-                                  <Input
-                                    required
-                                    placeholder="Quantity"
-                                    className="w-[30%]"
-                                    type="number"
-                                    min={1}
-                                    name={item.value}
-                                  />
-                                </div>
-                              );
-                            })}
+                          <div className="flex flex-col gap-2 max-h-[400px] overflow-auto pr-3">
+                            {listOfSelectedProducts.length > 0 &&
+                              listOfSelectedProducts.map((item, index) => {
+                                return (
+                                  <div
+                                    key={index}
+                                    className={`flex items-center gap-3 justify-between ${index !== 0 ? "border-t pt-2" : ""}`}
+                                  >
+                                    <label className="text-pretty">{item.label}</label>
+                                    <Input
+                                      required
+                                      placeholder="Quantity"
+                                      className="w-[30%]"
+                                      type="number"
+                                      min={1}
+                                      name={item.value}
+                                    />
+                                  </div>
+                                );
+                              })}
+
+                          </div>
                         </div>
 
                         <div className="flex justify-end gap-2">
