@@ -393,9 +393,12 @@ function Promo() {
                 );
             },
             cell: ({ row }) => {
+
+                const isActive = new Date(row.getValue("StartDate")) < new Date();
+
                 return (
-                    <div className="text-center">
-                        {format(new Date(row.getValue("StartDate")), "MM-dd-yyyy | HH:mm")}
+                    <div className={`text-center ${isActive ? "text-green-500" : "text-red-500"}`}>
+                        {format(new Date(row.getValue("StartDate")), "MMM dd, yyyy | HH:mm aa")}
                     </div>
                 );
             },
@@ -421,9 +424,12 @@ function Promo() {
                 );
             },
             cell: ({ row }) => {
+                
+                const isExpired = new Date() > new Date(row.getValue("EndDate"));
+
                 return (
-                    <div className="text-center">
-                        {format(new Date(row.getValue("EndDate")), "MM-dd-yyyy | HH:mm")}
+                    <div className={`text-center ${isExpired ? "text-red-500" : "text-green-500"}`}>
+                        {format(new Date(row.getValue("EndDate")), "MMM dd, yyyy | HH:mm aa")}
                     </div>
                 );
             },

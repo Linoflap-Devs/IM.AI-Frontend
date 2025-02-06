@@ -109,7 +109,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
   ContactPersoni18n: { en: "Contact Person", ja: "連絡先担当者" },
   SupplierNamei18n: { en: "Supplier Name", ja: "仕入先名" },
   AddProducti18n: { en: "Add Product", ja: "商品追加" },
-  ProductSuppliedi18n: { en: "Product Supplied", ja: "商品提供" },
+  ProductSuppliedi18n: { en: "Productshmm Supplied", ja: "商品提供" },
   Submiti18n: { en: "Submit", ja: "送信" },
   ProductListi18n: { en: "Product List", ja: "商品リスト" },
   Deletei18n: { en: "Delete", ja: "削除" },

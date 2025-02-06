@@ -99,6 +99,23 @@ function ManageStore() {
     const [isOpenDial, setIsOpenDial] = useState<boolean>(false);
     const [isOpenDelDial, setIsOpenDelDial] = useState<boolean>(false);
 
+    // pagination
+
+    const pageSize = 5;
+    const [page, setPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = Math.ceil(filteredStoreBranches.length / pageSize);
+     // Get current items
+    const indexOfLastItem = page * pageSize;
+    const indexOfFirstItem = indexOfLastItem - pageSize;
+    const currentItems = filteredStoreBranches.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Change page
+    const goToPage = (pageNumber: number) => {
+        setPage(pageNumber);
+    };
+
+
     axios.defaults.headers.common[
         "Authorization"
     ] = `Bearer ${session.data?.token}`;
@@ -278,17 +295,15 @@ function ManageStore() {
         <div className="mx-3 mb-3 flex flex-1">
             <Card className="flex flex-1 flex-col gap-2 p-3">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">
-                        {BranchListi18n[locale]}
-                    </h1>
-                    <div className="flex w-auto items-center justify-end gap-3">
-                        <Input
-                            onChange={searchHandler}
-                            className="w-3/2"
-                            placeholder={
-                                Searchi18n[locale] + " " + Namei18n[locale]
-                            }
-                        />
+                    <div className="flex flex-col gap-3">
+                        <h1 className="text-2xl font-semibold">
+                            {BranchListi18n[locale]}
+                        </h1>
+                        
+                    </div>
+                    
+                    <div className="flex w-auto self-start justify-end gap-3">
+                        
                         <Dialog
                             open={isOpenDial}
                             onOpenChange={(open) => {setIsOpenDial(open), form.reset(), setEditStoreIndex(null)} }
@@ -541,6 +556,8 @@ function ManageStore() {
                             </DialogContent>
                         </Dialog>
                     </div>
+
+                    
                     <AlertDialog
                         open={isOpenDelDial}
                         onOpenChange={setIsOpenDelDial}
@@ -573,6 +590,70 @@ function ManageStore() {
                         </AlertDialogContent>
                     </AlertDialog>
                 </div>
+
+                <div className="flex justify-between mt-3">
+                    <Input
+                        onChange={searchHandler}
+                        className="w-3/2"
+                        placeholder={
+                            Searchi18n[locale] + " " + Namei18n[locale]
+                        }
+                    />
+                    <div className="flex gap-2">
+                        {/* <Button
+                            onClick={() => {
+                                setIsOpenDial(true);
+                                form.reset();
+                            }}
+                            variant={page === 1 ? "default" : "default"}
+                        >
+                            Previous
+                        </Button>
+
+                        <Button
+                            onClick={() => {
+                                setIsOpenDial(true);
+                                form.reset();
+                            }}
+                            variant={page === 1 ? "default" : "default"}
+                        >
+                            Next
+                        </Button> */}
+                            {filteredStoreBranches.length > 0 && (
+                                <div className="flex items-center justify-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => goToPage(page - 1)}
+                                    disabled={page === 1}
+                                >
+                                    Previous
+                                </Button>
+
+                                {/* Page Numbers */}
+                                <div className="flex gap-2">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((singlePage) => (
+                                    <Button
+                                        key={singlePage}
+                                        variant={singlePage === page ? "default" : "outline"}
+                                        onClick={() => goToPage(singlePage)}
+                                        className={`min-w-8 `}
+                                    >
+                                        {singlePage}
+                                    </Button>
+                                    ))}
+                                </div>
+
+                                <Button
+                                    variant="outline"
+                                    onClick={() => goToPage(page + 1)}
+                                    disabled={page === totalPages}
+                                >
+                                    Next
+                                </Button>
+                                </div>
+                            )}
+                    </div>
+                </div>
                 <div className="my flex flex-1 flex-col items-center">
                     <ScrollArea className="my-auto h-[710px] w-full">
                         <div className="flex flex-col gap-7">
@@ -582,7 +663,7 @@ function ManageStore() {
                                     className="mx-auto mt-28 animate-spin"
                                 />
                             ) : (
-                                filteredStoreBranches.map((item, index) => {
+                                currentItems.map((item, index) => {
                                     return (
                                         <Card
                                             key={index}
@@ -656,6 +737,9 @@ function ManageStore() {
                             )}
                         </div>
                     </ScrollArea>
+                    <div className="flex items-end justify-end text-end w-full">
+                        <p className="text-end">Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredStoreBranches.length)} of <span className="font-bold">{filteredStoreBranches.length}</span> items</p>
+                    </div>
                 </div>
             </Card>
         </div>

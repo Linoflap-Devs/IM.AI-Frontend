@@ -184,7 +184,7 @@ function CustomerList() {
     return (
         <div className="flex h-full flex-1 flex-col gap-3 px-3">
             {/* Add User */}
-            <AlertDialog open={openAddGuest} onOpenChange={setOpenAddGuest}>
+            <AlertDialog open={openAddGuest} onOpenChange={(open) => {setOpenAddGuest(open); form.reset(); form.clearErrors(); setError(null)}}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>

@@ -322,7 +322,7 @@ export default function Product() {
                                     {`${Addi18n[locale]} ${Producti18n[locale]}`}
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="max-w-[600px] w-[600px]">
                                 <DialogHeader>
                                     <DialogTitle className="flex items-center justify-between text-2xl">
                                         {`${Addi18n[locale]} ${Producti18n[locale]}`}
@@ -335,14 +335,14 @@ export default function Product() {
                                                 onSubmit
                                             )}
                                         >
-                                            <div className="space-y-2 max-h-[700px] overflow-auto pe-2">
+                                            <div className="space-y-2 max-h-[700px] overflow-auto pe-5">
                                                 {userData?.role == 2 && (
                                                     <div className="flex items-center justify-between">
                                                         <label className="text-lg font-medium">
                                                             {Branchi18n[locale]}
                                                         </label>
                                                         <BranchDropDown
-                                                            className="w-[277.19px]"
+                                                            className="w-[60%]"
                                                             defaultValue={
                                                                 AllBranchi18n[
                                                                     locale
