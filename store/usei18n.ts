@@ -122,7 +122,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
   Percentagei18n: { en: "Percentage", ja: "割合" },
   PromoProducti18n: { en: "Promo Product", ja: "プロモーション商品" },
   AlertDialogue1i18n: {
-    en: "This action cannot be undone. This will permanently delete this record on our servers",
+    en: "This action cannot be undone. This will permanently delete this record on our servers.",
     ja: "この操作は元に戻せません。この操作は本当に削除されます。",
   },
   AlertDialogue2i18n: {

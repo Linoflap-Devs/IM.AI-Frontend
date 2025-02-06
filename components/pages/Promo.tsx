@@ -16,6 +16,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { useEffect, useState } from "react";
 import { useI18nStore } from "@/store/usei18n";
 import { z } from "zod";
@@ -87,7 +88,9 @@ function Promo() {
         SuccesfullyAddedNewPromoi18n,
         Failedi18n,
         PleaseUseADifferentPromoCodei18n,
-        SuccesfullyDeletedPromoi18n
+        SuccesfullyDeletedPromoi18n,
+        ProdNamei18n,
+        ConfirmDeletion
     } = useI18nStore();
     const addPromoFormSchema = z.object({
         name: z.string().min(2).max(50),
@@ -371,6 +374,21 @@ function Promo() {
                 const isActive = hasStarted && !hasEnded
                 return <div className="text-center"><span className={`p-1 rounded ${hasEnded ? "bg-red-200 text-red-800" : hasStarted ? "bg-green-200 text-green-800" : "bg-orange-200 text-orange-800"}`}>{hasEnded ? "Expired" : hasStarted ? "Active" : "Inactive"}</span></div>;
             },
+            sortingFn: (rowA, rowB) => {
+                // Helper function to get status
+                const getStatus = (row: any) => {
+                    const hasStarted = new Date(row.getValue("StartDate")) < new Date()
+                    const hasEnded = new Date(row.getValue("EndDate")) < new Date()
+                    if (hasEnded) return 2  // Expired
+                    if (hasStarted) return 1 // Active
+                    return 3                 // Inactive
+                }
+    
+                const statusA = getStatus(rowA)
+                const statusB = getStatus(rowB)
+                
+                return statusA - statusB
+            }
         },
         {
             accessorKey: "StartDate",
@@ -481,7 +499,7 @@ function Promo() {
         },
     ];
     const columnsProductList: ColumnDef<PromoProductDataList>[] = [
-        { accessorKey: "Name", header: Namei18n[locale] },
+        { accessorKey: "Name", header: ProdNamei18n[locale] },
     ];
     function onSubmit(values: z.infer<typeof addPromoFormSchema>) {
         if(isEditMode){
@@ -502,11 +520,11 @@ function Promo() {
                     </h1>
                     {userData?.role == "3" && (
                         <div>
-                            <AlertDialog
+                            <Dialog
                                 open={openDialAdd}
                                 onOpenChange={setOpenDialAdd}
                             >
-                                <AlertDialogTrigger
+                                <DialogTrigger
                                     onClick={() => {
                                         setIsEditMode(false) 
                                         addPromoForm.reset({
@@ -520,13 +538,13 @@ function Promo() {
                                     className="rounded-lg bg-primary px-2 py-2 font-medium text-white"
                                 >
                                     {AddPromoi18n[locale]}
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader className="gap-5">
+                                        <DialogTitle className="text-2xl">
                                             { isEditMode ? "Edit Promo" : AddPromoi18n[locale]}
-                                        </AlertDialogTitle>
-                                        <div>
+                                        </DialogTitle>
+                                        <div className="mt-5">
                                             <Form {...addPromoForm}>
                                                 <form
                                                     onSubmit={addPromoForm.handleSubmit(
@@ -541,9 +559,9 @@ function Promo() {
                                                         name="name"
                                                         render={({ field }) => (
                                                             <FormItem className="flex flex-col gap-3">
-                                                                <FormLabel>
+                                                                <FormLabel className="text-lg">
                                                                     {
-                                                                        Namei18n[
+                                                                        PromoNamei18n[
                                                                             locale
                                                                         ]
                                                                     }
@@ -569,7 +587,7 @@ function Promo() {
                                                         name="products"
                                                         render={({ field }) => (
                                                             <FormItem className="flex flex-col gap-3">
-                                                                <FormLabel>
+                                                                <FormLabel className="text-lg">
                                                                     {Producti18n[locale]}
                                                                 </FormLabel>
                                                                 <div>
@@ -673,7 +691,7 @@ function Promo() {
                                                         name="discount"
                                                         render={({ field }) => (
                                                             <FormItem className="flex flex-col gap-3">
-                                                                <FormLabel>
+                                                                <FormLabel className="text-lg">
                                                                     {
                                                                         Discounti18n[
                                                                             locale
@@ -711,7 +729,7 @@ function Promo() {
                                                         name="start"
                                                         render={({ field }) => (
                                                             <FormItem className="flex flex-col gap-2 pt-2">
-                                                                <FormLabel>
+                                                                <FormLabel className="text-lg">
                                                                     {
                                                                         "Start Date"
                                                                     }
@@ -789,7 +807,7 @@ function Promo() {
                                                         name="expiry"
                                                         render={({ field }) => (
                                                             <FormItem className="flex flex-col gap-2 pt-2">
-                                                                <FormLabel>
+                                                                <FormLabel className="text-lg">
                                                                     {
                                                                         Expiryi18n[
                                                                             locale
@@ -863,9 +881,7 @@ function Promo() {
                                                     />
 
                                                     <div className="flex justify-end gap-3 pt-3">
-                                                        <AlertDialogCancel>
-                                                            {Canceli18n[locale]}
-                                                        </AlertDialogCancel>
+                                                        
                                                         <Button type="submit">
                                                             { isEditMode ? "Update" : Submiti18n[locale]}
                                                         </Button>
@@ -873,9 +889,9 @@ function Promo() {
                                                 </form>
                                             </Form>
                                         </div>
-                                    </AlertDialogHeader>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     )}
                 </div>
@@ -902,7 +918,7 @@ function Promo() {
                             data={promoDetailsQuery.data ?? []}
                             pageSize={10}
                             filtering={true}
-                            columnsToSearch={["name"]}
+                            columnsToSearch={["Name"]}
                         />
                     </div>
                 </SheetContent>
@@ -911,7 +927,7 @@ function Promo() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {AlertDialogue2i18n[locale]}
+                            {ConfirmDeletion[locale]}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                             {AlertDialogue1i18n[locale]}
