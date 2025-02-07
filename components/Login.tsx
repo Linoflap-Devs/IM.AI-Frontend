@@ -27,12 +27,12 @@ function Login() {
     const formSchema = z.object({
         email: z
             .string()
-            .min(1, { message: "Email must contain a valid Email" })
+            .min(1, { message: "Please enter a valid email address." })
             .max(50)
             .email(),
         password: z
             .string()
-            .min(2, { message: "Password must contain a valid Password" })
+            .min(2, { message: "Password must contain a valid password." })
             .max(50),
         remember30: z.boolean().default(false).optional(),
     });
@@ -55,7 +55,7 @@ function Login() {
                 redirect: false,
             });
             if (res?.error) {
-                setError("Invalid Credentials");
+                setError("Invalid credentials. Please verify your details.");
             } else {
                 router.push("/home/dashboard");
             }

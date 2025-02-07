@@ -81,7 +81,7 @@ function CustomerList() {
             console.log(data);
             toast({
                 title: "Success",
-                description: `Succesfully added new Temporary Account ${data.data.Email}`,
+                description: `Succesfully added new temporary account ${data.data.Email}`,
                 duration: 3000,
             });
         },

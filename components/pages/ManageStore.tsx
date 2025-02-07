@@ -57,6 +57,7 @@ function ManageStore() {
     const userData = session.data?.data;
     const { globalCompanyState } = useGlobalStore();
     const [editStoreIndex, setEditStoreIndex] = useState<number | null>(null);
+    const [editStoreId, setEditStoreId] = useState<number | null>(null);
     const [filteredStoreBranches, setFilteredStoreBranches] = useState<
         StoreBranches[]
     >([]);
@@ -169,7 +170,7 @@ function ManageStore() {
             form.reset();
             toast({
                 title: "Success",
-                description: `Succesfully Added New Store`,
+                description: `Succesfully added a new branch.`,
             });
             setIsOpenDial(false);
         },
@@ -177,7 +178,7 @@ function ManageStore() {
             console.log(e);
             toast({
                 title: "Failed",
-                description: `Theres an error adding New Store please try again later`,
+                description: `There was an error adding a new branch please try again later.`,
             });
         },
     });
@@ -201,9 +202,10 @@ function ManageStore() {
         onSuccess: () => {
             toast({
                 title: "Success",
-                description: `Succesfully Edited Branch`,
+                description: `Succesfully updated the branch.`,
             });
             setEditStoreIndex(null);
+            setEditStoreId(null);
             form.reset();
             storeQuery.refetch();
             setIsOpenDial(false);
@@ -225,7 +227,7 @@ function ManageStore() {
             storeQuery.refetch();
             toast({
                 title: "Success",
-                description: `Succesfully Deleted Store`,
+                description: `Succesfully deleted the branch.`,
             });
         },
     });
@@ -242,36 +244,37 @@ function ManageStore() {
         },
     });
     function onSubmit(values: z.infer<typeof formSchema>) {
-        if (editStoreIndex !== null) {
+        if (editStoreId !== null || editStoreIndex !== null) {
             editStoreMutation.mutate(values);
         } else {
             addStore.mutate(values);
         }
     }
     useEffect(() => {
-        if (editStoreIndex !== null) {
-            const companyID = filteredStoreBranches[editStoreIndex].CompanyId;
+        if (editStoreIndex !== null || editStoreId !== null) {
+            const companyID = filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.CompanyId;
+            console.log(filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId))
             setTimeout(() => {
-                form.setValue("companyId", companyID);
+                form.setValue("companyId", companyID || 0);
                 form.setValue(
                     "contact",
-                    `${filteredStoreBranches[editStoreIndex].Contact}`
+                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.Contact}`
                 );
                 form.setValue(
                     "contactPerson",
-                    `${filteredStoreBranches[editStoreIndex].ContactPerson}`
+                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.ContactPerson}`
                 );
                 form.setValue(
                     "fullAddress",
-                    `${filteredStoreBranches[editStoreIndex].Address}`
+                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.Address}`
                 );
                 form.setValue(
                     "branchName",
-                    `${filteredStoreBranches[editStoreIndex].Name}`
+                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.Name}`
                 );
                 form.setValue(
                     'tinNumber',
-                    `${filteredStoreBranches[editStoreIndex].TIN}`
+                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.TIN}`
                 )
             });
         }
@@ -306,7 +309,7 @@ function ManageStore() {
                         
                         <Dialog
                             open={isOpenDial}
-                            onOpenChange={(open) => {setIsOpenDial(open), form.reset(), setEditStoreIndex(null)} }
+                            onOpenChange={(open) => {setIsOpenDial(open), form.reset(), setEditStoreIndex(null); setEditStoreId(null);} }
                         >
                             <DialogTrigger
                                 onClick={() => {
@@ -321,7 +324,7 @@ function ManageStore() {
                                 <DialogHeader>
                                     <DialogTitle>
                                         {editStoreIndex !== null
-                                            ? `${Editi18n[locale]}: ${filteredStoreBranches[editStoreIndex].Name}`
+                                            ? `${Editi18n[locale]}: ${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.Name}`
                                             : AddBranchi18n[locale]}
                                     </DialogTitle>
                                     {/* <DialogDescription>
@@ -715,6 +718,7 @@ function ManageStore() {
                                                         setEditStoreIndex(
                                                             index
                                                         );
+                                                        setEditStoreId( item.BranchId )
                                                     }}
                                                 >
                                                     {Editi18n[locale]}

@@ -502,7 +502,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "ゲストアカウントを作成",
   },
   CreateANewGuestOrOneTimeAccount: {
-    en: "Create a new guest or one-time account",
+    en: "Create a new Guest or One-Time Account",
     ja: "ゲストを新規作成または一時アカウントを作成",
   },
   EnterPromoNamei18n: {
