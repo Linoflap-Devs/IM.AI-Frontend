@@ -353,7 +353,7 @@ export default function TransferOrder() {
           TransferStocki18n[status as keyof typeof TransferStocki18n][locale];
 
         const statusClass = () => {
-          switch(status){
+          switch (status) {
             case "Declined":
             case "Cancelled":
               return "bg-red-200 text-red-800 p-1 rounded-sm"
@@ -366,11 +366,11 @@ export default function TransferOrder() {
               return "bg-blue-100 text-blue-800 p-1 rounded-sm"
           }
         }
-        
+
         return (
           <div className="text-center">
             <span className={`${statusClass()}`}>
-              {status == "Company Approved" 
+              {status == "Company Approved"
                 ? userData?.role == 3
                   ? TransferStocki18n["Pending Store Approval"][locale]
                   : defaultStatus
@@ -766,21 +766,18 @@ export default function TransferOrder() {
       {/* ==================================== */}
       {/* Company */}
       {/* Accept */}
-      <Dialog
+      <AlertDialog
         open={openModalConfirmComp}
         onOpenChange={setOpenModalConfirmComp}
       >
-        <DialogContent>
+        <AlertDialogContent>
           <form
             onSubmit={onSubmitCompany}
             className="flex flex-col gap-2 py-2 text-black"
           >
-            <DialogHeader>
-              <DialogTitle>{PickASourceBranchi18n[locale]}</DialogTitle>
-            {/* <DialogDescription>
-              {PickABranchToTransferFromAndModifyQuantityIfNeededi18n[locale]}
-            </DialogDescription> */}
-            </DialogHeader>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{PickASourceBranchi18n[locale]}</AlertDialogTitle>
+            </AlertDialogHeader>
             <div className="flex flex-col">
               <label className="text-base ">Stock Source Store</label>
               <BranchDropDown
@@ -825,9 +822,15 @@ export default function TransferOrder() {
                 <Loader2 size={42} className="m-auto animate-spin" />
               </div>
             )}
-            <DialogFooter className="mt-3">
+            <AlertDialogFooter className="mt-3">
               <div className="flex justify-end gap-2">
-                <Button type="button" variant="secondary">{Canceli18n[locale]}</Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setOpenModalConfirmComp(false)}
+                >
+                  {Canceli18n[locale]}
+                </Button>
                 <Button
                   onClick={() => {
                     setOpenModalConfirmComp(false);
@@ -841,21 +844,28 @@ export default function TransferOrder() {
                   {`Confirm`}
                 </Button>
               </div>
-            </DialogFooter>
+            </AlertDialogFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Deny */}
-      <Dialog open={openModalDenyComp} onOpenChange={setOpenModalDenyComp}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{DenyStockTransferRequesti18n[locale]}</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={openModalDenyComp}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{DenyStockTransferRequesti18n[locale]}</AlertDialogTitle>
+            <AlertDialogDescription>
               {AreYouAbsolutelySureToDenyTransferStockRequesti18n[locale]}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button type="button" variant="secondary">{Canceli18n[locale]}</Button>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setOpenModalDenyComp(false)}
+            >
+              {Canceli18n[locale]}
+            </Button>
             <Button
               type="button"
               variant={"destructive"}
@@ -864,53 +874,60 @@ export default function TransferOrder() {
                   transferStockId,
                   status: "Declined",
                 });
+                setOpenModalDenyComp(false);
               }}
             >
               Continue
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Re-Initialize Transfer */}
-      <Dialog
-        open={openModalCompanyReIn}
-        onOpenChange={setOpenModalCompanyReIn}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{ReProcessStockTransferi18n[locale]}</DialogTitle>
-            <DialogDescription>
+      <AlertDialog open={openModalCompanyReIn}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{ReProcessStockTransferi18n[locale]}</AlertDialogTitle>
+            <AlertDialogDescription>
               {AreYouAbsolutelySureToReProcessTransferStockRequesti18n[locale]}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button type="button" variant="secondary">{Canceli18n[locale]}</Button>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setOpenModalCompanyReIn(false)}
+            >
+              {Canceli18n[locale]}
+            </Button>
             <Button
               type="button"
               onClick={() => {
                 reprocessRequestMutation.mutate({
                   transferStockId,
                 });
+                setOpenModalCompanyReIn(false);
               }}
             >
               Continue
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      {/* Loading  */}
-      <Dialog open={openLoadingModal} onOpenChange={setOpenLoadingModal}>
-        <DialogContent className="flex size-60 items-center justify-center">
-          <DialogHeader>
-            <DialogTitle className="flex flex-col items-center justify-between">
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {/* Loading */}
+      <AlertDialog open={openLoadingModal}>
+        <AlertDialogContent className="flex size-60 items-center justify-center">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex flex-col items-center justify-between">
               <Loader2 size={40} className="animate-spin" />
-            </DialogTitle>
-            <DialogDescription className="text-center">
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
               Loading
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Card className="mx-3 mb-2 flex flex-1 flex-col gap-2 p-3">
         {userData && userData.role <= 3 && (
           <div className="flex items-center justify-between">
@@ -918,91 +935,78 @@ export default function TransferOrder() {
               {TransferStocki18n["Transfer Stock"][locale]}
             </h1>
             <div className="flex gap-3">
-              <Button className="bg-green-400">
-                {`${Downloadi18n[locale]}`}
-              </Button>
+              <Button className="bg-green-400">{`${Downloadi18n[locale]}`}</Button>
               {userData.role === 3 && (
-                <Dialog open={open} onOpenChange={(open) => {setOpen(open); setListOfSelectedProducts([]);}}>
-                  <DialogTrigger asChild>
-                    <Button variant={"default"}>{RequestTransferi18n[locale]}</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                      <DialogTitle className="flex items-center justify-between text-2xl">
-                        {`${RequestTransferi18n[locale]}`}
-                        {/* <Button 
+                <AlertDialog open={open}>
+                  <AlertDialogTrigger asChild>
+                    <Button onClick={() => { setOpen(true); setListOfSelectedProducts([]); }}>
+                      {RequestTransferi18n[locale]}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader className="flex items-center justify-between text-2xl">
+                      {`${RequestTransferi18n[locale]}`}
+                    </AlertDialogHeader>
+                    <form onSubmit={onSubmit} className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <label>{SelectProducti18n[locale]}</label>
+                        <ProductDropDown
+                          externalState={listOfSelectedProducts}
+                          setExternalState={setListOfSelectedProducts}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-2 py-2">
+                        {listOfSelectedProducts.length > 0 && (
+                          <div className="flex items-center justify-between font-bold pr-3">
+                            <div>{Producti18n[locale]}</div>
+                            <div className="w-[30%]">{Quantityi18n[locale]}</div>
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-2 max-h-[400px] overflow-auto pr-3">
+                          {listOfSelectedProducts.map((item, index) => (
+                            <div
+                              key={index}
+                              className={`flex items-center gap-3 justify-between ${index !== 0 ? "border-t pt-2" : ""
+                                }`}
+                            >
+                              <label className="text-pretty">{item.label}</label>
+                              <Input
+                                required
+                                placeholder="Quantity"
+                                className="w-[30%]"
+                                type="number"
+                                min={1}
+                                name={item.value}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <Button
                           type="button"
+                          variant="secondary"
                           onClick={() => {
                             setListOfSelectedProducts([]);
+                            setOpen(false);
                           }}
                         >
-                          X
-                        </Button> */}
-                      </DialogTitle>
-                      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-                        <div className="flex items-center justify-between">
-                          <label>{SelectProducti18n[locale]}</label>
-                          <ProductDropDown
-                            externalState={listOfSelectedProducts}
-                            setExternalState={setListOfSelectedProducts}
-                          />
-                        </div>
-                        <div className="flex flex-col gap-2 py-2">
-                          {
-                            listOfSelectedProducts.length > 0 &&
-                            <div className="flex items-center justify-between font-bold pr-3">
-                              <div className="">{Producti18n[locale]}</div>
-                              <div className="w-[30%]">{Quantityi18n[locale]}</div>
-                            </div>
-                          }
-                          <div className="flex flex-col gap-2 max-h-[400px] overflow-auto pr-3">
-                            {listOfSelectedProducts.length > 0 &&
-                              listOfSelectedProducts.map((item, index) => {
-                                return (
-                                  <div
-                                    key={index}
-                                    className={`flex items-center gap-3 justify-between ${index !== 0 ? "border-t pt-2" : ""}`}
-                                  >
-                                    <label className="text-pretty">{item.label}</label>
-                                    <Input
-                                      required
-                                      placeholder="Quantity"
-                                      className="w-[30%]"
-                                      type="number"
-                                      min={1}
-                                      name={item.value}
-                                    />
-                                  </div>
-                                );
-                              })}
-
-                          </div>
-                        </div>
-
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => {
-                              setListOfSelectedProducts([]);
-                              setOpen(false);
-                            }}
-                          >
-                            {Canceli18n[locale]}
-                          </Button>
-                          <Button
-                            disabled={listOfSelectedProducts.length < 1}
-                            type="submit"
-                          >
-                            {Request[locale]}
-                          </Button>
-                        </div>
-                      </form>
-                  </DialogContent>
-                </Dialog>
+                          {Canceli18n[locale]}
+                        </Button>
+                        <Button disabled={listOfSelectedProducts.length < 1} type="submit">
+                          {Request[locale]}
+                        </Button>
+                      </div>
+                    </form>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
             </div>
           </div>
         )}
+
         <div>
           {userData && (
             <DataTable
@@ -1010,11 +1014,11 @@ export default function TransferOrder() {
               columnsToSearch={["TransferOrderId", "SourceBranch", "DestinationBranch"]}
               resetSortBtn={true}
               pageSize={userData.role === 1 ? 13 : 11}
-              data={getTransferOrder?.data ? getTransferOrder.data : []}
+              data={getTransferOrder?.data || []}
               pagination={true}
               columns={columns}
               visibility={{
-                action: userData.role == 1 || userData.role == 4 ? false : true,
+                action: !(userData.role === 1 || userData.role === 4),
                 SourceStoreId: false,
                 DestinationStoreId: false,
               }}
