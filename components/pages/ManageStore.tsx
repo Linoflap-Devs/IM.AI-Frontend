@@ -601,6 +601,7 @@ function ManageStore() {
                         }
                     />
                     <div className="flex gap-2">
+
                         {/* <Button
                             onClick={() => {
                                 setIsOpenDial(true);
@@ -620,8 +621,8 @@ function ManageStore() {
                         >
                             Next
                         </Button> */}
-                        {filteredStoreBranches.length > 0 && (
-                            <div className="flex items-center justify-center gap-2">
+                            {filteredStoreBranches.length > 0 && (
+                                <div className="flex items-center justify-center gap-2">
                                 <Button
                                     variant="outline"
                                     onClick={() => goToPage(page - 1)}
@@ -631,7 +632,7 @@ function ManageStore() {
                                 </Button>
 
                                 {/* Page Numbers */}
-                                <div className="flex gap-2">
+                                {/* <div className="flex gap-2">
                                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((singlePage) => (
                                         <Button
                                             key={singlePage}
@@ -642,7 +643,33 @@ function ManageStore() {
                                             {singlePage}
                                         </Button>
                                     ))}
+                                </div> */}
+
+                                 {/* Page Numbers */}
+                                <div className="flex gap-2">
+                                    {(() => {
+                                        const totalPagesToShow = 3; // Number of page buttons to show
+                                        let startPage = Math.max(1, page - Math.floor(totalPagesToShow / 2));
+                                        let endPage = Math.min(totalPages, startPage + totalPagesToShow - 1);
+
+                                        // Adjust startPage if endPage is at the limit
+                                        if (endPage - startPage + 1 < totalPagesToShow) {
+                                            startPage = Math.max(1, endPage - totalPagesToShow + 1);
+                                        }
+
+                                        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((singlePage) => (
+                                            <Button
+                                                key={singlePage}
+                                                variant={singlePage === page ? "default" : "outline"}
+                                                onClick={() => goToPage(singlePage)}
+                                                className={`min-w-8`}
+                                            >
+                                                {singlePage}
+                                            </Button>
+                                        ));
+                                    })()}
                                 </div>
+
 
                                 <Button
                                     variant="outline"
