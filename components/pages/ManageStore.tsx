@@ -80,6 +80,7 @@ function ManageStore() {
         Uploadi18n,
         Imagei18n,
         Canceli18n,
+        Companyi8n,
         CompanyIdi8n,
         AddCompanyIdi8n,
         Continuei18n,
@@ -131,6 +132,8 @@ function ManageStore() {
                         ? globalCompanyState
                         : userData?.companyId;
 
+
+
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_URL}/branch/getbranches/cId/${companyId}`,
                     {
@@ -139,6 +142,7 @@ function ManageStore() {
                         },
                     }
                 );
+                console.log('Fetched Store Data:', response)
                 setFilteredStoreBranches(response.data);
                 return response.data;
             }
@@ -346,26 +350,46 @@ function ManageStore() {
                                                                 <div className="flex w-full items-center justify-between">
                                                                     <FormLabel className="text-lg">
                                                                         {
-                                                                            CompanyIdi8n[
+                                                                            Companyi8n[
                                                                             locale
                                                                             ]
                                                                         }
                                                                     </FormLabel>
-                                                                    <FormControl className="w-[60%]">
-                                                                        <Input
-                                                                            {...field}
-                                                                            type="number"
-                                                                            disabled={
-                                                                                userData?.companyId !==
-                                                                                null
-                                                                            }
-                                                                            placeholder={
-                                                                                AddCompanyIdi8n[
-                                                                                locale
-                                                                                ]
-                                                                            }
-                                                                        />
-                                                                    </FormControl>
+
+            <FormControl className="w-[60%]">
+            <select className="w-full px-4 py-2 border rounded-md"
+                value={field.value || ""}  // Ensure this is set to the selected BranchId
+                            onChange={(e) => {
+                                const selectedName = e.target.value;  // Get the selected store name
+                                const selectedStore = storeQuery.data?.find((store) => store.Name === selectedName);
+
+                                if (selectedStore) {
+                                    console.log("Selected Store Name:", selectedStore.Name);
+                                    console.log("Mapped Company ID:", selectedStore.CompanyId);
+                                    console.log("Mapped Branch ID:", selectedStore.BranchId);
+
+                                    // Here we submit the CompanyId (based on the selected store), not the store name
+                                    field.onChange(selectedStore.CompanyId); // Submit CompanyId
+                                }
+                            }}
+                        >
+                            {/* Placeholder option that updates dynamically */}
+                            <option value="" disabled>
+                                {
+                                    // Find the store name by BranchId from field.value
+                                    storeQuery.data?.find((store) => store.BranchId === field.value)?.Name ||
+                                    AddCompanyIdi8n[locale]  // Fallback value when no store is selected
+                                }
+                            </option>
+
+                            {/* Map fetched store names */}
+                            {storeQuery.data?.map((store: StoreBranches) => (
+                                <option key={`${store.CompanyId}-${store.BranchId}`} value={store.Name}>
+                                    {store.Name}
+                                </option>
+                            ))}
+                        </select>
+                    </FormControl>
                                                                 </div>
                                                                 <FormMessage className="text-xs w-full text-end" />
                                                             </FormItem>
@@ -621,8 +645,8 @@ function ManageStore() {
                         >
                             Next
                         </Button> */}
-                            {filteredStoreBranches.length > 0 && (
-                                <div className="flex items-center justify-center gap-2">
+                        {filteredStoreBranches.length > 0 && (
+                            <div className="flex items-center justify-center gap-2">
                                 <Button
                                     variant="outline"
                                     onClick={() => goToPage(page - 1)}

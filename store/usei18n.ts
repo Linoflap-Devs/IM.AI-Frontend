@@ -211,6 +211,10 @@ export const useI18nStore = create<I18nStore>((set) => ({
     en: "Company ID",
     ja: "会社ID",
   },
+  Companyi8n: {
+    en: "Company",
+    ja: "会社",
+  },
   AddCompanyIdi8n: {
     en: "Add Company ID",
     ja: "会社IDを追加",
@@ -862,6 +866,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
   ConfirmDeleteMessage: {
     en: "This action cannot be undone and will permanently delete this record from our servers.",
     ja: "このアクションは元に戻せません。このレコードをサーバーから削除します。",
+
   },
   ConfirmDeleteMessageCategory: {
     en: (category: string) =>
