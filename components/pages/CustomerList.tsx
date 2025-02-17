@@ -84,6 +84,8 @@ function CustomerList() {
                 description: `Succesfully added new temporary account ${data.data.Email}`,
                 duration: 3000,
             });
+            setOpenAddGuest(false); // Close modal after success
+            form.reset(); // Reset the form after submission
         },
     });
     const form = useForm<z.infer<typeof formSchema>>({
@@ -181,6 +183,7 @@ function CustomerList() {
         getUserClientQuery.refetch();
     }, [globalBranchState, globalCompanyState]);
 
+    console.log(clientList)
     return (
         <div className="flex h-full flex-1 flex-col gap-3 px-3">
             {/* Add User */}
@@ -263,7 +266,7 @@ function CustomerList() {
                     resetSortBtn={true}
                     columns={clientListColoumns}
                     filtering={true}
-                    columnsToSearch={["Email", "UserClientId", "ContactNumber"]}
+                    columnsToSearch={["Email", "UserClientId", "ContactNumber", "UserClient"]}
                     data={clientList}
                     pageSize={11}
                     pagination={true}

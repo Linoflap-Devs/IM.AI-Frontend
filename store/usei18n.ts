@@ -211,6 +211,10 @@ export const useI18nStore = create<I18nStore>((set) => ({
     en: "Company ID",
     ja: "会社ID",
   },
+  Companyi8n: {
+    en: "Company",
+    ja: "会社",
+  },
   AddCompanyIdi8n: {
     en: "Add Company ID",
     ja: "会社IDを追加",
@@ -549,10 +553,11 @@ export const useI18nStore = create<I18nStore>((set) => ({
     en: "Are you absolutely sure?",
     ja: "本当に本気ですべての操作を実行しますか？",
   },
-  ThisActionCannotBeUndoneThisWillPermanentlyDeleteYourAccountAndRemoveYourDataFromOurServersi18n: {
-    en: "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
-    ja: "この操作は取り消せません。この操作は永久にアカウントを削除し、サーバーからのデータを削除します。",
-  },
+  ThisActionCannotBeUndoneThisWillPermanentlyDeleteYourAccountAndRemoveYourDataFromOurServersi18n:
+    {
+      en: "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
+      ja: "この操作は取り消せません。この操作は永久にアカウントを削除し、サーバーからのデータを削除します。",
+    },
   GoBacki18n: {
     en: "Go Back",
     ja: "戻る",
@@ -783,91 +788,90 @@ export const useI18nStore = create<I18nStore>((set) => ({
   },
   TINNumber: {
     en: "TIN Number",
-    ja: "TIN番号"
+    ja: "TIN番号",
   },
   TINNumberFormatErrorMsg: {
     en: "Please enter a valid TIN.",
-    ja: "有効な TIN を入力してください。"
+    ja: "有効な TIN を入力してください。",
   },
   AddCategory: {
     en: "Add Category",
-    ja: "カデゴリーを追加"
+    ja: "カデゴリーを追加",
   },
   EditCategory: {
     en: "Edit Category",
-    ja: "カデゴリーを編集"
+    ja: "カデゴリーを編集",
   },
   CategoryName: {
     en: "Category Name",
-    ja: "カデゴリー名"
+    ja: "カデゴリー名",
   },
   Update: {
     en: "Update",
-    ja: "更新"
+    ja: "更新",
   },
   DeleteCategory: {
     en: "Delete Category",
-    ja: "カデゴリーを削除"
+    ja: "カデゴリーを削除",
   },
   DeleteCategoryDeleteMsg: {
     en: "Are you sure you want to delete this record?",
-    ja: "このレコードを削除しますか？"
+    ja: "このレコードを削除しますか？",
   },
   BatchNo: {
     en: "Batch Number",
-    ja: "バッチ番号"
+    ja: "バッチ番号",
   },
 
   CurrencyMarker: {
     en: "₱",
-    ja: "¥"
+    ja: "¥",
   },
 
   InventoryI18n: {
     en: "Inventory",
-    ja: "在庫"
+    ja: "在庫",
   },
 
   PurchasePrice: {
     en: "Purchase Price",
-    ja: "購入価格"
+    ja: "購入価格",
   },
 
   RetailPrice: {
     en: "Retail Price",
-    ja: "小売価格"
+    ja: "小売価格",
   },
 
   Deliveries: {
     en: "Deliveries",
-    ja: "出荷"
+    ja: "出荷",
   },
 
   Availability: {
     en: "Availability",
-    ja: "利用可能性"
+    ja: "利用可能性",
   },
 
   SupplierContactInfo: {
     en: "Supplier Contact Information",
-    ja: "仕入先連絡先情報"
+    ja: "仕入先連絡先情報",
   },
 
   ConfirmDeletion: {
     en: "Confirm Deletion",
-    ja: "削除を確認"
+    ja: "削除を確認",
   },
 
   ConfirmDeleteMessage: {
     en: "This action cannot be undone and will permanently delete this record from our servers.",
-    ja: "このアクションは元に戻せません。このレコードをサーバーから削除します。"
+    ja: "このアクションは元に戻せません。このレコードをサーバーから削除します。",
   },
 
   Request: {
     en: "Request",
-    ja: "リクエスト"
-  }
-  
+    ja: "リクエスト",
+  },
 }));
 export interface I18nStore {
   locale: locale;

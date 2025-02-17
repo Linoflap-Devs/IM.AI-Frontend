@@ -44,11 +44,11 @@ const fileSchema = z.object({
 });
 const formSchema = z.object({
     companyId: z.coerce.number().min(1).max(50),
-    branchName: z.string({required_error: "Branch name is required"}).min(1, {message: "Store name is required"}).max(50),
-    fullAddress: z.string({required_error: "Address is required"}).min(1, {message: "Address is required"}).max(100),
-    contact: z.coerce.string({required_error: "Contact is required"}).min(1, {message: "Contact is required"}).max(50),
-    contactPerson: z.string({required_error: "Contact person is required"}).min(1, {message: "Contact person is required"}).max(50),
-    tinNumber: z.coerce.string({required_error: "TIN Number is required"}).min(9, {message: "TIN Number is required"}).max(12),
+    branchName: z.string({ required_error: "Branch name is required" }).min(1, { message: "Store name is required" }).max(50),
+    fullAddress: z.string({ required_error: "Address is required" }).min(1, { message: "Address is required" }).max(100),
+    contact: z.coerce.string({ required_error: "Contact is required" }).min(1, { message: "Contact is required" }).max(50),
+    contactPerson: z.string({ required_error: "Contact person is required" }).min(1, { message: "Contact person is required" }).max(50),
+    tinNumber: z.coerce.string({ required_error: "TIN Number is required" }).min(9, { message: "TIN Number is required" }).max(12),
     imgFile: fileSchema.required(),
     /* imgFile: z.instanceof(File), */
 });
@@ -80,12 +80,13 @@ function ManageStore() {
         Uploadi18n,
         Imagei18n,
         Canceli18n,
+        Companyi8n,
         CompanyIdi8n,
         AddCompanyIdi8n,
         Continuei18n,
         AlertDialogue1i18n,
         Searchi18n,
-        BranchListi18n, 
+        BranchListi18n,
         AddBranchi18n,
         Contacti18n,
         AreYouAbsolutelySurei18n,
@@ -106,7 +107,7 @@ function ManageStore() {
     const [page, setPage] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = Math.ceil(filteredStoreBranches.length / pageSize);
-     // Get current items
+    // Get current items
     const indexOfLastItem = page * pageSize;
     const indexOfFirstItem = indexOfLastItem - pageSize;
     const currentItems = filteredStoreBranches.slice(indexOfFirstItem, indexOfLastItem);
@@ -131,6 +132,8 @@ function ManageStore() {
                         ? globalCompanyState
                         : userData?.companyId;
 
+
+
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_URL}/branch/getbranches/cId/${companyId}`,
                     {
@@ -139,6 +142,7 @@ function ManageStore() {
                         },
                     }
                 );
+                console.log('Fetched Store Data:', response)
                 setFilteredStoreBranches(response.data);
                 return response.data;
             }
@@ -302,14 +306,14 @@ function ManageStore() {
                         <h1 className="text-2xl font-semibold">
                             {BranchListi18n[locale]}
                         </h1>
-                        
+
                     </div>
-                    
+
                     <div className="flex w-auto self-start justify-end gap-3">
-                        
+
                         <Dialog
                             open={isOpenDial}
-                            onOpenChange={(open) => {setIsOpenDial(open), form.reset(), setEditStoreIndex(null); setEditStoreId(null);} }
+                            onOpenChange={(open) => { setIsOpenDial(open), form.reset(), setEditStoreIndex(null); setEditStoreId(null); }}
                         >
                             <DialogTrigger
                                 onClick={() => {
@@ -348,28 +352,47 @@ function ManageStore() {
                                                                 <div className="flex w-full items-center justify-between">
                                                                     <FormLabel className="text-lg">
                                                                         {
-                                                                            CompanyIdi8n[
-                                                                                locale
+                                                                            Companyi8n[
+                                                                            locale
                                                                             ]
                                                                         }
                                                                     </FormLabel>
-                                                                    <FormControl className="w-[60%]">
-                                                                        <Input
-                                                                            {...field}
-                                                                            type="number"
-                                                                            disabled={
-                                                                                userData?.companyId !==
-                                                                                null
-                                                                            }
-                                                                            placeholder={
-                                                                                AddCompanyIdi8n[
-                                                                                    locale
-                                                                                ]
-                                                                            }
-                                                                        />
-                                                                    </FormControl>
+            <FormControl className="w-[60%]">
+            <select className="w-full px-4 py-2 border rounded-md"
+                value={field.value || ""}  // Ensure this is set to the selected BranchId
+                            onChange={(e) => {
+                                const selectedName = e.target.value;  // Get the selected store name
+                                const selectedStore = storeQuery.data?.find((store) => store.Name === selectedName);
+
+                                if (selectedStore) {
+                                    console.log("Selected Store Name:", selectedStore.Name);
+                                    console.log("Mapped Company ID:", selectedStore.CompanyId);
+                                    console.log("Mapped Branch ID:", selectedStore.BranchId);
+
+                                    // Here we submit the CompanyId (based on the selected store), not the store name
+                                    field.onChange(selectedStore.CompanyId); // Submit CompanyId
+                                }
+                            }}
+                        >
+                            {/* Placeholder option that updates dynamically */}
+                            <option value="" disabled>
+                                {
+                                    // Find the store name by BranchId from field.value
+                                    storeQuery.data?.find((store) => store.BranchId === field.value)?.Name ||
+                                    AddCompanyIdi8n[locale]  // Fallback value when no store is selected
+                                }
+                            </option>
+
+                            {/* Map fetched store names */}
+                            {storeQuery.data?.map((store: StoreBranches) => (
+                                <option key={`${store.CompanyId}-${store.BranchId}`} value={store.Name}>
+                                    {store.Name}
+                                </option>
+                            ))}
+                        </select>
+                    </FormControl>
                                                                 </div>
-                                                                <FormMessage className="text-xs w-full text-end"  />
+                                                                <FormMessage className="text-xs w-full text-end" />
                                                             </FormItem>
                                                         )}
                                                     />
@@ -383,7 +406,7 @@ function ManageStore() {
                                                             <FormLabel className="text-lg">
                                                                 {
                                                                     StoreNamei8n[
-                                                                        locale
+                                                                    locale
                                                                     ]
                                                                 }
                                                             </FormLabel>
@@ -391,14 +414,14 @@ function ManageStore() {
                                                                 <Input
                                                                     placeholder={
                                                                         AddStoreNamei8n[
-                                                                            locale
+                                                                        locale
                                                                         ]
                                                                     }
                                                                     {...field}
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage className="text-xs w-full text-end"  />
+                                                        <FormMessage className="text-xs w-full text-end" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -411,7 +434,7 @@ function ManageStore() {
                                                             <FormLabel className="text-lg">
                                                                 {
                                                                     Addressi8n[
-                                                                        locale
+                                                                    locale
                                                                     ]
                                                                 }
                                                             </FormLabel>
@@ -419,14 +442,14 @@ function ManageStore() {
                                                                 <Input
                                                                     placeholder={
                                                                         AddAddressi8n[
-                                                                            locale
+                                                                        locale
                                                                         ]
                                                                     }
                                                                     {...field}
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage className="text-xs w-full text-end"  />
+                                                        <FormMessage className="text-xs w-full text-end" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -439,7 +462,7 @@ function ManageStore() {
                                                             <FormLabel className="text-lg">
                                                                 {
                                                                     ContactNumberi8n[
-                                                                        locale
+                                                                    locale
                                                                     ]
                                                                 }
                                                             </FormLabel>
@@ -448,14 +471,14 @@ function ManageStore() {
                                                                     type="number"
                                                                     placeholder={
                                                                         AddContactNumberi8n[
-                                                                            locale
+                                                                        locale
                                                                         ]
                                                                     }
                                                                     {...field}
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage className="text-xs w-full text-end"  />
+                                                        <FormMessage className="text-xs w-full text-end" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -468,7 +491,7 @@ function ManageStore() {
                                                             <FormLabel className="text-lg">
                                                                 {
                                                                     ContactPersoni8n[
-                                                                        locale
+                                                                    locale
                                                                     ]
                                                                 }
                                                             </FormLabel>
@@ -476,14 +499,14 @@ function ManageStore() {
                                                                 <Input
                                                                     placeholder={
                                                                         AddContactPersoni8n[
-                                                                            locale
+                                                                        locale
                                                                         ]
                                                                     }
                                                                     {...field}
                                                                 />
                                                             </FormControl>
                                                         </div>
-                                                        <FormMessage className="text-xs w-full text-end"  />
+                                                        <FormMessage className="text-xs w-full text-end" />
                                                     </FormItem>
                                                 )}
                                             />
@@ -495,7 +518,7 @@ function ManageStore() {
                                                         <div className="flex w-full items-center justify-between">
                                                             <FormLabel className="text-lg">
                                                                 {
-                                                                   TINNumber[locale]
+                                                                    TINNumber[locale]
                                                                 }
                                                             </FormLabel>
                                                             <FormControl className="w-[60%]">
@@ -533,8 +556,8 @@ function ManageStore() {
                                                                                 .target
                                                                                 .files
                                                                                 ? e
-                                                                                      .target
-                                                                                      .files[0]
+                                                                                    .target
+                                                                                    .files[0]
                                                                                 : null
                                                                         );
                                                                     }}
@@ -560,7 +583,7 @@ function ManageStore() {
                         </Dialog>
                     </div>
 
-                    
+
                     <AlertDialog
                         open={isOpenDelDial}
                         onOpenChange={setIsOpenDelDial}
@@ -622,8 +645,8 @@ function ManageStore() {
                         >
                             Next
                         </Button> */}
-                            {filteredStoreBranches.length > 0 && (
-                                <div className="flex items-center justify-center gap-2">
+                        {filteredStoreBranches.length > 0 && (
+                            <div className="flex items-center justify-center gap-2">
                                 <Button
                                     variant="outline"
                                     onClick={() => goToPage(page - 1)}
@@ -635,14 +658,14 @@ function ManageStore() {
                                 {/* Page Numbers */}
                                 <div className="flex gap-2">
                                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((singlePage) => (
-                                    <Button
-                                        key={singlePage}
-                                        variant={singlePage === page ? "default" : "outline"}
-                                        onClick={() => goToPage(singlePage)}
-                                        className={`min-w-8 `}
-                                    >
-                                        {singlePage}
-                                    </Button>
+                                        <Button
+                                            key={singlePage}
+                                            variant={singlePage === page ? "default" : "outline"}
+                                            onClick={() => goToPage(singlePage)}
+                                            className={`min-w-8 `}
+                                        >
+                                            {singlePage}
+                                        </Button>
                                     ))}
                                 </div>
 
@@ -653,8 +676,8 @@ function ManageStore() {
                                 >
                                     Next
                                 </Button>
-                                </div>
-                            )}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="my flex flex-1 flex-col items-center">
@@ -691,7 +714,7 @@ function ManageStore() {
                                                     <p className="text-sm font-medium text-gray-500">
                                                         {
                                                             ContactPersoni8n[
-                                                                locale
+                                                            locale
                                                             ]
                                                         }
                                                         : {item.ContactPerson}
@@ -718,7 +741,7 @@ function ManageStore() {
                                                         setEditStoreIndex(
                                                             index
                                                         );
-                                                        setEditStoreId( item.BranchId )
+                                                        setEditStoreId(item.BranchId)
                                                     }}
                                                 >
                                                     {Editi18n[locale]}
