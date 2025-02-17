@@ -255,34 +255,32 @@ function ManageStore() {
         }
     }
     useEffect(() => {
-        if (editStoreIndex !== null || editStoreId !== null) {
-            const companyID = filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.CompanyId;
-            console.log(filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId))
-            setTimeout(() => {
-                form.setValue("companyId", companyID || 0);
-                form.setValue(
-                    "contact",
-                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.Contact}`
-                );
-                form.setValue(
-                    "contactPerson",
-                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.ContactPerson}`
-                );
-                form.setValue(
-                    "fullAddress",
-                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.Address}`
-                );
-                form.setValue(
-                    "branchName",
-                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.Name}`
-                );
-                form.setValue(
-                    'tinNumber',
-                    `${filteredStoreBranches.find((store: StoreBranches) => store.BranchId == editStoreId)?.TIN}`
-                )
-            });
+        // This effect runs whenever the modal opens (isOpenDial) and when the store is being edited (editStoreIndex or editStoreId)
+        if (isOpenDial) {
+            // If you're editing an existing store, fetch the companyId from the store
+            if (editStoreId !== null) {
+                const store = filteredStoreBranches.find((store: StoreBranches) => store.BranchId === editStoreId);
+                const companyID = store?.CompanyId;
+
+                // Prefill the companyId from globalCompanyState or the store's companyId if editing
+                const companyIdToUse = globalCompanyState !== "all" ? globalCompanyState : companyID;
+
+                // Set the form's companyId value
+                form.setValue("companyId", companyIdToUse || userData?.companyId || 0);
+
+                // Prefill other form fields based on the selected store
+                form.setValue("contact", store?.Contact ? String(store.Contact) : ""); // Ensure contact is a string
+                form.setValue("contactPerson", store?.ContactPerson || "");
+                form.setValue("fullAddress", store?.Address || "");
+                form.setValue("branchName", store?.Name || "");
+                form.setValue("tinNumber", store?.TIN || "");
+            } else {
+                // If no store is being edited, just set the companyId based on the global state or user data
+                form.setValue("companyId", globalCompanyState !== "all" ? globalCompanyState : userData?.companyId || 0);
+            }
         }
-    }, [form.setValue, isOpenDial]);
+    }, [isOpenDial, editStoreId, filteredStoreBranches, globalCompanyState, userData?.companyId, form]);
+
 
     function searchHandler(e: any) {
         setFilteredStoreBranches(() => {
@@ -357,6 +355,7 @@ function ManageStore() {
                                                                             ]
                                                                         }
                                                                     </FormLabel>
+
             <FormControl className="w-[60%]">
             <select className="w-full px-4 py-2 border rounded-md"
                 value={field.value || ""}  // Ensure this is set to the selected BranchId
@@ -626,6 +625,7 @@ function ManageStore() {
                         }
                     />
                     <div className="flex gap-2">
+
                         {/* <Button
                             onClick={() => {
                                 setIsOpenDial(true);
@@ -656,7 +656,7 @@ function ManageStore() {
                                 </Button>
 
                                 {/* Page Numbers */}
-                                <div className="flex gap-2">
+                                {/* <div className="flex gap-2">
                                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((singlePage) => (
                                         <Button
                                             key={singlePage}
@@ -667,7 +667,33 @@ function ManageStore() {
                                             {singlePage}
                                         </Button>
                                     ))}
+                                </div> */}
+
+                                 {/* Page Numbers */}
+                                <div className="flex gap-2">
+                                    {(() => {
+                                        const totalPagesToShow = 3; // Number of page buttons to show
+                                        let startPage = Math.max(1, page - Math.floor(totalPagesToShow / 2));
+                                        let endPage = Math.min(totalPages, startPage + totalPagesToShow - 1);
+
+                                        // Adjust startPage if endPage is at the limit
+                                        if (endPage - startPage + 1 < totalPagesToShow) {
+                                            startPage = Math.max(1, endPage - totalPagesToShow + 1);
+                                        }
+
+                                        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((singlePage) => (
+                                            <Button
+                                                key={singlePage}
+                                                variant={singlePage === page ? "default" : "outline"}
+                                                onClick={() => goToPage(singlePage)}
+                                                className={`min-w-8`}
+                                            >
+                                                {singlePage}
+                                            </Button>
+                                        ));
+                                    })()}
                                 </div>
+
 
                                 <Button
                                     variant="outline"

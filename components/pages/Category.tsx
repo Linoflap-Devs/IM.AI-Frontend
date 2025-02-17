@@ -67,7 +67,7 @@ export default function Category() {
         DeleteCategoryDeleteMsg,
         Canceli18n,
         CompanyIdi8n,
-        ConfirmDeleteMessage,
+        ConfirmDeleteMessageCategory,
         ConfirmDeletion
     } = useI18nStore();
 
@@ -76,7 +76,7 @@ export default function Category() {
     const [open, setOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedEditId, setSelectedEditId] = useState(0)
-    const [selectedRecord, setSelectedRecord] = useState<{id: number, categoryName: string, companyId: number}>({id: 0, categoryName: "", companyId: 0});
+    const [selectedRecord, setSelectedRecord] = useState<{ id: number, categoryName: string, companyId: number }>({ id: 0, categoryName: "", companyId: 0 });
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     const getCategoriesQuery = useQuery({
@@ -85,7 +85,7 @@ export default function Category() {
         queryFn: async () => {
 
             const isAdmin = userData.role === 1;
-            
+
             const adminQuery = await axios.get(
                 `${process.env.NEXT_PUBLIC_API_URL}/product/getCategoriesAll`,
                 {
@@ -105,21 +105,21 @@ export default function Category() {
                     },
                 }
             );
-            
+
             const response = isAdmin ? adminQuery : companyQuery;
 
             console.log(`${process.env.NEXT_PUBLIC_API_URL}/product/getCategories`, globalCompanyState !== "all" ? globalCompanyState : userData?.companyId)
 
             return response.data;
         },
-    });    
+    });
 
     const formSchema = z.object({
-        categoryName: z.string().min(1 , { message: "Category Name is required" }),
+        categoryName: z.string().min(1, { message: "Category Name is required" }),
         companyId: z.coerce.number().min(1, { message: "Company is required" }),
     })
 
-    const form = useForm<z.infer <typeof formSchema>>({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         values: {
             categoryName: selectedRecord.categoryName || "",
@@ -232,7 +232,7 @@ export default function Category() {
     function handleOpen() {
         setOpen(!open);
         form.reset();
-        setSelectedRecord({} as {id: number, categoryName: string, companyId: number});
+        setSelectedRecord({} as { id: number, categoryName: string, companyId: number });
     }
 
     function onSubmit(data: z.infer<typeof formSchema>) {
@@ -265,11 +265,11 @@ export default function Category() {
         },
         {
             id: "actions",
-            header: ({column}: any) => {
+            header: ({ column }: any) => {
                 return (
-                  <p className="text-center">{Actioni18n[locale]}</p>
+                    <p className="text-center">{Actioni18n[locale]}</p>
                 )
-              },
+            },
             cell: ({ row }) => {
                 return (
                     <div className="flex gap-4 justify-center">
@@ -277,8 +277,8 @@ export default function Category() {
                             variant={"outline"}
                             onClick={() => {
                                 console.log(row)
-                                setSelectedRecord({id: row.original.CategoryId, categoryName: row.original.Name, companyId: row.original.CompanyId});
-                                
+                                setSelectedRecord({ id: row.original.CategoryId, categoryName: row.original.Name, companyId: row.original.CompanyId });
+
                                 setIsEditMode(true);
                                 setOpen(true);
                             }}
@@ -290,7 +290,7 @@ export default function Category() {
                             variant="destructive"
                             onClick={() => {
                                 console.log(row)
-                                setSelectedRecord({id: row.original.CategoryId, categoryName: row.original.Name, companyId: row.original.CompanyId});
+                                setSelectedRecord({ id: row.original.CategoryId, categoryName: row.original.Name, companyId: row.original.CompanyId });
                                 setDeleteOpen(true);
                             }}
                             className="h-max px-4"
@@ -339,7 +339,7 @@ export default function Category() {
                                 )}
                             />
                             <FormField
-                            
+
                                 control={form.control}
                                 name="companyId"
                                 render={({ field }) => (
@@ -363,19 +363,14 @@ export default function Category() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {ConfirmDeletion[locale] }
+                            {ConfirmDeletion[locale]}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {ConfirmDeleteMessage[locale]}
+                            {ConfirmDeleteMessageCategory[locale](selectedRecord?.categoryName || "this record")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <Button
-                            variant={"secondary"}
-                            onClick={() => {
-                                setDeleteOpen(false);
-                            }}
-                        >
+                        <Button variant={"secondary"} onClick={() => setDeleteOpen(false)}>
                             {Canceli18n[locale]}
                         </Button>
                         <Button
@@ -403,7 +398,7 @@ export default function Category() {
                         }}
                     >
                         {AddCategory[locale]}
-                    </Button>   
+                    </Button>
                 </div>
                 <div>
                     <DataTable

@@ -112,7 +112,7 @@ function Promo() {
             products: undefined
         },
     });
-    
+
     /* Queries */
     //Axios Configuration
     axios.defaults.headers.common[
@@ -282,8 +282,8 @@ function Promo() {
             expiry: new Date(row.original.EndDate),
             // start: undefined,
             // expiry: undefined,
-            products: promoDetailsQuery.data?.map((product: any) => {return { label: product.Name, value: product.ProductId}}) ?? []
-        }   
+            products: promoDetailsQuery.data?.map((product: any) => { return { label: product.Name, value: product.ProductId } }) ?? []
+        }
         setSelectedPromoDetail(details)
         console.log(details)
         addPromoForm.reset(details)
@@ -316,7 +316,7 @@ function Promo() {
                 ...prev,
                 products: labelValue, // Use the queried products
             }));
-            
+
             addPromoForm.setValue("products", labelValue); // Update form directly
         }
     }, [promoDetailsQuery.data, isEditMode]);
@@ -383,10 +383,10 @@ function Promo() {
                     if (hasStarted) return 1 // Active
                     return 3                 // Inactive
                 }
-    
+
                 const statusA = getStatus(rowA)
                 const statusB = getStatus(rowB)
-                
+
                 return statusA - statusB
             }
         },
@@ -442,7 +442,7 @@ function Promo() {
                 );
             },
             cell: ({ row }) => {
-                
+
                 const isExpired = new Date() > new Date(row.getValue("EndDate"));
 
                 return (
@@ -502,17 +502,17 @@ function Promo() {
         { accessorKey: "Name", header: ProdNamei18n[locale] },
     ];
     function onSubmit(values: z.infer<typeof addPromoFormSchema>) {
-        if(isEditMode){
+        if (isEditMode) {
             editPromoMutation.mutate(values)
         }
         else {
             promoMutation.mutate(values);
         }
     }
-    
+
     return (
         <div className="mx-3 mb-3 flex flex-1 gap-3">
-            
+
             <Card className="flex flex-1 flex-col gap-3 p-3">
                 <div className="flex items-center justify-between pb-2">
                     <h1 className="text-2xl font-semibold">
@@ -526,14 +526,14 @@ function Promo() {
                             >
                                 <DialogTrigger
                                     onClick={() => {
-                                        setIsEditMode(false) 
+                                        setIsEditMode(false)
                                         addPromoForm.reset({
                                             name: "",
                                             discount: "",
                                             start: undefined,
                                             expiry: undefined,
                                             products: []
-                                        }) 
+                                        })
                                     }}
                                     className="rounded-lg bg-primary px-2 py-2 font-medium text-white"
                                 >
@@ -542,7 +542,7 @@ function Promo() {
                                 <DialogContent>
                                     <DialogHeader className="gap-5">
                                         <DialogTitle className="text-2xl">
-                                            { isEditMode ? "Edit Promo" : AddPromoi18n[locale]}
+                                            {isEditMode ? "Edit Promo" : AddPromoi18n[locale]}
                                         </DialogTitle>
                                         <div className="mt-5">
                                             <Form {...addPromoForm}>
@@ -562,7 +562,7 @@ function Promo() {
                                                                 <FormLabel className="text-lg">
                                                                     {
                                                                         PromoNamei18n[
-                                                                            locale
+                                                                        locale
                                                                         ]
                                                                     }
                                                                 </FormLabel>
@@ -603,7 +603,7 @@ function Promo() {
                                                                                 productQuery.data ||
                                                                                 []
                                                                             }
-                                                                            placeholder= {SelectProductsIncludedToThePromoi18n[locale]}
+                                                                            placeholder={SelectProductsIncludedToThePromoi18n[locale]}
                                                                             emptyIndicator={
                                                                                 <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                                     Products
@@ -694,7 +694,7 @@ function Promo() {
                                                                 <FormLabel className="text-lg">
                                                                     {
                                                                         Discounti18n[
-                                                                            locale
+                                                                        locale
                                                                         ]
                                                                     }
                                                                 </FormLabel>
@@ -703,7 +703,7 @@ function Promo() {
                                                                         <Input
                                                                             placeholder={
                                                                                 EnterPercDisci18n[
-                                                                                    locale
+                                                                                locale
                                                                                 ]
                                                                             }
                                                                             min={
@@ -810,7 +810,7 @@ function Promo() {
                                                                 <FormLabel className="text-lg">
                                                                     {
                                                                         Expiryi18n[
-                                                                            locale
+                                                                        locale
                                                                         ]
                                                                     }
                                                                 </FormLabel>
@@ -881,9 +881,9 @@ function Promo() {
                                                     />
 
                                                     <div className="flex justify-end gap-3 pt-3">
-                                                        
+
                                                         <Button type="submit">
-                                                            { isEditMode ? "Update" : Submiti18n[locale]}
+                                                            {isEditMode ? "Update" : Submiti18n[locale]}
                                                         </Button>
                                                     </div>
                                                 </form>

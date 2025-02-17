@@ -164,8 +164,8 @@ function CustomerList() {
             cell: ({ row }) => {
                 const date: Date = new Date(
                     (row.getValue("CreatedAt") as string)
-                        /* .replace("T", " ")
-                        .replace("Z", "") */
+                    /* .replace("T", " ")
+                    .replace("Z", "") */
                 );
                 return (
                     <div className="px-[1rem]">
@@ -187,7 +187,7 @@ function CustomerList() {
     return (
         <div className="flex h-full flex-1 flex-col gap-3 px-3">
             {/* Add User */}
-            <AlertDialog open={openAddGuest} onOpenChange={(open) => {setOpenAddGuest(open); form.reset(); form.clearErrors(); setError(null)}}>
+            <AlertDialog open={openAddGuest} onOpenChange={(open) => { setOpenAddGuest(open); form.reset(); form.clearErrors(); setError(null) }}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
@@ -257,9 +257,11 @@ function CustomerList() {
                     <h1 className="text-2xl font-semibold">{Customersi18n[locale]}</h1>
                     <div className="flex flex-grow-0 gap-4">
                         <Button className="bg-green-500">{Downloadi18n[locale]}</Button>
-                        <Button onClick={() => setOpenAddGuest(true)}>
-                            {AddGuesti18n[locale]}
-                        </Button>
+                        {userData?.role > 2 && (
+                            <Button onClick={() => setOpenAddGuest(true)}>
+                                {AddGuesti18n[locale]}
+                            </Button>
+                        )}
                     </div>
                 </div>
                 <DataTable

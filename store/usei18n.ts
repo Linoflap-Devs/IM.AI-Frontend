@@ -410,7 +410,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "すぐに補充する",
   },
   RequestTransferi18n: {
-    en: "Request Stock Transfer",
+    en: "Request Transfer",
     ja: "転送依頼",
   },
   DateIssuedi18n: {
@@ -866,6 +866,13 @@ export const useI18nStore = create<I18nStore>((set) => ({
   ConfirmDeleteMessage: {
     en: "This action cannot be undone and will permanently delete this record from our servers.",
     ja: "このアクションは元に戻せません。このレコードをサーバーから削除します。",
+
+  },
+  ConfirmDeleteMessageCategory: {
+    en: (category: string) =>
+      `Are you sure you want to delete this record? [${category}]`,
+    ja: (category: string) =>
+      `このレコードを削除してもよろしいですか？ [${category}]`,
   },
 
   Request: {
@@ -1142,5 +1149,9 @@ export interface I18nStore {
   SupplierContactInfo: LocalizedString;
   ConfirmDeletion: LocalizedString;
   ConfirmDeleteMessage: LocalizedString;
+  ConfirmDeleteMessageCategory: {
+    en: (category: string) => string;
+    ja: (category: string) => string;
+  };
   Request: LocalizedString;
 }
