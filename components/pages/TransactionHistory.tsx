@@ -72,7 +72,7 @@ function TransactionHistory() {
         Itemsi18n,
         Datei18n,
         PleaseSelectACompanyOrABranchi18n,
-        RetailPrice, 
+        RetailPrice,
         PurchasePrice,
         CurrencyMarker,
         Quantityi18n
@@ -110,7 +110,7 @@ function TransactionHistory() {
                 description: SuccesfullyPermittedCartContentTransferi18n[locale],
             });
         },
-    }); 
+    });
     const transactionQuery: UseQueryResult<TransactionTableData[]> = useQuery({
         queryKey: [`transaction`, format(new Date(date?.from!), 'yyyy-MM-dd'), format(new Date(date?.to!), 'yyyy-MM-dd')],
         enabled: session.data?.token !== undefined,
@@ -148,17 +148,17 @@ function TransactionHistory() {
                 return response.data;
             }
         }
-    }) 
+    })
     const columns: ColumnDef<TransactionTableData>[] = [
-        { 
-            accessorKey: "ReferenceNumber", 
+        {
+            accessorKey: "ReferenceNumber",
             header: ReferenceNumberi18n[locale],
             cell: ({ row }) => {
                 return (
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button 
+                                <Button
                                     variant={"link"}
                                     className=" decoration-black m-0 p-0"
                                     onClick={() => {
@@ -169,7 +169,7 @@ function TransactionHistory() {
                                             Price: row.getValue("Price")
                                         })
                                         setOpen(true)
-                                    }}    
+                                    }}
                                 >
                                     <div className="flex justify-start items-center text-black">
                                         <span className="">{row.getValue("ReferenceNumber")}</span>
@@ -206,24 +206,34 @@ function TransactionHistory() {
                 );
             },
             cell: ({ row }) => {
-                const date: Date = new Date(
-                    (row.getValue("CreatedAt") as string)
-                        .replace("T", " ")
-                        .replace("Z", "")
-                );
-                return (
-                    <div className="text-center">
-                        {date.toLocaleDateString(locale, {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "numeric",
-                            hour12: true,
-                        })}
-                    </div>
-                );
+                const dateVal = row.getValue("CreatedAt");
+                if (dateVal !== null) {
+                    const date: Date = new Date(
+                        (row.getValue("CreatedAt") as string)
+                            .replace("T", " ")
+                            .replace("Z", "")
+                    );
+                    const formattedDate = date.toLocaleDateString(locale, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                    });
+                    const formattedTime = date.toLocaleTimeString(locale, {
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                    });
+
+                    return (
+                        <div className="text-center">
+                            {formattedDate} | {formattedTime}
+                        </div>
+                    );
+                } else {
+                    return null;
+                }
             },
+
         },
         {
             accessorKey: "PushCartId",
@@ -280,9 +290,8 @@ function TransactionHistory() {
                 };
                 return (
                     <div
-                        className={`text-center text-md font-semibold ${
-                            statusObject[status as keyof typeof statusObject]
-                        }`}
+                        className={`text-center text-md font-semibold ${statusObject[status as keyof typeof statusObject]
+                            }`}
                     >
                         {status}
                     </div>
@@ -301,10 +310,10 @@ function TransactionHistory() {
                             className="h-max px-3 py-1"
                             disabled={
                                 row.getValue("TransactionStatus") ===
-                                    "Success" ||
+                                "Success" ||
                                 row.getValue("TransferableTransaction") == true
                             }
-                            onClick={() => {                               
+                            onClick={() => {
                                 setTransferableId(
                                     row.getValue("TransactionId")
                                 );
@@ -329,14 +338,14 @@ function TransactionHistory() {
     const transactionDetailColumns: ColumnDef<any>[] = [
         {
             accessorKey: "Name",
-            header: "Name"
+            header: "Product Name"
         },
         {
             accessorKey: "Price",
             header: () => {
                 return (
                     <div className="text-end">
-                       {RetailPrice[locale]} 
+                        {RetailPrice[locale]}
                     </div>
                 );
             },
@@ -354,7 +363,7 @@ function TransactionHistory() {
             header: () => {
                 return (
                     <div className="text-end">
-                       {Quantityi18n[locale]} 
+                        {Quantityi18n[locale]}
                     </div>
                 );
             },
@@ -379,7 +388,7 @@ function TransactionHistory() {
     const handleDateChange = (val: DateRange | undefined) => {
         setDate(val);
         setFromReportDate(val?.from || new Date());
-        setToReportDate(val?.to || new Date());    
+        setToReportDate(val?.to || new Date());
     }
 
     return (
@@ -471,7 +480,7 @@ function TransactionHistory() {
                 </div>
                 <DataTable
                     filtering={true}
-                    columnsToSearch={["ReferenceNumber"]}
+                    columnsToSearch={["ReferenceNumber", "PushCartId"]}
                     resetSortBtn={true}
                     pageSize={11}
                     data={transactionQuery.data ?? []}
@@ -491,7 +500,7 @@ function TransactionHistory() {
                             Transaction Details
                         </h1>
                     </SheetHeader>
-                    
+
                     <div className="flex w-full flex-col gap-3 py-5">
                         {
                             selectedTransactionParent && (
@@ -519,7 +528,7 @@ function TransactionHistory() {
                             pageSize={10}
                             filtering={true}
                             isLoading={getTransactionQuery.isLoading}
-                            columnsToSearch={["Name"]}
+                            columnsToSearch={["Name", "PushCartId"]}
                         />
                     </div>
                 </SheetContent>

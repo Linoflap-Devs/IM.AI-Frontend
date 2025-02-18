@@ -39,7 +39,7 @@ function Header() {
         },
     ];
     function headerType() {
-        
+
         const pathMap = {
             dashboard: { en: "Dashboard", ja: "ダッシュボード" },
             inventory: { en: "Inventory", ja: "在庫" },
@@ -49,26 +49,26 @@ function Header() {
             managestore: { en: "Branches", ja: "店舗管理" },
             manageuser: { en: "Manage User", ja: "ユーザー管理" },
             customerlist: { en: "Customers", ja: "クライアントリスト" },
-            promo: { en: "Promo", ja: "プロモーション" },
+            promo: { en: "Promos", ja: "プロモーション" },
             products: { en: "Products", ja: "製品" },
             transferorder: { en: "Transfer Stock", ja: "在庫転送" },
             category: { en: "Category", ja: "カテゴリー" },
             report: { en: "Report", ja: "レポート" },
             transactionhistory: { en: "Transaction History", ja: "取引履歴" },
             unusualtransaction: { en: "Unusual Transaction", ja: "異常取引" },
-            deliveries: {en: "Deliveries", ja: "配達"},
-            batches: {en: "Batches", ja: "バッチ"},
+            deliveries: { en: "Deliveries", ja: "配達" },
+            batches: { en: "Batches", ja: "バッチ" },
             /* Children */
-            
+
         };
         const title =
             pathMap[
-                Object.keys(pathMap).find((key) => {
-                    let slug = currentPath.slice(currentPath.lastIndexOf("/") + 1);
-                    
-                    return slug.includes(key)
-                }
-                ) as keyof typeof pathMap
+            Object.keys(pathMap).find((key) => {
+                let slug = currentPath.slice(currentPath.lastIndexOf("/") + 1);
+
+                return slug.includes(key)
+            }
+            ) as keyof typeof pathMap
             ];
         return title ? (
             <div className="text-xl font-semibold">{title[locale]}</div>
