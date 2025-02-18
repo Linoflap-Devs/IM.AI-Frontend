@@ -62,7 +62,7 @@ function Reports() {
     axios.defaults.headers.common[
         "Authorization"
     ] = `Bearer ${session.data?.token}`;
-    
+
     const {
         locale,
         localeExtended,
@@ -82,7 +82,7 @@ function Reports() {
         Itemsi18n,
         Datei18n,
         PleaseSelectACompanyOrABranchi18n,
-        RetailPrice, 
+        RetailPrice,
         PurchasePrice,
         CurrencyMarker,
         Quantityi18n
@@ -139,21 +139,21 @@ function Reports() {
                 return response.data[0]
                     ? response.data[0]
                     : [
-                          {
-                              January: 0,
-                              February: 0,
-                              March: 0,
-                              April: 0,
-                              May: 0,
-                              June: 0,
-                              July: 0,
-                              August: 0,
-                              September: 0,
-                              October: 0,
-                              November: 0,
-                              December: 0,
-                          },
-                      ];
+                        {
+                            January: 0,
+                            February: 0,
+                            March: 0,
+                            April: 0,
+                            May: 0,
+                            June: 0,
+                            July: 0,
+                            August: 0,
+                            September: 0,
+                            October: 0,
+                            November: 0,
+                            December: 0,
+                        },
+                    ];
             }
         },
     });
@@ -178,21 +178,21 @@ function Reports() {
                 return response.data[0]
                     ? response.data[0]
                     : [
-                          {
-                              January: 0,
-                              February: 0,
-                              March: 0,
-                              April: 0,
-                              May: 0,
-                              June: 0,
-                              July: 0,
-                              August: 0,
-                              September: 0,
-                              October: 0,
-                              November: 0,
-                              December: 0,
-                          },
-                      ];
+                        {
+                            January: 0,
+                            February: 0,
+                            March: 0,
+                            April: 0,
+                            May: 0,
+                            June: 0,
+                            July: 0,
+                            August: 0,
+                            September: 0,
+                            October: 0,
+                            November: 0,
+                            December: 0,
+                        },
+                    ];
             }
         },
     });
@@ -208,7 +208,7 @@ function Reports() {
                 return response.data;
             }
         }
-    }) 
+    })
 
     const options: ChartOptions<"line"> = {
         responsive: true as boolean,
@@ -250,7 +250,7 @@ function Reports() {
                     <TooltipProvider>
                         <Tooltip1>
                             <TooltipTrigger asChild>
-                                <Button 
+                                <Button
                                     variant={"link"}
                                     className=" decoration-black m-0 p-0"
                                     onClick={() => {
@@ -261,7 +261,7 @@ function Reports() {
                                             Price: row.getValue("Price")
                                         })
                                         setOpen(true)
-                                    }}    
+                                    }}
                                 >
                                     <div className="flex justify-start items-center text-black">
                                         <span className="">{row.getValue("ReferenceNumber")}</span>
@@ -359,16 +359,20 @@ function Reports() {
                             .replace("T", " ")
                             .replace("Z", "")
                     );
+                    const formattedDate = date.toLocaleDateString(locale, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                    });
+                    const formattedTime = date.toLocaleTimeString(locale, {
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                    });
+
                     return (
                         <div className="text-center">
-                            {date.toLocaleDateString(locale, {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: true,
-                            })}
+                            {formattedDate} | {formattedTime}
                         </div>
                     );
                 } else {
@@ -389,7 +393,7 @@ function Reports() {
             header: () => {
                 return (
                     <div className="text-end">
-                       {RetailPrice[locale]} 
+                        {RetailPrice[locale]}
                     </div>
                 );
             },
@@ -407,7 +411,7 @@ function Reports() {
             header: () => {
                 return (
                     <div className="text-end">
-                       {Quantityi18n[locale]} 
+                        {Quantityi18n[locale]}
                     </div>
                 );
             },
@@ -454,7 +458,7 @@ function Reports() {
     const handleDateChange = (val: DateRange | undefined) => {
         setDate(val);
         setFromReportDate(val?.from || new Date());
-        setToReportDate(val?.to || new Date());    
+        setToReportDate(val?.to || new Date());
     }
 
     return (
@@ -462,7 +466,7 @@ function Reports() {
             <Card className="flex flex-1 flex-col gap-3 p-3">
                 <Card className="p-4">
                     {globalBranchState === "all" &&
-                    globalCompanyState === "all" ? (
+                        globalCompanyState === "all" ? (
                         <div className="flex h-[284px] w-[1466px] items-center justify-center">
                             <h1 className="text-center text-2xl font-bold">
                                 {PleaseSelectACompanyOrABranchi18n[locale]}
@@ -546,7 +550,7 @@ function Reports() {
                             Transaction Details
                         </h1>
                     </SheetHeader>
-                    
+
                     <div className="flex w-full flex-col gap-3 py-5">
                         {
                             selectedTransactionParent && (
@@ -566,7 +570,9 @@ function Reports() {
                                 </div>
                             )
                         }
-                        <p className="font-semibold">Items</p>
+                        <div className="flex flex-row justify-between items-center">
+                            <p className="font-semibold">Items: {getTransactionQuery.data ? getTransactionQuery.data.length : 0}</p>
+                        </div>
                         <DataTable
                             columns={transactionDetailColumns}
                             pagination={true}
@@ -579,6 +585,7 @@ function Reports() {
                     </div>
                 </SheetContent>
             </Sheet>
+
         </div>
     );
 }

@@ -12,6 +12,13 @@ import {
     FormMessage
 } from "../ui/form";
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -144,6 +151,23 @@ function ManageStore() {
             }
         },
     });
+    const companiesQuery = useQuery({
+        queryKey: ["getCompanies"],
+        enabled: session.status === "authenticated" && userData?.role <= 2,
+        queryFn: async () => {
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL}/company/getCompanyOptions`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${session.data?.token}`
+                    }
+                }
+            );
+            console.log("Companies Data:", response.data);
+            return response.data;
+        }
+    });
+
     const addStore = useMutation({
         mutationKey: ["addstore"],
         mutationFn: async (newStore: any) => {
@@ -341,35 +365,53 @@ function ManageStore() {
                                                     <FormField
                                                         control={form.control}
                                                         name="companyId"
-                                                        render={({ field }) => (
-                                                            <FormItem className="flex flex-col items-center">
-                                                                <div className="flex w-full items-center justify-between">
-                                                                    <FormLabel className="text-lg">
-                                                                        {
-                                                                            CompanyIdi8n[
-                                                                            locale
-                                                                            ]
-                                                                        }
-                                                                    </FormLabel>
-                                                                    <FormControl className="w-[60%]">
-                                                                        <Input
-                                                                            {...field}
-                                                                            type="number"
-                                                                            disabled={
-                                                                                userData?.companyId !==
-                                                                                null
-                                                                            }
-                                                                            placeholder={
-                                                                                AddCompanyIdi8n[
-                                                                                locale
-                                                                                ]
-                                                                            }
-                                                                        />
-                                                                    </FormControl>
-                                                                </div>
-                                                                <FormMessage className="text-xs w-full text-end" />
-                                                            </FormItem>
-                                                        )}
+                                                        render={({ field }) => {
+                                                            // Define the company type
+                                                            type CompanyOption = {
+                                                                value: string;
+                                                                label: string;
+                                                            };
+
+                                                            // Find the selected company label to display
+                                                            const selectedCompany = companiesQuery.data?.find(
+                                                                (company: CompanyOption) => Number(company.value) === field.value
+                                                            );
+                                                            const selectedCompanyLabel = selectedCompany?.label || AddCompanyIdi8n[locale];
+
+                                                            return (
+                                                                <FormItem className="flex flex-col items-center">
+                                                                    <div className="flex w-full items-center justify-between">
+                                                                        <FormLabel className="text-lg">
+                                                                            {CompanyIdi8n[locale]}
+                                                                        </FormLabel>
+                                                                        <FormControl className="w-[50%]">
+                                                                            <Select
+                                                                                disabled={userData?.companyId !== null}
+                                                                                value={field.value?.toString() || ""}
+                                                                                onValueChange={(value) => {
+                                                                                    field.onChange(parseInt(value));
+                                                                                }}
+                                                                            >
+                                                                                <SelectTrigger className="w-full max-w-[278px]">
+                                                                                    <span>{selectedCompanyLabel}</span>
+                                                                                </SelectTrigger>
+                                                                                <SelectContent>
+                                                                                    {companiesQuery.data?.map((company: CompanyOption) => (
+                                                                                        <SelectItem
+                                                                                            key={company.value}
+                                                                                            value={company.value}
+                                                                                        >
+                                                                                            {company.label}
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </FormControl>
+                                                                    </div>
+                                                                    <FormMessage className="text-xs w-full text-end" />
+                                                                </FormItem>
+                                                            );
+                                                        }}
                                                     />
                                                 )}
                                             <FormField

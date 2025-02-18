@@ -759,7 +759,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "転送可",
   },
   SuccesfullyPermittedCartContentTransferi18n: {
-    en: "Succesfully permitted Cart content transfer",
+    en: "Successful permission granted for cart content transfer.",
     ja: "転送可",
   },
   DoYouWantToAllowThisCartToTransferItsTransactionsi18n: {

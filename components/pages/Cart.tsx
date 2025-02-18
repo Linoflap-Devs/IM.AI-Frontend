@@ -153,7 +153,7 @@ function Cart() {
     const columns: ColumnDef<CartInformation>[] = [
         {
             accessorKey: "CartCode",
-            header: cartsi18n[locale],
+            header: "Cart ID",
         },
         {
             accessorKey: "TransactionId",
@@ -182,13 +182,12 @@ function Cart() {
                 const battery: number = row.getValue("Battery");
                 return (
                     <div
-                        className={`mx-auto w-[70px] text-center rounded px-3 py-1 font-semibold text-white ${
-                            battery <= 10
-                                ? "bg-red-400"
-                                : battery <= 50
+                        className={`mx-auto w-[70px] text-center rounded px-3 py-1 font-semibold text-white ${battery <= 10
+                            ? "bg-red-400"
+                            : battery <= 50
                                 ? "bg-orange-400"
                                 : "bg-green-400"
-                        }`}
+                            }`}
                     >
                         % {battery}
                     </div>
@@ -197,7 +196,7 @@ function Cart() {
         },
         {
             accessorKey: "PushCartStatusId",
-            header: ({ column,table }) => {
+            header: ({ column, table }) => {
                 return (
                     <div className="flex flex-col items-center">
                         <Button
@@ -239,17 +238,16 @@ function Cart() {
                 const statusValue = statusValObj[status];
                 return (
                     <div
-                        className={`mx-auto rounded py-1 px-2 font-semibold text-center w-[8.9rem]  ${
-                            statusValue == Chargingi18n[locale]
-                                ? "bg-orange-400 text-white/80"
-                                : statusValue == LowBatteryi18n[locale]
+                        className={`mx-auto rounded py-1 px-2 font-semibold text-center w-[8.9rem]  ${statusValue == Chargingi18n[locale]
+                            ? "bg-orange-400 text-white/80"
+                            : statusValue == LowBatteryi18n[locale]
                                 ? "bg-red-400 text-white/80"
                                 : statusValue == Availablei18n[locale]
-                                ? "bg-green-400 text-white/80"
-                                : statusValue == Maintenancei18n[locale]
-                                ? "bg-yellow-400 text-white/80"
-                                : "bg-blue-400 text-white/80"
-                        }`}
+                                    ? "bg-green-400 text-white/80"
+                                    : statusValue == Maintenancei18n[locale]
+                                        ? "bg-yellow-400 text-white/80"
+                                        : "bg-blue-400 text-white/80"
+                            }`}
                     >
                         {statusValObj[status]}
                     </div>
@@ -265,8 +263,8 @@ function Cart() {
                 const user: string | null =
                     firstname && lastname
                         ? `${row.getValue("Firstname")} ${row.getValue(
-                              "LastName"
-                          )}`
+                            "LastName"
+                        )}`
                         : "No User";
                 return <div className="text-center font-semibold">{user}</div>;
             },
@@ -282,8 +280,8 @@ function Cart() {
                 const user: string | null =
                     firstname && lastname
                         ? `${row.getValue("Firstname")} ${row.getValue(
-                              "LastName"
-                          )}`
+                            "LastName"
+                        )}`
                         : null;
                 return (
                     <div className="flex justify-center gap-2">
@@ -363,7 +361,7 @@ function Cart() {
                                                         item.CreatedAt && (
                                                             <div>
                                                                 <p className="text-black/[.70] text-xs">{format(new Date(item.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
-                                                            </div>    
+                                                            </div>
                                                         )
                                                     }
                                                 </div>
@@ -417,7 +415,7 @@ function Cart() {
                     resetSortBtn={true}
                     columns={columns}
                     filtering={true}
-                    columnsToSearch={["CartCode"]}
+                    columnsToSearch={["CartCode", "asd", "Costumer", "FirstName", "LastName"]}
                     isLoading={cartQuery.isPending}
                     visibility={{
                         Firstname: false,
