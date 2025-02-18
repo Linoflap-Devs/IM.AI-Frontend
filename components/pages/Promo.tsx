@@ -901,7 +901,7 @@ function Promo() {
                     data={promoQuery.data ?? []}
                     isLoading={promoQuery.isPending}
                     filtering={true}
-                    columnsToSearch={["Name", "EndDate", "StartDate"]}
+                    columnsToSearch={["Name", "EndDate", "StartDate","Percentage"]}
                     pageSize={10}
                     visibility={{ PromoId: false }}
                 />
@@ -918,7 +918,7 @@ function Promo() {
                             data={promoDetailsQuery.data ?? []}
                             pageSize={10}
                             filtering={true}
-                            columnsToSearch={["Name"]}
+                            columnsToSearch={["Name","Percentage"]}
                         />
                     </div>
                 </SheetContent>

@@ -87,6 +87,7 @@ function ManageStore() {
         Uploadi18n,
         Imagei18n,
         Canceli18n,
+        Companyi8n,
         CompanyIdi8n,
         AddCompanyIdi8n,
         Continuei18n,
@@ -138,6 +139,8 @@ function ManageStore() {
                         ? globalCompanyState
                         : userData?.companyId;
 
+
+
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_API_URL}/branch/getbranches/cId/${companyId}`,
                     {
@@ -146,6 +149,7 @@ function ManageStore() {
                         },
                     }
                 );
+                console.log('Fetched Store Data:', response)
                 setFilteredStoreBranches(response.data);
                 return response.data;
             }
@@ -663,8 +667,8 @@ function ManageStore() {
                         >
                             Next
                         </Button> */}
-                            {filteredStoreBranches.length > 0 && (
-                                <div className="flex items-center justify-center gap-2">
+                        {filteredStoreBranches.length > 0 && (
+                            <div className="flex items-center justify-center gap-2">
                                 <Button
                                     variant="outline"
                                     onClick={() => goToPage(page - 1)}
