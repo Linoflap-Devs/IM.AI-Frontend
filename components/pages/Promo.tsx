@@ -86,6 +86,7 @@ function Promo() {
         Activei18n,
         Successi18n,
         SuccesfullyAddedNewPromoi18n,
+        SuccesfullyEditedPromoi18n,
         Failedi18n,
         PleaseUseADifferentPromoCodei18n,
         SuccesfullyDeletedPromoi18n,
@@ -240,7 +241,7 @@ function Promo() {
             promoQuery.refetch();
             toast({
                 title: Successi18n[locale],
-                description: SuccesfullyAddedNewPromoi18n[locale],
+                description: SuccesfullyEditedPromoi18n[locale],
             });
             setTimeout(() => {
                 setOpenDialAdd(false);
@@ -934,6 +935,9 @@ function Promo() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
+                        <AlertDialogCancel>
+                            {Canceli18n[locale]}
+                        </AlertDialogCancel>
                         <AlertDialogAction
                             disabled={!openDial}
                             onClick={() => {
@@ -942,9 +946,6 @@ function Promo() {
                         >
                             {Continuei18n[locale]}
                         </AlertDialogAction>
-                        <AlertDialogCancel>
-                            {Canceli18n[locale]}
-                        </AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

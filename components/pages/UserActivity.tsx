@@ -93,15 +93,14 @@ function UserActivity() {
 
                 return (
                     <div className="text-center">
-                        {date.toLocaleDateString(locale, {
-                            year: "numeric",
+                        {date.toLocaleString(locale, {
                             month: "long",
                             day: "numeric",
+                            year: "numeric",
                             hour: "numeric",
                             minute: "numeric",
-                            second: "numeric",
                             hour12: true,
-                        })}
+                        }).replace('at', ' |')}
                     </div>
                 );
             },
@@ -161,7 +160,7 @@ function UserActivity() {
     ];
     useEffect(() => {
         userActivityQuery.refetch();
-    },[date]);
+    }, [date]);
     return (
         <div className="mx-3 mb-3 flex w-full flex-1">
             <Card className="flex w-full flex-col gap-3 p-3">
@@ -193,7 +192,7 @@ function UserActivity() {
                                         date.to ? (
                                             <>
                                                 {format(
-                                                    date.from,
+                                                    date.to,
                                                     "LLL dd, y",
                                                     {
                                                         locale: localeExtended[
@@ -230,12 +229,12 @@ function UserActivity() {
                                 />
                             </PopoverContent>
                         </Popover>
-                        
+
                     </div>
                 </div>
                 <DataTable
                     filtering={true}
-                    columnsToSearch={["Costumer"]}
+                    columnsToSearch={["Costumer", "Activity", "Email"]}
                     resetSortBtn={true}
                     pageSize={8}
                     data={userActivityQuery.data ?? []}

@@ -659,7 +659,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "カードレポート",
   },
   SuccesfullySentACartReporti18n: {
-    en: "Succesfully sent a cart report!",
+    en: "Successfully sent a cart report!",
     ja: "カードレポートを送信しました！",
   },
   SuccessfullyAddedTheProducti18n: {
@@ -703,11 +703,11 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "製品の追加に成功しました",
   },
   SuccesfullyAddedProducti18n: {
-    en: "Succesfully added product",
+    en: "Successfully added product",
     ja: "製品の追加に成功しました",
   },
   SuccesfullyConfirmedReceivedi18n: {
-    en: "Succesfully confirmed received",
+    en: "Successfully confirmed received",
     ja: "受け取り確認に成功しました",
   },
   AcceptTransferingStocki18n: {
@@ -771,8 +771,12 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "このカードを転送しますか？",
   },
   SuccesfullyAddedNewPromoi18n: {
-    en: "Succesfully added new promo",
+    en: "Successfully added new promo",
     ja: "新しいプロモーションを追加しました",
+  },
+  SuccesfullyEditedPromoi18n: {
+    en: "Successfully updated and saved the new promo",
+    ja: "プロモーションを更新して保存しました",
   },
   Failedi18n: {
     en: "Failed",
@@ -783,7 +787,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     ja: "別のプロモーションコードを使用してください",
   },
   SuccesfullyDeletedPromoi18n: {
-    en: "Succesfully deleted promo",
+    en: "Successfully deleted promo",
     ja: "削除しました",
   },
   TINNumber: {
@@ -1129,6 +1133,7 @@ export interface I18nStore {
   SuccesfullyPermittedCartContentTransferi18n: LocalizedString;
   DoYouWantToAllowThisCartToTransferItsTransactionsi18n: LocalizedString;
   SuccesfullyAddedNewPromoi18n: LocalizedString;
+  SuccesfullyEditedPromoi18n: LocalizedString;
   Failedi18n: LocalizedString;
   PleaseUseADifferentPromoCodei18n: LocalizedString;
   SuccesfullyDeletedPromoi18n: LocalizedString;
