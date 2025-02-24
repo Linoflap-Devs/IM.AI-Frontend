@@ -56,6 +56,7 @@ function Header() {
             report: { en: "Report", ja: "レポート" },
             transactionhistory: { en: "Transaction History", ja: "取引履歴" },
             unusualtransaction: { en: "Unusual Transaction", ja: "異常取引" },
+            useractivity: { en: "User Activity", ja: "ユーザーアクティビティ" },
             deliveries: { en: "Deliveries", ja: "配達" },
             batches: { en: "Batches", ja: "バッチ" },
             /* Children */
@@ -96,7 +97,7 @@ function Header() {
             <div className="flex justify-start gap-10">
                 {session.status === "authenticated" &&
                     userData.role <= 2 &&
-                    hideFilter(currentPath, ["createacc", "useractivity"]) && (
+                    hideFilter(currentPath, ["createacc"]) && (
                         <div className="flex items-center gap-2">
                             <label className="text-lg font-medium">
                                 {Companyi18n[locale]}
@@ -109,7 +110,7 @@ function Header() {
                     userData.role <= 4 &&
                     hideFilter(currentPath, [
                         "createacc",
-                        "useractivity",
+
                         "suppliers",
                         "managestore",
                     ]) && (

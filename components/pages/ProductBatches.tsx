@@ -15,14 +15,14 @@ import { addDays, format } from "date-fns";
 import { DataTable } from "../ui/data-table";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Button } from "../ui/button";
-import { 
+import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
- } from "../ui/dialog";
+} from "../ui/dialog";
 import { useToast } from "../ui/use-toast";
 import { Sheet, SheetContent, SheetHeader } from "../ui/sheet";
 import {
@@ -54,10 +54,10 @@ interface ProductBatchesProps {
     refetchMethod: () => void;
     batchRefetchMethod: () => void;
     user: number
-    adjustmentTypeOptions?: {label: string, value: string}[]
+    adjustmentTypeOptions?: { label: string, value: string }[]
 }
 
-export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOptions = [], batchRefetchMethod}: ProductBatchesProps) {
+export function ProductBatches({ batches, refetchMethod, user, adjustmentTypeOptions = [], batchRefetchMethod }: ProductBatchesProps) {
 
     // Adjust Quantity States
     const [adjustDialogOpen, setAdjustDialogOpen] = useState(false);
@@ -88,10 +88,10 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
 
     const adjustQuantityFormSchema = z.object({
         operation: z.string().min(1, { message: "Select an operation." }),
-        quantity: z.coerce.number({invalid_type_error: "Quantity is required."}).refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." }),
+        quantity: z.coerce.number({ invalid_type_error: "Quantity is required." }).refine(value => value !== 0, { message: "Enter a quantity (cannot be zero)." }),
         adjustmentType: z.string().min(1, { message: "Select an adjustment type." }),
         notes: z.string(),
-        
+
 
     })
 
@@ -121,7 +121,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
             return response.data
         }
     })
-    
+
     const adjustmentHistoryQuery = useQuery({
         queryKey: ["batchAdjustmentHistory", selectedBatchId],
         enabled: selectedBatchId !== "",
@@ -165,7 +165,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
 
     const toStoreMutation = useMutation({
         mutationFn: async (id: string) => {
-            const response =  await axios.patch(
+            const response = await axios.patch(
                 `${process.env.NEXT_PUBLIC_API_URL}/batch/storeBatch`,
                 {
                     id: id
@@ -269,6 +269,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
         adjustmentMutation.mutate(data)
     }
 
+
     const column: ColumnDef<any>[] = [
         {
             id: "batchId",
@@ -288,26 +289,26 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
         },
         {
             accessorKey: "Initial",
-            header: () => <p className="text-end">Initial Qty</p> ,
+            header: () => <p className="text-end">Initial Qty</p>,
             cell: ({ row }) => {
                 return <p className="text-end">{row.getValue("Initial") || 0}</p>
             }
         },
         {
             accessorKey: "ExpirationDate",
-            header: ({table}) => {
+            header: ({ table }) => {
                 return (
                     <Button
                         variant="ghost"
                         className="flex items-center gap-1 justify-center mx-0 px-0"
-                        onClick={ () => {
+                        onClick={() => {
                             table.getColumn("ExpirationDate")?.toggleSorting(
                                 table.getColumn("ExpirationDate")?.getIsSorted() === 'asc'
                             )
                         }}
                     >
                         <span>Expiration Date</span>
-                        <ArrowUpDown size={16} />                            
+                        <ArrowUpDown size={16} />
                     </Button>
                 )
             },
@@ -328,15 +329,15 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
             header: "Status",
             cell: ({ row }) => {
                 const expiry: string = row.getValue("ExpirationDate");
-                const status: string =  row.getValue("Quantity") == 0 ? "Completed"
-                                        : new Date(expiry) < new Date() 
-                                        ? "Expired" 
-                                        : new Date(expiry) <= addDays(new Date(), 30) 
-                                        ? "Near-Expiry" 
-                                        : "In-Stock";
+                const status: string = row.getValue("Quantity") == 0 ? "Completed"
+                    : new Date(expiry) < new Date()
+                        ? "Expired"
+                        : new Date(expiry) <= addDays(new Date(), 30)
+                            ? "Near-Expiry"
+                            : "In-Stock";
                 return (
-                    <span className={`p-1 font-semibold rounded text-sm ${status == "Completed" ? "bg-blue-100 text-blue-800" : status == "In-Stock" ? "bg-green-100 text-green-800" : status== "Near-Expiry" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
-                       {status}
+                    <span className={`p-1 font-semibold rounded text-sm ${status == "Completed" ? "bg-blue-100 text-blue-800" : status == "In-Stock" ? "bg-green-100 text-green-800" : status == "Near-Expiry" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"}`}>
+                        {status}
                     </span>
                 );
             }
@@ -352,7 +353,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                 }
                 return (
                     <span className={`p-1 font-semibold rounded text-sm ${classes(row.getValue("LocationStatus"))}`}>
-                       {row.getValue("LocationStatus") || "Unknown"}
+                        {row.getValue("LocationStatus") || "Unknown"}
                     </span>
                 );
             }
@@ -368,82 +369,82 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
             id: "actions",
             enableHiding: false,
             cell: ({ row }: any) => {
-              const record = row.original;
-              return (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Open menu</span>
-                      <Ellipsis className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {
-                        row.getValue("LocationStatus") == "In Storage" ? (
+                const record = row.original;
+                return (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <Ellipsis className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {
+                                row.getValue("LocationStatus") == "In Storage" ? (
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            toDisplayMutation.mutate(record.Id)
+                                        }}
+                                    >
+                                        <div className="flex justify-between w-full items-center">
+                                            <p>Move to Shelves</p>
+                                            <ArrowsUpFromLine size={12} color="currentColor" />
+                                        </div>
+                                    </DropdownMenuItem>
+                                ) : (
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            toStoreMutation.mutate(record.Id)
+                                        }}
+                                    >
+                                        <div className="flex justify-between w-full items-center">
+                                            <p>Move to Storage</p>
+                                            <Box size={12} color="currentColor" />
+                                        </div>
+                                    </DropdownMenuItem>
+                                )
+                            }
                             <DropdownMenuItem
-                            onClick={() => {
-                                toDisplayMutation.mutate(record.Id)
-                            }}
+                                onClick={() => {
+                                    handleRemarksClick(row.getValue("batchId"))
+                                    setSelectedBatchName(row.getValue("BatchNo"))
+                                }}
                             >
                                 <div className="flex justify-between w-full items-center">
-                                    <p>Move to Shelves</p>
-                                    <ArrowsUpFromLine size={12} color="currentColor" />  
+                                    <p>View Remarks</p>
+                                    <MessageSquareText size={12} color="currentColor" />
                                 </div>
                             </DropdownMenuItem>
-                        ) : (
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem
-                            onClick={() => {
-                                toStoreMutation.mutate(record.Id)
-                            }}
+                                onClick={() => {
+                                    setSelectedBatchId(row.getValue("batchId"))
+                                    setSelectedBatchName(row.getValue("BatchNo"))
+                                    setCurrentQuantity(row.getValue("Quantity"))
+                                    setCurrentLocation(row.getValue("LocationStatus"))
+                                    setAdjustDialogOpen(true)
+                                }}
                             >
                                 <div className="flex justify-between w-full items-center">
-                                    <p>Move to Storage</p>
-                                    <Box size={12} color="currentColor" />  
+                                    <p>Adjust Quantity</p>
+                                    <SquarePen size={12} color="currentColor" />
                                 </div>
                             </DropdownMenuItem>
-                        )
-                    }
-                    <DropdownMenuItem
-                        onClick={() => {
-                            handleRemarksClick(row.getValue("batchId"))
-                            setSelectedBatchName(row.getValue("BatchNo"))
-                        }}
-                    >
-                        <div className="flex justify-between w-full items-center">
-                            <p>View Remarks</p>
-                            <MessageSquareText size={12} color="currentColor" />  
-                        </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        onClick={() => {
-                            setSelectedBatchId(row.getValue("batchId"))
-                            setSelectedBatchName(row.getValue("BatchNo"))
-                            setCurrentQuantity(row.getValue("Quantity"))
-                            setCurrentLocation(row.getValue("LocationStatus"))
-                            setAdjustDialogOpen(true)
-                        }}
-                    >
-                        <div className="flex justify-between w-full items-center">
-                            <p>Adjust Quantity</p>
-                            <SquarePen size={12} color="currentColor" />  
-                        </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() => {
-                            setSelectedBatchId(row.getValue("batchId"))
-                            setSelectedBatchName(row.getValue("BatchNo"))
-                            setAdjustSheetOpen(true)
-                        }}
-                    >
-                        <div className="flex justify-between w-full items-center">
-                            <p>Adjustment History</p>
-                            <Clock size={12} color="currentColor" />  
-                        </div>
-                    </DropdownMenuItem>
-                    {/* <DropdownMenuSeparator /> 
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    setSelectedBatchId(row.getValue("batchId"))
+                                    setSelectedBatchName(row.getValue("BatchNo"))
+                                    setAdjustSheetOpen(true)
+                                }}
+                            >
+                                <div className="flex justify-between w-full items-center">
+                                    <p>Adjustment History</p>
+                                    <Clock size={12} color="currentColor" />
+                                </div>
+                            </DropdownMenuItem>
+                            {/* <DropdownMenuSeparator /> 
                     <DropdownMenuItem
                       onClick={() => {
                       }}
@@ -454,9 +455,9 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                           <Trash size={12} color="currentColor" />  
                         </div>
                     </DropdownMenuItem> */}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              );
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                );
             },
         }
     ];
@@ -489,7 +490,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                         <span className={`py-1 px-2 rounded ${isPositive ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
                             {isPositive ? `+` : `-`} {Math.abs(row.getValue("Quantity"))}
                         </span>
-                        
+
                     </p>
                 )
             }
@@ -502,6 +503,22 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                     <p className="text-end">
                         {row.getValue("Total")}
                     </p>
+                );
+            }
+        },
+        {
+            accessorKey: "Location",
+            header: "Location",
+            cell: ({ row }) => {
+                const classes = (status: string) => {
+                    if (status == "On Display") return "bg-green-100 text-green-800";
+                    if (status == "In Storage") return "bg-orange-100 text-orange-800";
+                    return "bg-gray-100 text-gray-800"
+                }
+                return (
+                    <span className={`p-1 font-semibold rounded text-sm ${classes(row.getValue("Location"))}`}>
+                        {row.getValue("Location") || "Unknown"}
+                    </span>
                 );
             }
         },
@@ -521,22 +538,6 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
             }
         },
         {
-            accessorKey: "Location",
-            header: "Location",
-            cell: ({ row }) => {
-                const classes = (status: string) => {
-                    if (status == "On Display") return "bg-green-100 text-green-800";
-                    if (status == "In Storage") return "bg-orange-100 text-orange-800";
-                    return "bg-gray-100 text-gray-800"
-                }
-                return (
-                    <span className={`p-1 font-semibold rounded text-sm ${classes(row.getValue("Location"))}`}>
-                       {row.getValue("Location") || "Unknown"}
-                    </span>
-                );
-            }
-        },
-        {
             accessorKey: "CreatedAt",
             header: "Date",
             cell: ({ row }) => {
@@ -546,7 +547,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
         {
             accessorKey: "Notes",
             header: "Remarks",
-            cell: ({row}) => {
+            cell: ({ row }) => {
                 return (
                     <TooltipProvider delayDuration={0}>
                         <Tooltip>
@@ -559,7 +560,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="top" align="end">
-                            <p className="max-w-[200px]">{row.getValue("Notes")}</p>
+                                <p className="max-w-[200px]">{row.getValue("Notes")}</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -567,16 +568,17 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
             }
         }
     ]
+
     return (
         <>
-            
+
             <Dialog
                 open={adjustDialogOpen}
                 onOpenChange={() => {
                     setAdjustDialogOpen(false)
                     adjustQuantityForm.reset()
                 }}
-            >  
+            >
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Adjust Quantity</DialogTitle>
@@ -592,28 +594,45 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                 name="operation"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col items-center">
-                                         <div className="flex w-full items-center justify-between">
+                                        <div className="flex w-full items-center justify-between">
                                             <FormLabel className="">
                                                 Adjustment Type
                                             </FormLabel>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                value={field.value}
-                                                
-                                            >
-                                                <FormControl className="w-[60%]">
-                                                    <SelectTrigger>
-                                                        <SelectValue
-                                                            placeholder="Select type of adjustment"
-                                                        />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="+">Add Quantity</SelectItem>
-                                                    <SelectItem value="-">Remove Quantity</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                         </div>
+                                            <div className="w-[60%]">
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        // Add validation before setting the value
+                                                        if (value === "-" && currentQuantity === 0) {
+                                                            toast({
+                                                                title: "Error",
+                                                                description: "Cannot remove quantity when batch is completed",
+                                                                variant: "destructive"
+                                                            });
+                                                            return;
+                                                        }
+                                                        field.onChange(value);
+                                                    }}
+                                                    value={field.value}
+                                                >
+                                                    <FormControl className="w-full">
+                                                        <SelectTrigger>
+                                                            <SelectValue
+                                                                placeholder="Select type of adjustment"
+                                                            />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="+">Add Quantity</SelectItem>
+                                                        <SelectItem
+                                                            value="-"
+                                                            className={currentQuantity === 0 ? "opacity-50 cursor-not-allowed" : ""}
+                                                        >
+                                                            Remove Quantity
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
                                         <FormMessage className="text-xs w-full text-end" />
                                     </FormItem>
                                 )}
@@ -672,7 +691,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                                 />
                                             </FormControl>
                                         </div>
-                                        <FormMessage className="text-xs w-full text-end"/>
+                                        <FormMessage className="text-xs w-full text-end" />
                                     </FormItem>
                                 )}
                             />
@@ -685,7 +704,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                             <FormLabel className="">
                                                 Adjustment Remarks
                                             </FormLabel>
-                                           
+
                                         </div>
                                         <FormControl className="w-full">
                                             <Textarea
@@ -698,7 +717,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                     </FormItem>
                                 )}
                             />
-                            
+
                             <div className="flex justify-end">
                                 <Button type="submit" disabled={adjustmentLoading}>
                                     {adjustmentLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirm"}
@@ -733,23 +752,23 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                     </SheetHeader>
                     <div className="flex w-full flex-1 overflow-y-scroll flex-col gap-3 py-5 px-3">
                         {
-                            remarksQuery.isLoading ? 
-                            <LoaderComponent></LoaderComponent> :
-                            remarksQuery.data?.length > 0 ? (
-                                remarksQuery.data?.map((remark: any, i: number) => {
-                                    return (
-                                        <div className={`flex flex-col gap-2 ${i == remarksQuery.data.length - 1 ? "" : "border-b pb-2"}`}>
-                                            <p className="text-sm font-semibold">{`${capitalFirst(remark.FirstName)} ${capitalFirst(remark.LastName)}`}</p>
-                                            <p className="text-sm">{remark.BatchRemarkText}</p>
-                                            <p className="text-end text-sm text-muted-foreground">{format(new Date(remark.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
-                                        </div>
-                                    )
-                                })
-                            ):(
-                                <div className="flex h-full w-full items-center justify-center">
-                                    <p>No remarks.</p>
-                                </div>
-                            )
+                            remarksQuery.isLoading ?
+                                <LoaderComponent></LoaderComponent> :
+                                remarksQuery.data?.length > 0 ? (
+                                    remarksQuery.data?.map((remark: any, i: number) => {
+                                        return (
+                                            <div className={`flex flex-col gap-2 ${i == remarksQuery.data.length - 1 ? "" : "border-b pb-2"}`}>
+                                                <p className="text-sm font-semibold">{`${capitalFirst(remark.FirstName)} ${capitalFirst(remark.LastName)}`}</p>
+                                                <p className="text-sm">{remark.BatchRemarkText}</p>
+                                                <p className="text-end text-sm text-muted-foreground">{format(new Date(remark.CreatedAt), "MMM dd, yyyy | hh:mm a")}</p>
+                                            </div>
+                                        )
+                                    })
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center">
+                                        <p>No remarks.</p>
+                                    </div>
+                                )
                         }
                     </div>
                     <div className="flex gap-3 py-5 pb-2 border-t w-full">
@@ -759,7 +778,7 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                                     control={form.control}
                                     name="remarks"
                                     render={({ field }) => (
-                                        <FormItem className="w-full"> 
+                                        <FormItem className="w-full">
                                             <FormControl>
                                                 <Textarea
                                                     placeholder="Enter Remarks"
@@ -790,28 +809,28 @@ export function ProductBatches({batches, refetchMethod, user, adjustmentTypeOpti
                     </SheetHeader>
                     <div className="flex w-full flex-1 overflow-y-scroll flex-col gap-3 py-5 px-1">
                         {
-                            adjustmentHistoryQuery.isLoading ? 
-                            <LoaderComponent></LoaderComponent> :
-                            adjustmentHistoryQuery.data?.length > 0 ? (
-                                <DataTable
-                                    columns={adjustmentColumns}
-                                    pagination={true}
-                                    data={adjustmentHistoryQuery.data ?? []}
-                                    pageSize={10}
-                                    filtering={true}
-                                    columnsToSearch={["StockAdjustmentType", "FirstName", "LastName", "AdjustmentType"]}
-                                    visibility={
-                                        {
-                                            FirstName: false,
-                                            LastName: false
+                            adjustmentHistoryQuery.isLoading ?
+                                <LoaderComponent></LoaderComponent> :
+                                adjustmentHistoryQuery.data?.length > 0 ? (
+                                    <DataTable
+                                        columns={adjustmentColumns}
+                                        pagination={true}
+                                        data={adjustmentHistoryQuery.data ?? []}
+                                        pageSize={10}
+                                        filtering={true}
+                                        columnsToSearch={["StockAdjustmentType", "FirstName", "LastName", "AdjustmentType"]}
+                                        visibility={
+                                            {
+                                                FirstName: false,
+                                                LastName: false
+                                            }
                                         }
-                                    }
-                                />
-                            ):(
-                                <div className="flex h-full w-full items-center justify-center">
-                                    <p>No adjustments.</p>
-                                </div>
-                            )
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center">
+                                        <p>No adjustments.</p>
+                                    </div>
+                                )
                         }
                     </div>
                 </SheetContent>
