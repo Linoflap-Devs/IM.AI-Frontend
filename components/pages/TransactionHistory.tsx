@@ -166,7 +166,6 @@ function TransactionHistory() {
                                         setSelectedTransactionParent({
                                             ReferenceNumber: row.getValue("ReferenceNumber"),
                                             CreatedAt: row.getValue("CreatedAt"),
-                                            Price: row.getValue("Price")
                                         })
                                         setOpen(true)
                                     }}
@@ -515,17 +514,26 @@ function TransactionHistory() {
                                     </div>
                                     <div className="flex flex-row justify-between items-center">
                                         <p className="">Total Price</p>
-                                        <p className="font-semibold text-right p-1">{CurrencyMarker[locale]}{parseInt(selectedTransactionParent.Price || "0").toFixed(2)}</p>
+                                        <p className="font-semibold text-right p-1">
+                                            {CurrencyMarker[locale]}
+                                            {getTransactionQuery.data
+                                                ?.reduce(
+                                                    (total: number, item: { Price: number; Quantity: number }) =>
+                                                        total + (item.Price * item.Quantity),
+                                                    0
+                                                )
+                                                .toFixed(2)}
+                                        </p>
                                     </div>
                                 </div>
                             )
                         }
-                        <p className="font-semibold">Items</p>
+                        <p className="font-semibold">Items: {getTransactionQuery.data ? getTransactionQuery.data.length : 0}</p>
                         <DataTable
                             columns={transactionDetailColumns}
                             pagination={true}
                             data={getTransactionQuery.data ?? []}
-                            pageSize={10}
+                            pageSize={5}
                             filtering={true}
                             isLoading={getTransactionQuery.isLoading}
                             columnsToSearch={["Name", "PushCartId"]}

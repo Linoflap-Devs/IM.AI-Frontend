@@ -577,7 +577,7 @@ function Reports() {
                             columns={transactionDetailColumns}
                             pagination={true}
                             data={getTransactionQuery.data ?? []}
-                            pageSize={10}
+                            pageSize={5}
                             filtering={true}
                             isLoading={getTransactionQuery.isLoading}
                             columnsToSearch={["Name"]}
