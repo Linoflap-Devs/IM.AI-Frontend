@@ -386,7 +386,7 @@ function Reports() {
     const transactionDetailColumns: ColumnDef<any>[] = [
         {
             accessorKey: "Name",
-            header: "Name"
+            header: "Product Name"
         },
         {
             accessorKey: "Price",
