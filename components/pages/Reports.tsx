@@ -386,7 +386,7 @@ function Reports() {
     const transactionDetailColumns: ColumnDef<any>[] = [
         {
             accessorKey: "Name",
-            header: "Name"
+            header: "Product Name"
         },
         {
             accessorKey: "Price",
@@ -577,7 +577,7 @@ function Reports() {
                             columns={transactionDetailColumns}
                             pagination={true}
                             data={getTransactionQuery.data ?? []}
-                            pageSize={10}
+                            pageSize={5}
                             filtering={true}
                             isLoading={getTransactionQuery.isLoading}
                             columnsToSearch={["Name"]}
