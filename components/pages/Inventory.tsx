@@ -141,7 +141,14 @@ function Inventory() {
         Successi18n,
         BatchNo,
         InventoryI18n,
-        Availability
+        Availability,
+        Valid,
+        NearExpiry,
+        Expired,
+        BranchNamei18n,
+        ProductID,
+        NeedToRestock,
+        InStock
     } = useI18nStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -418,7 +425,9 @@ function Inventory() {
         
         {
             accessorKey: "ProductId",
-            id: "id"
+            header: () => <span>{ProductID[locale]}</span>,
+            id: "id",
+
         },
         {
             accessorKey: "Name",
@@ -466,14 +475,14 @@ function Inventory() {
         },
         {
             accessorKey: "CategoryName",
-            header: "Category",
+            header: () => <span>{Categoryi18n[locale]}</span>,
             cell: ({ row }) => {
                 return row.getValue("CategoryName") || "N/A"
             }
         },
         {
             accessorKey: "BranchName",
-            header: "Branch"
+            header: () => <span>{BranchNamei18n[locale]}</span>,
         },
         {
             accessorKey: "Total_Quantity",
@@ -502,7 +511,7 @@ function Inventory() {
         },
         {
             accessorKey: "Valid",
-            header: () => <div className="text-right">Valid</div>,
+            header: () => <div className="text-right">{Valid[locale]}</div>,
             cell: ({ row }) => {
                 const quantity: number = row.getValue("Valid");
                 return <div className={`text-right ${ quantity > 0 && "text-green-600 font-semibold"  || "" }`}>{quantity || 0}</div>;
@@ -510,7 +519,7 @@ function Inventory() {
         },
         {
             accessorKey: "NearExpiry",
-            header: () => <div className="text-right">Near Expiry</div>,
+            header: () => <div className="text-right">{NearExpiry[locale]}</div>,
             cell: ({ row }) => {
                 const quantity: number = row.getValue("NearExpiry");
                 return <div className={`text-right ${ quantity > 0 && "text-yellow-600 font-semibold"  || "" }`}>{quantity || 0}</div>;
@@ -518,7 +527,7 @@ function Inventory() {
         },
         {
             accessorKey: "Expired",
-            header: () => <div className="text-right">Expired</div>,
+            header: () => <div className="text-right">{Expired[locale]}</div>,
             cell: ({ row }) => {
                 const quantity: number = row.getValue("Expired");
                 return <div className={`text-right ${ quantity > 0 && "text-red-600 font-semibold"  || "" }`}>{quantity || 0}</div>;
@@ -565,8 +574,8 @@ function Inventory() {
                         {quantity <= criticalLevel
                             ? ReStockImmediatelyi18n[locale]
                             : quantity <= reorderLevel
-                                ? "Need to Re-Stock"
-                                : "In-Stock"}
+                                ? NeedToRestock[locale]
+                                : InStock[locale]}
                     </div>
                 );
             },
@@ -657,6 +666,10 @@ function Inventory() {
                             if(value == "Out of Stocks") return "bg-red-100 text-red-800"
                             if(value == "Near-Expiry Products") return "bg-yellow-50 text-yellow-600"
                             if(value == "Expired Products") return "bg-gray-200 text-gray-600"
+                        }
+
+                        const title = (key: string) => {
+                            if(key == "Available Products") return "Available Products"
                         }
 
                         const filter = () => {

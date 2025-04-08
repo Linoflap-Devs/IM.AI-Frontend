@@ -883,6 +883,36 @@ export const useI18nStore = create<I18nStore>((set) => ({
     en: "Request",
     ja: "リクエスト",
   },
+
+  Valid: {
+    en: "Valid",
+    ja: "有効",
+  },
+  
+  NearExpiry: {
+    en: "Near Expiry",
+    ja: "期限切れ間近",
+  },
+
+  Expired: {
+    en: "Expired",
+    ja: "期限切れ"
+  },
+
+  ProductID: {
+    en: "Product ID",
+    ja: "製品番号"
+  },
+
+  InStock: {
+    en: "In-Stock",
+    ja: "在庫"
+  },
+
+  NeedToRestock: {
+    en: "Need to restock",
+    ja: "在庫不足"
+  }
 }));
 export interface I18nStore {
   locale: locale;
@@ -1159,4 +1189,10 @@ export interface I18nStore {
     ja: (category: string) => string;
   };
   Request: LocalizedString;
+  Valid: LocalizedString;
+  NearExpiry: LocalizedString; 
+  Expired: LocalizedString;
+  ProductID: LocalizedString;
+  InStock: LocalizedString;
+  NeedToRestock: LocalizedString;
 }

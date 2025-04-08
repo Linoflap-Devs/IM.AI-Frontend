@@ -93,6 +93,7 @@ function Products(productId: { productId: string}) {
                 return response.data;
             }
         },
+        refetchInterval: 3000
     })
 
     const lookupProductTransactions = useQuery({
