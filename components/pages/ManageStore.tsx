@@ -87,7 +87,6 @@ function ManageStore() {
         Uploadi18n,
         Imagei18n,
         Canceli18n,
-        Companyi8n,
         CompanyIdi8n,
         AddCompanyIdi8n,
         Continuei18n,

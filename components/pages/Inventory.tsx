@@ -242,7 +242,8 @@ function Inventory() {
                 return response.data;
             }
         },
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false,
+        refetchInterval: 3000
     });
 
     const getSuppliersQuery = useQuery({
@@ -320,12 +321,32 @@ function Inventory() {
         }
     })
 
+    function generateDateWithRandomNumbers() {
+        // Get current date
+        const now = new Date();
+        
+        // Format date as YYYYMMDD
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateString = `${year}${month}${day}`;
+        
+        // Generate 6 random digits
+        let randomNumbers = '';
+        for (let i = 0; i < 6; i++) {
+          randomNumbers += Math.floor(Math.random() * 10);
+        }
+        
+        // Combine and return
+        return dateString + randomNumbers;
+      }
+
     const addTransaction = useMutation({
         mutationFn: async (data: z.infer<typeof transactionSchema>) => {
             console.log(data);
-            const random = randomBytes(4).toString("hex");
+            const random = Number(randomBytes(8));
             const price = getStocksquery.data.find((stock: any) => stock.ProductId == data.productName)?.Price
-            const refNo = "REF" + random
+            const refNo = generateDateWithRandomNumbers()
             const response = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/transaction/testTransaction`,
                 {
